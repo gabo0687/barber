@@ -1,0 +1,1043 @@
+2023-09-10 17:20:45 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/beard.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:20:45 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/waze.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:20:45 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/whatsapp.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:21:04 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/beard.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:21:04 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/waze.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:21:04 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/whatsapp.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:21:42 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/waze.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:21:42 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/beard.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:21:42 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/whatsapp.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/script.js
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/jquery-3.7.0.min.js
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/styles.css
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/gear.svg
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/beard.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/whatsapp.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:22:49 Error: [MissingControllerException] Controller class ImgController could not be found.
+Exception Attributes: array (
+  'class' => 'ImgController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/img/layout/waze.png
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:10 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:10 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:19 Error: [MissingControllerException] Controller class Account.phpController could not be found.
+Exception Attributes: array (
+  'class' => 'Account.phpController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/account.php
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:19 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:19 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:24:24 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:07 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:07 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:08 Error: [MissingControllerException] Controller class AccountController could not be found.
+Exception Attributes: array (
+  'class' => 'AccountController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:09 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:09 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:13 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:13 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:13 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:13 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:13 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:14 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:14 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:15 Error: [MissingControllerException] Controller class AccountController could not be found.
+Exception Attributes: array (
+  'class' => 'AccountController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:15 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:15 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:17 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:17 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:17 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:17 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:18 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:18 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:18 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:25 Error: [MissingControllerException] Controller class AccountController could not be found.
+Exception Attributes: array (
+  'class' => 'AccountController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:25 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:25:25 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:26:00 Error: [MissingViewException] View file "Pages\account.ctp" is missing.
+Exception Attributes: array (
+  'file' => 'Pages\\account.ctp',
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\View\View.php(470): View->_getViewFileName('Pages\\account')
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(973): View->render('account', NULL)
+#2 C:\xampp8\htdocs\barberia\barber\app\Controller\PagesController.php(72): Controller->render('account')
+#3 [internal function]: PagesController->display('account')
+#4 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(500): ReflectionMethod->invokeArgs(Object(PagesController), Array)
+#5 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#6 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#7 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#8 {main}
+2023-09-10 17:26:00 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:26:00 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:26:22 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:26:22 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:26:24 Error: [MissingViewException] View file "Pages\account.ctp" is missing.
+Exception Attributes: array (
+  'file' => 'Pages\\account.ctp',
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\View\View.php(470): View->_getViewFileName('Pages\\account')
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(973): View->render('account', NULL)
+#2 C:\xampp8\htdocs\barberia\barber\app\Controller\PagesController.php(72): Controller->render('account')
+#3 [internal function]: PagesController->display('account')
+#4 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(500): ReflectionMethod->invokeArgs(Object(PagesController), Array)
+#5 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#6 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#7 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#8 {main}
+2023-09-10 17:26:24 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:26:25 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:27:32 Error: [MissingActionException] Action PagesController::display() could not be found.
+Exception Attributes: array (
+  'controller' => 'PagesController',
+  'action' => 'display',
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:27:32 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:27:32 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:27:51 Error: [MissingActionException] Action PagesController::display() could not be found.
+Exception Attributes: array (
+  'controller' => 'PagesController',
+  'action' => 'display',
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:27:51 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:27:51 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:28:06 Error: [MissingActionException] Action PagesController::account() could not be found.
+Exception Attributes: array (
+  'controller' => 'PagesController',
+  'action' => 'account',
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:28:06 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:28:06 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:28:21 Error: [MissingViewException] View file "Pages\account.ctp" is missing.
+Exception Attributes: array (
+  'file' => 'Pages\\account.ctp',
+)
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\View\View.php(470): View->_getViewFileName('Pages\\account')
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(973): View->render(NULL, NULL)
+#2 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(200): Controller->render()
+#3 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#4 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
+2023-09-10 17:28:21 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:28:21 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:29:10 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:29:10 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:29:55 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/jquery/jquery.min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:29:55 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:03 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:04 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:04 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:08 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:30:08 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:30:10 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/jquery/jquery.min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:10 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:41 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/jquery/jquery.min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:41 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:44 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/jquery/jquery.min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:44 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:30:46 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:30:46 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:31:21 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:31:21 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:31:25 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:31:27 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:31:27 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:01 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/jquery/jquery.min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:33:01 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:33:02 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:02 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:27 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/jquery/jquery.min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:33:27 Error: [MissingActionException] Action AppController::webroot() could not be found.
+Exception Attributes: array (
+  'controller' => 'AppController',
+  'action' => 'webroot',
+)
+Request URL: /barberia/barber/app/webroot/calendar/components/underscore/underscore-min.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(AppController), Object(CakeRequest))
+#2 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#3 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-10 17:33:29 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
