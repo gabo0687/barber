@@ -5,7 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>A lo fresa</title>
-    
+<link rel="icon" type="image/png" sizes="16x16"  href="img/layout/favicon-16x16.png">
+<meta name="msapplication-TileColor" content="#ffffff">
+<meta name="theme-color" content="#ffffff">
+
 <script type="text/javascript" src="js/jquery-3.7.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
@@ -15,9 +18,10 @@
 
   
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
-  <link rel="stylesheet" href="/resources/demos/style.css">
+
 <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
 <link href="css/styles.css" rel="stylesheet" type="text/css">
+<link href="css/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
 
 </head>
 
@@ -30,13 +34,17 @@
             </div>         
                 <a class="logo" href="index.php"></a>
                 <div class="user">
-                    <div class="username"><a class="user-edit" href="account">Nombre de usuario <img src="img/layout/gear.svg"></a> | <a class="logout">Logout</a> <a data-bs-toggle="modal" data-bs-target="#login">Ingreso</a> </div>
+                    <div class="username"><?php if($user != ''){ ?><a class="user-edit" href="account"><?php echo $user;?> <img src="img/layout/gear.svg"></a> | <a class="logout" href="logout">Logout</a> <?php }else{ ?><a data-bs-toggle="modal" data-bs-target="#login">Ingreso</a><?php } ?> </div>
                 </div>
                 <form class="header-search">   
-			        <div class="event-info-buttons"> 
+			       <?php if( $user != '' ){ ?>
+                <div class="event-info-buttons"> 
               <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
+              <?php if( $user == 'Berman' ){?>
               <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
+              <?php } ?>
               </div>
+              <?php } ?>
             </form>
         
         </div>
@@ -66,10 +74,10 @@
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form action="login" method="POST">
           <div class="form-group">
             <label for="loginInputEmail1">Email</label>
-            <input type="email" class="form-control" id="loginInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            <input type="text" name="user" class="form-control" id="loginInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
           </div>
           <div class="form-group">
             <label for="loginInputPassword1">Contraseña</label>
@@ -77,7 +85,7 @@
           </div>
             <div class="form-group text-right">                
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
-              <button type="button" class="btn btn-primary">Ingresar</button>
+              <button type="submit" class="btn btn-primary">Ingresar</button>
             </div>
             
             <div class="form-group text-right">
@@ -134,9 +142,10 @@
       </div>
       <div class="modal-body">
         <label>Seleccione la fecha que deseas reservar</label>
-        <input class="form-control" type="text" onfocus="changeReservationDate()" placeholder="MM/DD/YYYY" name="fecha_reserva" id="fecha_reserva">
-       
-        <span class="description">Cliente:</span>                
+        <input class="form-control" type="text" onfocus="changeReservationDate()" placeholder="09/12/2023" name="fecha_reserva" id="fecha_reserva">
+      
+        <?php if( $user == 'Berman' ){ ?>  
+      <span class="description">Cliente:</span>                
       <span class="tax">
 
         <input type="search" list="clients" class="form-control" name="client" placeholder="Escribe el nombre del cliente">
@@ -147,9 +156,9 @@
           <option value="3 - Eithzan Aguilar | +50683589621" />
           <option value="4 - Abigail Aguilar | +50683459127" />
         </datalist>
+      </span>
+      <?php } ?>
 
-                      
-                      </span>  
       <span class="description">Servicio:</span>
       <span class="tax">
                       <select class="form-control">
@@ -168,7 +177,7 @@
       </span>             
       <span class="description">Escoger hora:</span>
       <span class="tax">
-                      <select class="form-control">               
+                      <select class="form-control" onchange="notificationTime(this.value)">               
       <?php 
       $time_hour = 8;
       $time_minute = '00';
@@ -185,7 +194,16 @@
       } 
       ?>  
          </select>
-      </span>    
+      </span>  
+      <div id="notificaciones_check" style="display:none">
+      </br>
+      <span class="tax">
+      <input checked type="checkbox" />
+      </span> 
+      <span class="description" id="notificaciones_text"><b>Notificarme si se libera un espacio en el rango de 8:00 a 9:00 para el Martes 12 de Setiembre 2023</b></span>
+      </br><button type="button" class="btn btn-success"><a>Guardar Notificación</a></button>
+      </br>
+      </div>
       </br>
       <label><b>Espacios para hoy CORTE DE PELO:</b></label>
           <ul class="ticket-list">
@@ -196,9 +214,23 @@
                    <span class="price">Tiempo: 1 hora</span>
                   <span class="price">Precio: ₡10.000</span>
                   <span class="price">Barberos disponibles:</span>
-                  <span class="price"><input type="radio" name="barbero" id="barbero1">Joss</span>
+                  <span class="price">
+                  <input type="radio" name="barbero" id="barbero1">Berman
+                  <input type="radio" name="barbero" id="barbero1">Dey
+                  <input type="radio" name="barbero" id="barbero1">Joss</span>
                   <button type="button" class="btn btn-secondary"><a>Reservar</a></button>
-              </li>    
+              </li>  
+              <li class="ticket-on-sale">
+                  <span class="number">Hora: 8:15</span>
+                  <span class="price">Servicio: Corte de Pelo</span>
+                   <span class="price">Tiempo: 1 hora</span>
+                  <span class="price">Precio: ₡10.000</span>
+                  <span class="price">Barberos disponibles:</span>
+                  <span class="price">
+                  <input type="radio" name="barbero" id="barbero1">Berman
+                  <input type="radio" name="barbero" id="barbero1">Dey</span>
+                  <button type="button" class="btn btn-secondary"><a>Reservar</a></button>
+              </li>   
                 
           </ul>
       </div>
@@ -208,6 +240,15 @@
 </body>
 </html>
 <script>
+
+function notificationTime(time){
+  $('#notificaciones_check').show();
+  var time = time.split(':');
+  var timeTo = parseFloat(time[0]) + 1; 
+  var timeFrom = parseFloat(time[0]) -1; 
+  $("#notificaciones_text").html('<b>Notificarme si se libera un espacio en el rango de '+timeFrom+':00 a '+timeTo+':00 para el Martes 12 de Setiembre 2023</b>');
+}
+
   function changeDate(){
     $('#fecha_reserva_admin').attr('type','date');
     setTimeout(() => {
