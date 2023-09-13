@@ -41,7 +41,7 @@ body {
     border: none;
     border-radius: 0.5em;
     display: inline-block;
-    background-color: var(--dark-hover);
+    background-color: rgb(162, 33, 33);
 }
 .login{
     max-width: 640px;
@@ -443,7 +443,7 @@ footer {
     background-color: #ffffff;
 }
 .cart-item .cart-item-remove:hover{
-    background-color: var(--dark-hover);
+    background-color: rgb(162, 33, 33);
 }
 .cart-total{
     flex-grow: 1;
@@ -507,7 +507,7 @@ thead th{
 }
 .nav-pills .nav-link:hover{
     
-    background-color: var(--dark-hover);
+    background-color: rgb(162, 33, 33);
 }
 
 /*    RESPONSIVES: */

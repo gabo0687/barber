@@ -8,6 +8,8 @@ Profesionales en cuidado personal para caballero</span></p>
 </p>
 
 </section>
+
+<?php if( $user == 'Berman' ){ ?>
 <label style="color:white">Seleccione la fecha que desea consultar</label>
 <input  placeholder="MM/DD/YYYY" onfocus="changeDate()" class="form-control" type="text" name="fecha_reserva_admin" id="fecha_reserva_admin">
 </br>
@@ -17,12 +19,16 @@ Profesionales en cuidado personal para caballero</span></p>
     <option value="1">Berman</option>
     <option value="2">Joss</option>
     <option value="3">Dey</option>
-</select>    
+</select>  
+<?php 
+}
+if( $user != '' ){ ?>  
 </br>    
         <section class="event-list-section">
             <ul class="eventlist" id="eventlist">
-              
+            <h1 style="color:white">Citas Activas</h1>
                 <li>
+                
                     <span class="event-list-item-content">
                     <div class="event-list-info">
                         <h3>Corte de pelo</h3>
@@ -45,8 +51,11 @@ Profesionales en cuidado personal para caballero</span></p>
                     <p>Subir comprobante de pago:</p>    
                     <input type="file"  class="form-control" name="comprobante" id="comprobante">
                     </br>  
+                    <?php if( $user == 'Berman' ){ ?>
                     <button type="button" class="btn btn-success"><a>Cita finalizada</a></button>
+                    <?php }else{ ?>
                     <button type="button" class="btn btn-secondary"><a>Confirmar Cita</a></button>
+                    <?php } ?>
                     <button type="button" class="btn btn-danger"><a>Cancelar Cita</a></button>
                     </div>
                     </span>
@@ -54,9 +63,8 @@ Profesionales en cuidado personal para caballero</span></p>
                 </li>
                 
             </ul>
-        
-        
-        
+
         </section>
+<?php } ?>
     
     
