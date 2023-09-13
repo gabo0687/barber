@@ -2,8 +2,20 @@
     <article id="profile">
       <h2>Mi Perfil</h2>
       <ul class="nav nav-pills text-end">
-       <li class="nav-item"><a class="nav-link active" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile" type="button" role="tab" aria-controls="nav-profile" aria-selected="true">Perfil</a></li>
-       <li class="nav-item"><a class="nav-link" id="calendar" href="calendar" type="button" >Calendario</a></li>
+       <?php if( $user == 'Berman' ){?>
+       <li class="nav-item"><a class="nav-link fa fa-calendar" aria-hidden="true" id="calendar" href="calendar" type="button" > Calendario</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-scissors" aria-hidden="true" id="calendar" href="services" type="button" > Servicios</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-id-card" aria-hidden="true" id="calendar" href="users" type="button" > Usuarios</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-users" aria-hidden="true" id="calendar" href="clients" type="button" > Clientes</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-product-hunt" aria-hidden="true" id="calendar" href="products" type="button" > Productos</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-clock-o" aria-hidden="true" id="calendar" href="work" type="button" > Horas de trabajo</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-book" aria-hidden="true" id="calendar" href="expenses" type="button" > Gastos</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-line-chart" aria-hidden="true" id="calendar" href="sales" type="button" > Ventas</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-usd" aria-hidden="true" id="calendar" href="product_sales" type="button" > Reporte Productos</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-money" aria-hidden="true" id="calendar" href="expenses_sales" type="button" > Reporte Gastos</a></li>
+       <?php } ?>
+       
+       
        
       </ul>
    
@@ -36,3 +48,6 @@
       </div>
     </article>
   </section>
+  <script>
+    window.scrollTo(0, document.body.scrollHeight);
+  </script>

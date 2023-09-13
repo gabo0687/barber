@@ -6,24 +6,24 @@
 			"title": "Cita Eithzan Aguilar",
 			"modal": "#events-modal",
 			"class": "event-warning",
-			"start": "1694271621000",
-			"end":   "1694275221000"
+			"start": "1694530845000",
+			"end":   "1694534445000"
 		},
 		{
 			"id": "276",
 			"title": "Cita Gabriel Aguilar Abarca",
 			"modal": "#events-modal",
 			"class": "event-success",
-			"start": "1694271621000",
-			"end":   "1694277921000"
+			"start": "1694532645000",
+			"end":   "1694536245000"
 		},
 		{
 			"id": "255",
 			"title": "Cita Abigail Aguilar",
 			"modal": "#events-modal",
 			"class": "event-info",
-			"start": "1694271621000",
-			"end":   "1694275221000"
+			"start": "1694529045000",
+			"end":   "1694532045000"
 		},
 		{
 			"id": "295",
