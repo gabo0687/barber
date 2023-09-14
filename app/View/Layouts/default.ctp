@@ -83,7 +83,7 @@
           </div>
           <div class="form-group">
             <label for="loginInputPassword1">Contraseña</label>
-            <input type="password" class="form-control" name="loginPassw" id="loginPass"  placeholder="Password">
+            <input type="password" class="form-control" name="loginPass" id="loginPass"  placeholder="Password">
           </div>
             <div class="form-group text-right">                
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
@@ -119,11 +119,11 @@
           </div>
           <div class="form-group">
             <label for="signupName">Número de Celular*</label>
-            <input type="number" class="form-control" id="signupPhone" name="signupPhone"  placeholder="Telefono" onblur="checkPhone(this.value)">
+            <input type="number" class="form-control" id="signupPhone" name="signupPhone"  onblur="checkPhone(this.value)" placeholder="Telefono" >
           </div>
           <div class="form-group">
           <label for="signupGender">Genero*</label>
-            <select name="signupGender" id="cars">
+            <select name="signupGender" id="signupGender">
               <option value="1">Maculino</option>
               <option value="2">Femenino</option>
               <option value="3">indefinido</option>
@@ -259,6 +259,32 @@
   
   }
 
+  function checkPhone(userPhone){
+
+$.ajax({
+              type: 'POST', 
+              url: 'Pages/getPhone', 
+              data: 'phone='+userPhone,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(existPhone) {
+                if(existPhone == 1 ){
+                  event.preventDefault();
+                  $('#error-mail').show();
+                  $('#signupPhone').css('border','2px solid red');
+                } else{
+                  $('#error-mail').hide();
+                  $('#signupPhone').css('border','');
+                }
+              }
+});
+}
+
   function login(){
   var logNumber = $('#loginNumber').val();
   var logPassword = $('#loginPass').val();
@@ -285,31 +311,7 @@
           });
 }
 
-function checkPhone(userPhone){
 
-$.ajax({
-              type: 'POST', 
-              url: 'Pages/getPhone', 
-              data: 'phone='+userPhone,
-              beforeSend:function() {  
-
-              },
-              error: function(){
-                  
-              alert('No hay internet');    
-              },
-              success: function(existPhone) {
-                if(existPhone == 1 ){
-                  event.preventDefault();
-                  $('#error-mail').show();
-                  $('#signupPhone').css('border','2px solid red');
-                } else{
-                  $('#error-mail').hide();
-                  $('#signupPhone').css('border','');
-                }
-              }
-});
-}
 
 $( "#createUser" ).on( "submit", function( event ) {
   var nombre = $('#signupName').val();

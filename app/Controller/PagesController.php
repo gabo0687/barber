@@ -58,7 +58,7 @@ function login(){
 
 	$this->layout = 'ajax';
 	$this->autoRender = false;
-		$user = $_POST['loginUser'];
+		$user = $_POST['loginNumber'];
 		$pass = $_POST['loginPass'];
 		$pass = $this->Encrypt->encrypt($pass);
 		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 3,'User.status' => 1)));		
@@ -89,7 +89,6 @@ function signup(){
 		$genero = $_POST['signupGender'];
 		//$userEmail = $_POST['signupEmail'];
 		$userContrasena = $_POST['signupPassword1'];
-		//$userId = $_POST['usuarioId'];
 		//Save Product
 		$this->User->create();
 		$data['User']['name'] = $nombreUsuario;
