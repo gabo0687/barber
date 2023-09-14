@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array();
+public $uses = array('User');
 
 /**
  * Displays a view
@@ -52,4 +52,34 @@ public function home(){
 public function account(){
 	
 }
+
+function login(){
+
+	$this->layout = 'ajax';
+	$this->autoRender = false;
+	//echo("test");
+		$user = $_POST['loginUser'];
+		$pass = $_POST['loginPass'];
+		//$pass = $this->Encrypt->encrypt($pass);
+
+$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
+/*,'User.user_type' => 1,'User.estatus' => 1*/
+		
+		if(isset($register['User']['id'])){
+			@session_start();
+			$_SESSION['User'] = $register;
+			echo 1;
+		}else{
+			echo 0;
+		}
+
+}
+
+
+function logout(){
+	$this->autoRender = false;
+	$this->Session->destroy();
+	$this->redirect(array('action' => '../'));
+}
+
 }
