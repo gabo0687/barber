@@ -34,18 +34,24 @@
             </div>         
                 <a class="logo" href="index.php"></a>
                 <div class="user">
-                    <div class="username"><?php if($user != ''){ ?><a class="user-edit" href="account"><?php echo $user;?> <img src="img/layout/gear.svg"></a> | <a class="logout" href="logout">Logout</a> <?php }else{ ?><a data-bs-toggle="modal" data-bs-target="#login">Ingreso</a><?php } ?> </div>
-                </div>
-                <form class="header-search">   
-			       <?php if( $user != '' ){ ?>
-                <div class="event-info-buttons"> 
-              <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
-              <?php if( $user == 'Berman' ){?>
-              <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
-              <?php } ?>
-              </div>
-              <?php } ?>
-            </form>
+
+                <?php 
+                 
+                 if(!empty($_SESSION['User'])){ ?>
+                 <div class="username"><?php echo $_SESSION['User']['User']['name'];?> |  <a href="logout" class="logout">Logout</a> </div>
+                 <?php }else{ ?>
+                 <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
+                 <?php } ?>
+             </div>
+         <?php if(!empty($_SESSION['User'])){ ?>     
+         <form class="header-search">   
+           <div class="event-info-buttons"> 
+           <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
+           <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
+           </div>
+         </form>
+         <?php } ?>
+
         
         </div>
         
@@ -76,18 +82,23 @@
       <div class="modal-body">
         <form action="login" method="POST">
           <div class="form-group">
-            <label for="loginInputEmail1">Email</label>
-            <input type="text" name="user" class="form-control" id="loginInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            <label for="loginInputEmail1">Usuario</label>
+            <input type="text" class="form-control" name="loginUser" id="loginUser" aria-describedby="emailHelp" placeholder="Enter user">
           </div>
           <div class="form-group">
             <label for="loginInputPassword1">Contraseña</label>
-            <input type="password" class="form-control" id="loginInputPassword1" placeholder="Password">
+            <input type="password" class="form-control" name="loginPassw" id="loginPass"  placeholder="Password">
           </div>
             <div class="form-group text-right">                
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
-              <button type="submit" class="btn btn-primary">Ingresar</button>
+              <button type="button" class="btn btn-primary" id="loginUsers" onclick="login()">Login</button>
             </div>
-            
+            <div class="form-group" id="noerror-mail" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este correo no existe, por favor registrese.</b></span></label>
+            </div>
+            <div class="form-group" id="login-error" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Usuario o contraseña invalidos.</b></span></label>
+            </div>
             <div class="form-group text-right">
                 <small><a>¿Olvidó su contraseña?</a></small>
             </div>
@@ -263,6 +274,43 @@ function notificationTime(time){
 }, "500");
   
   }
+
+  function login(){
+  var logUser = $('#loginUser').val();
+  var logPassword = $('#loginPass').val();
+  $.ajax({
+              type: 'POST', 
+              url: 'Pages/login', 
+              data: 'loginUser='+logUser+'&loginPass='+logPassword,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(userExist) {
+                if(userExist == 1 ){
+                  $('#login-error').hide();
+                  window.location.reload();
+                } else{
+                  event.preventDefault();
+                  $('#login-error').show();
+                }
+              }
+          });
+}
+
+var input = document.getElementById("loginPass");
+input.addEventListener("keypress", function(event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("loginUsers").click();
+  }
+});
 
 </script>
 

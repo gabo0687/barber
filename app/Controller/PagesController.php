@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Service','Duration');
+	public $uses = array('Service','Duration','User');
 
 /**
  * Displays a view
@@ -81,16 +81,31 @@ public function services(){
 	}
 	$this->set('user',$user);
 }
-public function login(){
-	$this->autoRender = false;
+function login(){
+
 	$this->layout = 'ajax';
-	session_start();
-    $_SESSION['user'] = $_POST['user'];
-	$this->redirect(array('action' => '../'));
+	$this->autoRender = false;
+	$user = $_POST['loginUser'];
+	$pass = $_POST['loginPass'];
+	$pass = $this->Encrypt->encrypt($pass);
+
+$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
+
+		
+		if(isset($register['User']['id'])){
+			@session_start();
+			$_SESSION['User'] = $register;
+			echo 1;
+		}else{
+			echo 0;
+		}
+
 }
-public function logout(){
-	session_start();
-	$_SESSION['user'] = '';
+
+
+function logout(){
+	$this->autoRender = false;
+	$this->Session->destroy();
 	$this->redirect(array('action' => '../'));
 }
 

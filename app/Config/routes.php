@@ -35,6 +35,8 @@
 	Router::connect('/edit_service', array('controller' => 'pages', 'action' =>  'edit_service'));
 	
 	
+	Router::connect('/login', array('controller' => 'pages', 'action' => 'login'));
+	Router::connect('/logout', array('controller' => 'pages', 'action' => 'logout'));
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */
