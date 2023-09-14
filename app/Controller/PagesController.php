@@ -189,7 +189,8 @@ public function edit_service(){
 		}
 	}
 }
-function signup(){
+
+function saveUser(){
 	$this->layout = 'ajax';
 	$this->autoRender =false;
 	if ($this->request->is('post')) {
