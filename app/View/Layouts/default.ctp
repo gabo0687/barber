@@ -112,7 +112,7 @@
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="signup" method="post" id="createUser">
+        <form action="saveUser" method="post" id="createUser">
           <div class="form-group">
             <label for="signupName">Nombre Completo*</label>
             <input type="text" class="form-control" id="signupName" name="signupName"  placeholder="Nombre">

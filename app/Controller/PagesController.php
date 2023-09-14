@@ -79,7 +79,7 @@ function logout(){
 	$this->redirect(array('action' => '../'));
 }
 
-function signup(){
+function saveUser(){
 	$this->layout = 'ajax';
 	$this->autoRender =false;
 	if ($this->request->is('post')) {
