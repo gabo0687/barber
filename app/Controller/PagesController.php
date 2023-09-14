@@ -85,20 +85,12 @@ function login(){
 
 	$this->layout = 'ajax';
 	$this->autoRender = false;
-<<<<<<< HEAD
 	$user = $_POST['loginUser'];
 	$pass = $_POST['loginPass'];
 	$pass = $this->Encrypt->encrypt($pass);
 
-$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
+	$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
 
-		
-=======
-		$user = $_POST['loginUser'];
-		$pass = $_POST['loginPass'];
-		$pass = $this->Encrypt->encrypt($pass);
-		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 3,'User.status' => 1)));		
->>>>>>> f0414d4 (+Register, pending number validation on button)
 		if(isset($register['User']['id'])){
 			@session_start();
 			$_SESSION['User'] = $register;
@@ -116,7 +108,6 @@ function logout(){
 	$this->redirect(array('action' => '../'));
 }
 
-<<<<<<< HEAD
 public function add_service(){
 	$this->layout = 'ajax';
 	if ($this->request->is('post')) {
@@ -198,7 +189,6 @@ public function edit_service(){
 		}
 	}
 }
-=======
 function signup(){
 	$this->layout = 'ajax';
 	$this->autoRender =false;
@@ -209,7 +199,6 @@ function signup(){
 		$genero = $_POST['signupGender'];
 		//$userEmail = $_POST['signupEmail'];
 		$userContrasena = $_POST['signupPassword1'];
-		//$userId = $_POST['usuarioId'];
 		//Save Product
 		$this->User->create();
 		$data['User']['name'] = $nombreUsuario;
@@ -245,6 +234,5 @@ function signup(){
 			echo 1;
 		}
 	}
->>>>>>> f0414d4 (+Register, pending number validation on button)
 
 }
