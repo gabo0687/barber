@@ -78,8 +78,8 @@
       <div class="modal-body">
         <form>
           <div class="form-group">
-            <label for="loginInputEmail1">Usuario</label>
-            <input type="text" class="form-control" name="loginUser" id="loginUser" aria-describedby="emailHelp" placeholder="Enter user">
+            <label for="loginInputEmail1">Telefono</label>
+            <input type="number" class="form-control" name="loginNumber" id="loginNumber" aria-describedby="emailHelp" placeholder="Ingrese su numero de Telefono">
           </div>
           <div class="form-group">
             <label for="loginInputPassword1">Contraseña</label>
@@ -87,7 +87,7 @@
           </div>
             <div class="form-group text-right">                
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
-              <button type="button" class="btn btn-primary" id="loginUsers" onclick="login()">Login</button>
+              <button type="button" class="btn btn-primary" id="loginNumbers" onclick="login()">Login</button>
             </div>
             <div class="form-group" id="noerror-mail" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este correo no existe, por favor registrese.</b></span></label>
@@ -108,27 +108,48 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Registro</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Registrarse</h5>
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form action="signup" method="post" id="createUser">
           <div class="form-group">
-            <label for="signupInputName">Nombre de Usuario</label>
-            <input type="email" class="form-control" id="signupInputName" aria-describedby="emailHelp" placeholder="Enter email">
+            <label for="signupName">Nombre Completo*</label>
+            <input type="text" class="form-control" id="signupName" name="signupName"  placeholder="Nombre">
           </div>
           <div class="form-group">
-            <label for="signupInputEmail">Email</label>
-            <input type="email" class="form-control" id="signupInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+            <label for="signupName">Número de Celular*</label>
+            <input type="number" class="form-control" id="signupPhone" name="signupPhone"  placeholder="Telefono" onblur="checkPhone(this.value)">
           </div>
           <div class="form-group">
-            <label for="signupInputPassword1">Contraseña</label>
-            <input type="password" class="form-control" id="signupInputPassword1" placeholder="Password">
+          <label for="signupGender">Genero*</label>
+            <select name="signupGender" id="cars">
+              <option value="1">Maculino</option>
+              <option value="2">Femenino</option>
+              <option value="3">indefinido</option>
+            </select>
           </div>
           <div class="form-group">
-            <label for="signupInputPassword2">Repita la Contraseña</label>
-            <input type="password" class="form-control" id="signupInputPassword2" placeholder="Password">
+            <label for="signupName">Contraseña*</label>
+            <input type="password" class="form-control" id="signupPassword1" name="signupPassword1" placeholder="Contraseña">
           </div>
+          <div class="form-group">
+            <label for="signupName">Repita la Contraseña*</label>
+            <input type="password" class="form-control" id="signupPassword2" name="signupPassword2" placeholder="Contraseña">
+          </div>
+          </br>
+            <div class="form-group" id="error-pass" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Las contraseñas no coinciden.</b></span></label>
+            </div>
+            <div class="form-group" id="error-mail" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este numero ya esta siendo utilizado por otro usuario.</b></span></label>
+            </div>
+            <div class="form-group" id="error-passChar" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>La contraseña debe ser mayor a 7 caracteres y tener al menos 1 letra en Mayúscula.</b></span></label>
+            </div>
+            <div class="form-group" id="error-empty" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
+            </div>
           <div class="form-group text-right">
               <button type="submit" class="btn btn-primary">Enviar</button>
           </div>
@@ -239,12 +260,12 @@
   }
 
   function login(){
-  var logUser = $('#loginUser').val();
+  var logNumber = $('#loginNumber').val();
   var logPassword = $('#loginPass').val();
   $.ajax({
               type: 'POST', 
               url: 'Pages/login', 
-              data: 'loginUser='+logUser+'&loginPass='+logPassword,
+              data: 'loginNumber='+logNumber+'&loginPass='+logPassword,
               beforeSend:function() {  
 
               },
@@ -264,6 +285,102 @@
           });
 }
 
+function checkPhone(userPhone){
+
+$.ajax({
+              type: 'POST', 
+              url: 'Pages/getPhone', 
+              data: 'phone='+userPhone,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(existPhone) {
+                if(existPhone == 1 ){
+                  event.preventDefault();
+                  $('#error-mail').show();
+                  $('#signupPhone').css('border','2px solid red');
+                } else{
+                  $('#error-mail').hide();
+                  $('#signupPhone').css('border','');
+                }
+              }
+});
+}
+
+$( "#createUser" ).on( "submit", function( event ) {
+  var nombre = $('#signupName').val();
+  var celular = $('#signupPhone').val();
+  var genero = $('#signupGender').val();
+  //var userEmail = $('#signupEmail').val();
+  var userContrasena = $('#signupPassword1').val();
+  var confirmContrasena = $('#signupPassword2').val();
+  var mayuscula = false;
+  checkPhone(celular);
+ 
+  if(userContrasena.match(/[A-Z]/)){
+    mayuscula = true;
+  }
+
+  if( nombre == '' || celular == '' || genero == '' ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
+    event.preventDefault();
+    
+    if( userContrasena != confirmContrasena ){
+      $('#error-pass').show();
+      $('#signupPassword2').css('border','2px solid red');
+      $('#signupPassword1').css('border','2px solid red');
+    }else{
+      $('#error-pass').hide();
+      $('#signupPassword2').css('border','');
+      $('#signupPassword1').css('border','');
+    }
+    $showError = false;
+    if( nombre == '' ){
+      $('#signupName').css('border','2px solid red');
+      $showError = true;
+    }else{
+       $('#signupName').css('border','');
+    }
+    if( genero == '' ){
+      $('#signupGender').css('border','2px solid red');
+      $showError = true;
+    }else{
+       $('#signupGender').css('border','');
+    }
+    if( celular == '' ){
+      $showError = true;
+      $('#signupPhone').css('border','2px solid red');
+    }else{
+       $('#signupPhone').css('border','');
+    }
+    if( (userContrasena.length < 9) || (mayuscula == false) ){
+      $('#signupPassword1').css('border','2px solid red');
+      $('#error-passChar').show();
+    }else{
+       $('#signupPassword1').css('border','');
+       $('#error-passChar').show();
+    }
+    if ($showError){
+      $('#error-empty').show();
+    }else{
+      $('#error-empty').hide();
+    }
+  }else{
+    window.scrollTo(0, 0);
+    $('.close').click();
+    $('#userCreated').show();
+        setInterval(function() {
+            $('#userCreated').hide('2000');
+            $('#login').show();
+          }, 10000);
+    
+  }
+  
+});
+
 var input = document.getElementById("loginPass");
 input.addEventListener("keypress", function(event) {
   // If the user presses the "Enter" key on the keyboard
@@ -271,7 +388,7 @@ input.addEventListener("keypress", function(event) {
     // Cancel the default action, if needed
     event.preventDefault();
     // Trigger the button element with a click
-    document.getElementById("loginUsers").click();
+    document.getElementById("loginNumbers").click();
   }
 });
 
