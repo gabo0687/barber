@@ -85,6 +85,7 @@ function login(){
 
 	$this->layout = 'ajax';
 	$this->autoRender = false;
+<<<<<<< HEAD
 	$user = $_POST['loginUser'];
 	$pass = $_POST['loginPass'];
 	$pass = $this->Encrypt->encrypt($pass);
@@ -92,6 +93,12 @@ function login(){
 $register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
 
 		
+=======
+		$user = $_POST['loginUser'];
+		$pass = $_POST['loginPass'];
+		$pass = $this->Encrypt->encrypt($pass);
+		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 3,'User.status' => 1)));		
+>>>>>>> f0414d4 (+Register, pending number validation on button)
 		if(isset($register['User']['id'])){
 			@session_start();
 			$_SESSION['User'] = $register;
@@ -109,6 +116,7 @@ function logout(){
 	$this->redirect(array('action' => '../'));
 }
 
+<<<<<<< HEAD
 public function add_service(){
 	$this->layout = 'ajax';
 	if ($this->request->is('post')) {
@@ -190,5 +198,53 @@ public function edit_service(){
 		}
 	}
 }
+=======
+function signup(){
+	$this->layout = 'ajax';
+	$this->autoRender =false;
+	if ($this->request->is('post')) {
+		//Initialize
+		$nombreUsuario = $_POST['signupName'];
+		$celular = $_POST['signupPhone'];
+		$genero = $_POST['signupGender'];
+		//$userEmail = $_POST['signupEmail'];
+		$userContrasena = $_POST['signupPassword1'];
+		//$userId = $_POST['usuarioId'];
+		//Save Product
+		$this->User->create();
+		$data['User']['name'] = $nombreUsuario;
+		$data['User']['phone'] = $celular;
+		$data['User']['gender'] = $genero;
+		//$data['User']['email'] = trim($userEmail);
+		$data['User']['type'] = 3;
+		$data['User']['status'] = 1;
+		$data['User']['creation_date'] = date('Y-m-d H:i:s');
+		if($userContrasena != ''){
+			$pass = $this->Encrypt->encrypt($userContrasena);
+			$data['User']['password'] = $pass;
+		}
+		
+		if($this->User->save($data)){
+			
+				$this->redirect(array('action' => '../'));
+			}else{
+				$this->redirect(array('action' => '../error'));
+			}
+			
+		}
+		
+	}
+
+	public function getPhone(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$storedPhone = $this->User->find('first',array('conditions'=>array('User.phone'=>$_POST['phone'],'User.status'=>1)));
+    	if(empty($storedPhone)){
+			echo 0;
+		} else {
+			echo 1;
+		}
+	}
+>>>>>>> f0414d4 (+Register, pending number validation on button)
 
 }
