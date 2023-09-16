@@ -38,7 +38,7 @@
                 <?php 
                  
                  if(!empty($_SESSION['User'])){ ?>
-                 <div class="username"><?php echo $_SESSION['User']['User']['name'];?> |  <a href="logout" class="logout">Logout</a> </div>
+                 <div class="username"><a class="user-edit" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>|  <a href="logout" class="logout">Logout</a> </div>
                  <?php }else{ ?>
                  <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
                  <?php } ?>
@@ -47,8 +47,11 @@
          <form class="header-search">   
            <div class="event-info-buttons"> 
            <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
+           <?php 
+           if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '2' ){ ?> 
            <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
-           </div>
+           <?php } ?>
+          </div>
          </form>
          <?php } ?>
 

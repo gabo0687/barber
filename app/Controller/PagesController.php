@@ -36,6 +36,7 @@ class PagesController extends AppController {
  * @var array
  */
 	public $uses = array('Service','Duration','User');
+	public $components = array('Encrypt');
 
 /**
  * Displays a view
@@ -46,24 +47,24 @@ class PagesController extends AppController {
  *   or MissingViewException in debug mode.
  */
 public function home(){
-	session_start();
+
 	$user = '';
-	if(isset($_SESSION['user'])){
-		$user = $_SESSION['user'];
+	if(isset($_SESSION['User'])){
+		$user = $_SESSION['User'];
 	}
 	$this->set('user',$user);
 }
 
 public function account(){
-	session_start();
+
 	$user = '';
-	if(isset($_SESSION['user'])){
-		$user = $_SESSION['user'];
+	if(isset($_SESSION['User'])){
+		$user = $_SESSION['User'];
 	}
+	
 	$this->set('user',$user);
 }
 public function services(){
-	session_start();
 	$user = '';
 	$services = $this->Service->find('all');
 	$this->set('services',$services);
@@ -85,14 +86,15 @@ function login(){
 
 	$this->layout = 'ajax';
 	$this->autoRender = false;
-	$user = $_POST['loginUser'];
+	$user = $_POST['loginNumber'];
 	$pass = $_POST['loginPass'];
 	$pass = $this->Encrypt->encrypt($pass);
 
-	$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
+
+	$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.status' => 1)));
 
 		if(isset($register['User']['id'])){
-			@session_start();
+			
 			$_SESSION['User'] = $register;
 			echo 1;
 		}else{
