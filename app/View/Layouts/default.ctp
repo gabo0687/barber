@@ -56,7 +56,7 @@
         </div>
         <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
         <h4 class="alert-heading">Usuario creado! </h4>
-        <p><img src="img/icon-success.png" height="20px" width="20px" />hemos enviado un correo para la confirmacion de tu cuenta</p>
+        <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
         <hr>
       </div>
         
@@ -402,12 +402,19 @@ $( "#createUser" ).on( "submit", function( event ) {
     }else{
        $('#signupPhone').css('border','');
     }
+    if( checkNumber == true ){
+      $('#error-mail').show();
+      $('#signupPhone').css('border','2px solid red');
+    }else{
+      $('#error-mail').hide();
+      $('#signupPhone').css('border','');
+    }
     if( (userContrasena.length < 9) || (mayuscula == false) ){
       $('#signupPassword1').css('border','2px solid red');
       $('#error-passChar').show();
     }else{
        $('#signupPassword1').css('border','');
-       $('#error-passChar').show();
+       $('#error-passChar').hide();
     }
     if ($showError){
       $('#error-empty').show();
