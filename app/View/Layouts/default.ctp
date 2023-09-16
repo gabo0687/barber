@@ -276,7 +276,7 @@
 </body>
 </html>
 <script>
-
+var checkNumber = false;
 function notificationTime(time){
   $('#notificaciones_check').show();
   var time = time.split(':');
@@ -316,15 +316,18 @@ $.ajax({
               success: function(existPhone) {
                 if(existPhone == 1 ){
                   event.preventDefault();
+                  checkNumber = true;
                   $('#error-mail').show();
                   $('#signupPhone').css('border','2px solid red');
                 } else{
+                  checkNumber = false;
                   $('#error-mail').hide();
                   $('#signupPhone').css('border','');
                 }
               }
 });
 }
+
 
 function login(){
   var logNumber = $('#loginNumber').val();
@@ -368,7 +371,7 @@ $( "#createUser" ).on( "submit", function( event ) {
     mayuscula = true;
   }
 
-  if( nombre == '' || celular == '' || genero == '' || validatePhone(celular) == false ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
+  if( nombre == '' || celular == '' || genero == '' || checkNumber == true ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
     event.preventDefault();
     
     if( userContrasena != confirmContrasena ){
