@@ -38,23 +38,27 @@
                 <?php 
                  
                  if(!empty($_SESSION['User'])){ ?>
-                 <div class="username"><?php echo $_SESSION['User']['User']['name'];?> |  <a href="logout" class="logout">Logout</a> </div>
-                 <?php }else{ ?>
-                 <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
-                 <?php } ?>
-             </div>
-         <?php if(!empty($_SESSION['User'])){ ?>     
-         <form class="header-search">   
-           <div class="event-info-buttons"> 
-           <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
-           <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
-           </div>
-         </form>
-         <?php } ?>
+                  <div class="username"><?php echo $_SESSION['User']['User']['name'];?> |  <a href="logout" class="logout">Logout</a> </div>
+                  <?php }else{ ?>
+                  <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
+                  <?php } ?>
+              </div>
+          <?php if(!empty($_SESSION['User'])){ ?>     
+          <form class="header-search">   
+            <div class="event-info-buttons"> 
+            <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
+            <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
+            </div>
+          </form>
+          <?php } ?>
 
         
         </div>
-        
+        <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Usuario creado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
+        <hr>
+      </div>
         
         
     </header>
@@ -72,7 +76,7 @@
         <small><a href="policies.php">Políticas de Privacidad</a> | <a href="terms.php">Términos y Condiciones de Uso</a></small>
     </footer>
 
-<div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -80,7 +84,7 @@
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="login" method="POST">
+        <form>
           <div class="form-group">
             <label for="loginInputEmail1">Telefono</label>
             <input type="number" class="form-control" name="loginNumber" id="loginNumber" aria-describedby="emailHelp" placeholder="Ingrese su numero de Telefono">
@@ -272,7 +276,7 @@
 </body>
 </html>
 <script>
-
+var checkNumber = false;
 function notificationTime(time){
   $('#notificaciones_check').show();
   var time = time.split(':');
@@ -312,9 +316,11 @@ $.ajax({
               success: function(existPhone) {
                 if(existPhone == 1 ){
                   event.preventDefault();
+                  checkNumber = true;
                   $('#error-mail').show();
                   $('#signupPhone').css('border','2px solid red');
                 } else{
+                  checkNumber = false;
                   $('#error-mail').hide();
                   $('#signupPhone').css('border','');
                 }
@@ -322,12 +328,13 @@ $.ajax({
 });
 }
 
-  function login(){
+
+function login(){
   var logNumber = $('#loginNumber').val();
   var logPassword = $('#loginPass').val();
   $.ajax({
               type: 'POST', 
-              url: 'Pages/login', 
+              url: 'Pages/loginUser', 
               data: 'loginNumber='+logNumber+'&loginPass='+logPassword,
               beforeSend:function() {  
 
@@ -364,7 +371,7 @@ $( "#createUser" ).on( "submit", function( event ) {
     mayuscula = true;
   }
 
-  if( nombre == '' || celular == '' || genero == '' ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
+  if( nombre == '' || celular == '' || genero == '' || checkNumber == true ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
     event.preventDefault();
     
     if( userContrasena != confirmContrasena ){
@@ -395,12 +402,19 @@ $( "#createUser" ).on( "submit", function( event ) {
     }else{
        $('#signupPhone').css('border','');
     }
+    if( checkNumber == true ){
+      $('#error-mail').show();
+      $('#signupPhone').css('border','2px solid red');
+    }else{
+      $('#error-mail').hide();
+      $('#signupPhone').css('border','');
+    }
     if( (userContrasena.length < 9) || (mayuscula == false) ){
       $('#signupPassword1').css('border','2px solid red');
       $('#error-passChar').show();
     }else{
        $('#signupPassword1').css('border','');
-       $('#error-passChar').show();
+       $('#error-passChar').hide();
     }
     if ($showError){
       $('#error-empty').show();

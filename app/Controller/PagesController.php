@@ -36,7 +36,7 @@ class PagesController extends AppController {
  * @var array
  */
 	public $uses = array('Service','Duration','User');
-
+	public $components = array('Encrypt');
 /**
  * Displays a view
  *
@@ -81,16 +81,14 @@ public function services(){
 	}
 	$this->set('user',$user);
 }
-function login(){
+function loginUser(){
 
 	$this->layout = 'ajax';
 	$this->autoRender = false;
-	$user = $_POST['loginUser'];
-	$pass = $_POST['loginPass'];
-	$pass = $this->Encrypt->encrypt($pass);
-
-	$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 1,'User.status' => 1)));
-
+		$user = $_POST['loginNumber'];
+		$pass = $_POST['loginPass'];
+		$pass = $this->Encrypt->encrypt($pass);
+		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user,'User.password' => $pass,'User.type' => 3,'User.status' => 1)));		
 		if(isset($register['User']['id'])){
 			@session_start();
 			$_SESSION['User'] = $register;
@@ -215,7 +213,7 @@ function saveUser(){
 		}
 		
 		if($this->User->save($data)){
-			
+			sleep(10);
 				$this->redirect(array('action' => '../'));
 			}else{
 				$this->redirect(array('action' => '../error'));
