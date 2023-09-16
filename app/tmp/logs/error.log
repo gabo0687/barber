@@ -9115,3 +9115,108 @@ Request URL: /barberia/barber/css/bootstrap.min.css.map
 Stack Trace:
 #0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
 #1 {main}
+2023-09-15 14:14:21 Error: [Error] Call to a member function encrypt() on null
+Request URL: /barberia/barber/Pages/login
+Stack Trace:
+#0 [internal function]: PagesController->login()
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(500): ReflectionMethod->invokeArgs(Object(PagesController), Array)
+#2 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#3 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#4 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
+2023-09-15 14:15:05 Error: [Error] Call to a member function encrypt() on null
+Request URL: /barberia/barber/Pages/login
+Stack Trace:
+#0 [internal function]: PagesController->login()
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(500): ReflectionMethod->invokeArgs(Object(PagesController), Array)
+#2 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#3 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#4 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
+2023-09-15 14:15:55 Error: [Error] Call to a member function encrypt() on null
+Request URL: /barberia/barber/saveUser
+Stack Trace:
+#0 [internal function]: PagesController->saveUser()
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(500): ReflectionMethod->invokeArgs(Object(PagesController), Array)
+#2 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(193): Controller->invokeAction(Object(CakeRequest))
+#3 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#4 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
+2023-09-15 14:16:52 Error: [MissingComponentException] Component class EncryptComponent could not be found.
+Exception Attributes: array (
+  'class' => 'EncryptComponent',
+  'plugin' => '',
+)
+Request URL: /barberia/barber/saveUser
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\ComponentCollection.php(53): ComponentCollection->load('Encrypt', Array)
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(654): ComponentCollection->init(Object(PagesController))
+#2 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(188): Controller->constructClasses()
+#3 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#4 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#5 {main}
+2023-09-15 14:20:16 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-15 14:20:16 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-15 14:21:48 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-15 14:21:48 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-15 14:22:18 Error: [MissingControllerException] Controller class JsController could not be found.
+Exception Attributes: array (
+  'class' => 'JsController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/js/bootstrap.js.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-15 14:22:18 Error: [MissingControllerException] Controller class CssController could not be found.
+Exception Attributes: array (
+  'class' => 'CssController',
+  'plugin' => NULL,
+)
+Request URL: /barberia/barber/css/bootstrap.min.css.map
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#1 {main}
+2023-09-15 14:28:44 Error: [TypeError] Cannot access offset of type string on string
+Request URL: /barberia/barber/account
+Stack Trace:
+#0 C:\xampp8\htdocs\barberia\barber\lib\Cake\View\View.php(971): include()
+#1 C:\xampp8\htdocs\barberia\barber\lib\Cake\View\View.php(933): View->_evaluate('C:\\xampp8\\htdoc...', Array)
+#2 C:\xampp8\htdocs\barberia\barber\lib\Cake\View\View.php(473): View->_render('C:\\xampp8\\htdoc...')
+#3 C:\xampp8\htdocs\barberia\barber\lib\Cake\Controller\Controller.php(973): View->render(NULL, NULL)
+#4 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(200): Controller->render()
+#5 C:\xampp8\htdocs\barberia\barber\lib\Cake\Routing\Dispatcher.php(167): Dispatcher->_invoke(Object(PagesController), Object(CakeRequest))
+#6 C:\xampp8\htdocs\barberia\barber\app\webroot\index.php(115): Dispatcher->dispatch(Object(CakeRequest), Object(CakeResponse))
+#7 {main}

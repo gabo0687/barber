@@ -2,7 +2,7 @@
     <article id="profile">
       <h2>Mi Perfil</h2>
       <ul class="nav nav-pills text-end">
-       <?php if( $user == 'Berman' ){?>
+       <?php if( $user['User']['type'] == '1' ){?>
        <li class="nav-item"><a class="nav-link fa fa-calendar" aria-hidden="true" id="calendar" href="calendar" type="button" > Calendario</a></li>
        <li class="nav-item"><a class="nav-link fa fa-scissors" aria-hidden="true" id="calendar" href="services" type="button" > Servicios</a></li>
        <li class="nav-item"><a class="nav-link fa fa-id-card" aria-hidden="true" id="calendar" href="users" type="button" > Usuarios</a></li>
