@@ -34,6 +34,10 @@
 	Router::connect('/load_service', array('controller' => 'pages', 'action' =>  'load_service'));
 	Router::connect('/edit_service', array('controller' => 'pages', 'action' =>  'edit_service'));
 	Router::connect('/saveUser', array('controller' => 'pages', 'action' => 'saveUser'));
+	Router::connect('/load_reservations', array('controller' => 'pages', 'action' => 'load_reservations'));
+	Router::connect('/save_notification', array('controller' => 'pages', 'action' => 'save_notification'));
+	Router::connect('/save_reservation', array('controller' => 'pages', 'action' => 'save_reservation'));
+	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */

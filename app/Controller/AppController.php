@@ -31,6 +31,9 @@ App::uses('Controller', 'Controller');
  * @link		https://book.cakephp.org/2.0/en/controllers.html#the-app-controller
  */
 class AppController extends Controller {
+
+    public $uses = array('Service','Duration','User');
+
     function beforeFilter() {
      
             @session_start();
@@ -43,6 +46,17 @@ class AppController extends Controller {
                 //$userSession = $this->Session->read('User');
                 $userSession = $_SESSION['User'];
                 $this->set('userSessionFront',$userSession);
+                $services = $this->Service->find('all');
+                $this->set('services',$services);
+                $users = $this->User->find('all',array('conditions'=>array(
+                                            'OR'=> array(
+                                                        array('User.type'=>1),
+                                                        array('User.type'=>2)
+                                                        )
+                                                    )
+                                                )
+                                            );
+                $this->set('users',$users);
             }
             
         }
