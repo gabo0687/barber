@@ -40,7 +40,7 @@
 	Router::connect('/calendario', array('controller' => 'pages', 'action' => 'calendar'));
 	Router::connect('/home', array('controller' => 'pages', 'action' =>  'home'));
 	Router::connect('/save_reservation_calendar', array('controller' => 'pages', 'action' => 'save_reservation_calendar'));
-	
+	 
 	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
