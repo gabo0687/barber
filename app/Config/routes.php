@@ -26,13 +26,20 @@
  * to use (in this case, /app/View/Pages/home.ctp)...
  */
 	Router::connect('/', array('controller' => 'pages', 'action' =>  'home'));
-	Router::connect('/login', array('controller' => 'pages', 'action' =>  'login'));
+	Router::connect('/loginUser', array('controller' => 'pages', 'action' => 'loginUser'));
 	Router::connect('/logout', array('controller' => 'pages', 'action' =>  'logout'));
 	Router::connect('/account', array('controller' => 'pages', 'action' =>  'account'));
 	Router::connect('/services', array('controller' => 'pages', 'action' =>  'services'));
 	Router::connect('/add_service', array('controller' => 'pages', 'action' =>  'add_service'));
 	Router::connect('/load_service', array('controller' => 'pages', 'action' =>  'load_service'));
 	Router::connect('/edit_service', array('controller' => 'pages', 'action' =>  'edit_service'));
+	Router::connect('/saveUser', array('controller' => 'pages', 'action' => 'saveUser'));
+	Router::connect('/load_reservations', array('controller' => 'pages', 'action' => 'load_reservations'));
+	Router::connect('/save_notification', array('controller' => 'pages', 'action' => 'save_notification'));
+	Router::connect('/save_reservation', array('controller' => 'pages', 'action' => 'save_reservation'));
+	Router::connect('/calendario', array('controller' => 'pages', 'action' => 'calendar'));
+	Router::connect('/home', array('controller' => 'pages', 'action' =>  'home'));
+	Router::connect('/save_reservation_calendar', array('controller' => 'pages', 'action' => 'save_reservation_calendar'));
 	
 	
 /**

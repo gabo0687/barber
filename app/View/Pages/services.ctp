@@ -36,9 +36,9 @@
             $position = 0;
             foreach( $barbers as $barber ){ ?>
             <div class="form-group">
-              <label for="accountInputEmail">Duración(minutos) <?php echo $barber['nombre'];?></label>
-              <input type="number" class="form-control" id="duracion_edit<?php echo $barber['id'];?>" name="duracion_edit<?php echo $barber['id'];?>" aria-describedby="emailHelp" placeholder="Duración <?php echo $barber['nombre'];?>">
-              <input type="hidden" id="duracion_Id_edit<?php echo $barber['id'];?>" name="duracionId_edit<?php echo $barber['id'];?>" value="<?php echo $barber['id'];?>">
+              <label for="accountInputEmail">Duración(minutos) <?php echo $barber['User']['name'];?></label>
+              <input type="number" class="form-control" id="duracion_edit<?php echo $barber['User']['id'];?>" name="duracion_edit<?php echo $barber['User']['id'];?>" aria-describedby="emailHelp" placeholder="Duración <?php echo $barber['User']['name'];?>">
+              <input type="hidden" id="duracion_Id_edit<?php echo $barber['User']['id'];?>" name="duracionId_edit<?php echo $barber['User']['id'];?>" value="<?php echo $barber['User']['id'];?>">
             </div>
             <?php 
             $position++;
@@ -77,9 +77,9 @@
             $position = 0;
             foreach( $barbers as $barber ){ ?>
             <div class="form-group">
-              <label for="accountInputEmail">Duración(minutos) <?php echo $barber['nombre'];?></label>
-              <input type="number" class="form-control" id="duracion<?php echo $position;?>" name="duracion<?php echo $position;?>" aria-describedby="emailHelp" placeholder="Duración <?php echo $barber['nombre'];?>">
-              <input type="hidden" id="duracionId<?php echo $position;?>" name="duracionId<?php echo $position;?>" value="<?php echo $barber['id'];?>">
+              <label for="accountInputEmail">Duración(minutos) <?php echo $barber['User']['name'];?></label>
+              <input type="number" class="form-control" id="duracion<?php echo $position;?>" name="duracion<?php echo $position;?>" aria-describedby="emailHelp" placeholder="Duración <?php echo $barber['User']['name'];?>">
+              <input type="hidden" id="duracionId<?php echo $position;?>" name="duracionId<?php echo $position;?>" value="<?php echo $barber['User']['id'];?>">
             </div>
             <?php 
             $position++;
@@ -109,11 +109,11 @@
       $(this).tab('show')
     });
 
-    function editService(idServicio){
+    function editService(ServicioId){
       $.ajax({
                 type: 'POST', 
                 url: 'load_service', 
-                data: 'idServicio='+idServicio,
+                data: 'idServicio='+ServicioId,
                 beforeSend:function() {  
 
                 },
@@ -142,7 +142,7 @@
                     //console.log(`${key}: ${value}`);
                   });
                   
-                  $('#id_edit').val(idServicio); 
+                  $('#id_edit').val(ServicioId); 
                   $('#nombre_edit').val(nombreServicio);
                   $('#precio_edit').val(precioServicio);
                   //$('select>option>value('+generoServicio+')').prop('selected', true);

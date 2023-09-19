@@ -13,16 +13,22 @@
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-
-    
-
-  
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
 <link href="css/styles.css" rel="stylesheet" type="text/css">
 <link href="css/font-awesome/css/font-awesome.css" rel="stylesheet" type="text/css">
+<style>
+  .blink_me {
+  animation: blinker 1s linear infinite;
+}
 
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+</style>
 </head>
 
 <body>
@@ -34,21 +40,34 @@
             </div>         
                 <a class="logo" href="index.php"></a>
                 <div class="user">
-                    <div class="username"><?php if($user != ''){ ?><a class="user-edit" href="account"><?php echo $user;?> <img src="img/layout/gear.svg"></a> | <a class="logout" href="logout">Logout</a> <?php }else{ ?><a data-bs-toggle="modal" data-bs-target="#login">Ingreso</a><?php } ?> </div>
-                </div>
-                <form class="header-search">   
-			       <?php if( $user != '' ){ ?>
-                <div class="event-info-buttons"> 
-              <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal">💈Reservar espacio</a> 
-              <?php if( $user == 'Berman' ){?>
-              <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
-              <?php } ?>
-              </div>
-              <?php } ?>
-            </form>
+
+                <?php 
+                 
+                 if(!empty($_SESSION['User'])){ ?>
+                 <div class="username"><a class="user-edit" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>|  <a href="logout" class="logout">Logout</a> </div>
+                 <?php }else{ ?>
+                 <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
+                 <?php } ?>
+             </div>
+         <?php if(!empty($_SESSION['User'])){ ?>     
+         <form class="header-search">   
+           <div class="event-info-buttons"> 
+           <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
+           <?php 
+           if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '2' ){ ?> 
+           <a class="ticket-btn" id="calendar" href="calendario" type="button" >💈Vista del Calendario</a>
+           <?php } ?>
+          </div>
+         </form>
+         <?php } ?>
+
         
         </div>
-        
+        <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Usuario creado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
+        <hr>
+      </div>
         
         
     </header>
@@ -66,7 +85,7 @@
         <small><a href="policies.php">Políticas de Privacidad</a> | <a href="terms.php">Términos y Condiciones de Uso</a></small>
     </footer>
 
-<div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal fade" id="login" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
@@ -74,20 +93,25 @@
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form action="login" method="POST">
+        <form>
           <div class="form-group">
-            <label for="loginInputEmail1">Email</label>
-            <input type="text" name="user" class="form-control" id="loginInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
+            <label for="loginInputEmail1">Telefono</label>
+            <input type="number" class="form-control" name="loginNumber" id="loginNumber" aria-describedby="emailHelp" placeholder="Ingrese su numero de Telefono">
           </div>
           <div class="form-group">
             <label for="loginInputPassword1">Contraseña</label>
-            <input type="password" class="form-control" id="loginInputPassword1" placeholder="Password">
+            <input type="password" class="form-control" name="loginPass" id="loginPass"  placeholder="Password">
           </div>
             <div class="form-group text-right">                
               <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
-              <button type="submit" class="btn btn-primary">Ingresar</button>
+              <button type="button" class="btn btn-primary" id="loginNumbers" onclick="login()">Login</button>
             </div>
-            
+            <div class="form-group" id="noerror-mail" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este correo no existe, por favor registrese.</b></span></label>
+            </div>
+            <div class="form-group" id="login-error" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Usuario o contraseña invalidos.</b></span></label>
+            </div>
             <div class="form-group text-right">
                 <small><a>¿Olvidó su contraseña?</a></small>
             </div>
@@ -101,27 +125,48 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Registro</h5>
+        <h5 class="modal-title" id="exampleModalLabel">Registrarse</h5>
         <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
-        <form>
+        <form action="saveUser" method="post" id="createUser">
           <div class="form-group">
-            <label for="signupInputName">Nombre de Usuario</label>
-            <input type="email" class="form-control" id="signupInputName" aria-describedby="emailHelp" placeholder="Enter email">
+            <label for="signupName">Nombre Completo*</label>
+            <input type="text" class="form-control" id="signupName" name="signupName"  placeholder="Nombre">
           </div>
           <div class="form-group">
-            <label for="signupInputEmail">Email</label>
-            <input type="email" class="form-control" id="signupInputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+            <label for="signupName">Número de Celular*</label>
+            <input type="number" class="form-control" id="signupPhone" name="signupPhone"  onblur="checkPhone(this.value)" placeholder="Telefono" >
           </div>
           <div class="form-group">
-            <label for="signupInputPassword1">Contraseña</label>
-            <input type="password" class="form-control" id="signupInputPassword1" placeholder="Password">
+          <label for="signupGender">Genero*</label>
+            <select name="signupGender" id="signupGender">
+              <option value="1">Maculino</option>
+              <option value="2">Femenino</option>
+              <option value="3">indefinido</option>
+            </select>
           </div>
           <div class="form-group">
-            <label for="signupInputPassword2">Repita la Contraseña</label>
-            <input type="password" class="form-control" id="signupInputPassword2" placeholder="Password">
+            <label for="signupName">Contraseña*</label>
+            <input type="password" class="form-control" id="signupPassword1" name="signupPassword1" placeholder="Contraseña">
           </div>
+          <div class="form-group">
+            <label for="signupName">Repita la Contraseña*</label>
+            <input type="password" class="form-control" id="signupPassword2" name="signupPassword2" placeholder="Contraseña">
+          </div>
+          </br>
+            <div class="form-group" id="error-pass" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Las contraseñas no coinciden.</b></span></label>
+            </div>
+            <div class="form-group" id="error-mail" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este numero ya esta siendo utilizado por otro usuario.</b></span></label>
+            </div>
+            <div class="form-group" id="error-passChar" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>La contraseña debe ser mayor a 7 caracteres y tener al menos 1 letra en Mayúscula.</b></span></label>
+            </div>
+            <div class="form-group" id="error-empty" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
+            </div>
           <div class="form-group text-right">
               <button type="submit" class="btn btn-primary">Enviar</button>
           </div>
@@ -142,7 +187,7 @@
       </div>
       <div class="modal-body">
         <label>Seleccione la fecha que deseas reservar</label>
-        <input class="form-control" type="text" onfocus="changeReservationDate()" placeholder="09/12/2023" name="fecha_reserva" id="fecha_reserva">
+        <input class="form-control" type="text" onchange="filterReservations()" onfocus="changeReservationDate()" placeholder="<?php echo date('m/d/Y');?>" name="fecha_reserva" id="fecha_reserva">
       
         <?php if( $user == 'Berman' ){ ?>  
       <span class="description">Cliente:</span>                
@@ -161,35 +206,47 @@
 
       <span class="description">Servicio:</span>
       <span class="tax">
-                      <select class="form-control">
-                      <option value="1">Corte de pelo</option>
-                      <option value="2">Corte de pelo y barba</option>
+                      <select class="form-control" onchange="filterReservations()" name="services" id="services">
+                        <?php foreach( $services as $service ){ ?>
+                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                        <?php } ?>
                       </select>
       </span>   
       <span class="description">Filtrar por Barbero:</span>
       <span class="tax">
-                      <select class="form-control">
+                      <select class="form-control" onchange="filterReservations()" name="barber" id="barber">
                       <option value="0">Todos</option>
-                      <option value="1">Berman</option>
-                      <option value="2">Joss</option>
-                      <option value="2">Dey</option>
+                      <?php foreach( $users as $user ){?>
+                      <option value="<?php echo $user['User']['id'];?>"><?php echo $user['User']['name'];?></option>
+                      <?php } ?>
                       </select>
       </span>             
       <span class="description">Escoger hora:</span>
       <span class="tax">
-                      <select class="form-control" onchange="notificationTime(this.value)">               
+      <select class="form-control" onchange="filterReservations()" name="reservation_time" id="reservation_time"> 
+      <option value="0">Todas</option>              
       <?php 
       $time_hour = 8;
       $time_minute = '00';
-      for($i=0; $i <= 54; $i++){ ?>    
+      for($i=0; $i <= 28; $i++){ 
+        if( $time_minute != 60 ){
+        ?>    
       
         <option value="<?php echo $time_hour.':'.$time_minute;?>"><?php echo $time_hour.':'.$time_minute;?></option>      
       <?php
-      if( $time_minute == 45 ){
+        }
+      if( $time_minute == 30 ){
         $time_minute = '00';
         $time_hour = $time_hour + 1;
       }else{
-        $time_minute = $time_minute +15;
+        if( $time_minute == 60 ){
+          $time_minute = '00';
+        $time_hour = $time_hour + 1;
+        }else{
+          if( $time_minute == 00 || $time_minute == 30 ){
+            $time_minute = $time_minute +30;
+          }
+        }  
       } 
       } 
       ?>  
@@ -197,41 +254,17 @@
       </span>  
       <div id="notificaciones_check" style="display:none">
       </br>
-      <span class="tax">
-      <input checked type="checkbox" />
-      </span> 
-      <span class="description" id="notificaciones_text"><b>Notificarme si se libera un espacio en el rango de 8:00 a 9:00 para el Martes 12 de Setiembre 2023</b></span>
-      </br><button type="button" class="btn btn-success"><a>Guardar Notificación</a></button>
+      <span class="description" id="notificaciones_text"></span>
+      </br><button type="button" class="btn btn-success" onclick="saveNotification()"><a>Guardar Notificación</a> <span class="spinner-border-sm" id="loadingNotification"></span></button>
+      </br>
+      
       </br>
       </div>
+      <span style="color:green; display:none" id="notificationMessage"><b>Notificación guardada exitosamente!</b></span>
       </br>
-      <label><b>Espacios para hoy CORTE DE PELO:</b></label>
-          <ul class="ticket-list">
-           
-              <li class="ticket-on-sale">
-                  <span class="number">Hora: 8:00</span>
-                  <span class="price">Servicio: Corte de Pelo</span>
-                   <span class="price">Tiempo: 1 hora</span>
-                  <span class="price">Precio: ₡10.000</span>
-                  <span class="price">Barberos disponibles:</span>
-                  <span class="price">
-                  <input type="radio" name="barbero" id="barbero1">Berman
-                  <input type="radio" name="barbero" id="barbero1">Dey
-                  <input type="radio" name="barbero" id="barbero1">Joss</span>
-                  <button type="button" class="btn btn-secondary"><a>Reservar</a></button>
-              </li>  
-              <li class="ticket-on-sale">
-                  <span class="number">Hora: 8:15</span>
-                  <span class="price">Servicio: Corte de Pelo</span>
-                   <span class="price">Tiempo: 1 hora</span>
-                  <span class="price">Precio: ₡10.000</span>
-                  <span class="price">Barberos disponibles:</span>
-                  <span class="price">
-                  <input type="radio" name="barbero" id="barbero1">Berman
-                  <input type="radio" name="barbero" id="barbero1">Dey</span>
-                  <button type="button" class="btn btn-secondary"><a>Reservar</a></button>
-              </li>   
-                
+      <label id="ServiceText"></label>
+          <ul class="ticket-list">  
+            <li id="loading" class=""></li>
           </ul>
       </div>
     </div>
@@ -241,13 +274,168 @@
 </html>
 <script>
 
-function notificationTime(time){
-  $('#notificaciones_check').show();
-  var time = time.split(':');
-  var timeTo = parseFloat(time[0]) + 1; 
-  var timeFrom = parseFloat(time[0]) -1; 
-  $("#notificaciones_text").html('<b>Notificarme si se libera un espacio en el rango de '+timeFrom+':00 a '+timeTo+':00 para el Martes 12 de Setiembre 2023</b>');
+function reservar(reservationNumber){
+ 
+  var reservationDate    = $('#fecha_reserva').val();
+  var reservationBarber  = $("#barbero_"+reservationNumber+":checked").val();
+  var reservationService = $('#service_'+reservationNumber).val();
+  var reservationTime    = $('#time_'+reservationNumber).val();
+  $.ajax({
+                type: 'POST', 
+                url: 'save_reservation', 
+                data: 'reservation_date='+reservationDate+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
+                beforeSend:function() {  
+                  $('#loadingReservation'+reservationNumber).addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(notification) {
+                  $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
+                  $('#messageReservation'+reservationNumber).show();
+                  $('#button'+reservationNumber).hide();
+                  setInterval(function() {
+                    location.reload();
+                  }, 3000); 
+                  
+                }
+	});
+
 }
+
+function saveNotification(){
+  var reservationDate = $('#fecha_reserva').val();
+  var reservationFilterTime = $('#reservation_time').val();
+  $.ajax({
+                type: 'POST', 
+                url: 'save_notification', 
+                data: 'reservationDate='+reservationDate+'&reservationFilterTime='+reservationFilterTime,
+                beforeSend:function() {  
+                  $('#loadingNotification').addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(notification) {
+                 
+             
+                  $('#loadingNotification').removeClass('spinner-border');
+                  $('#notificaciones_check').hide();
+                  $('#notificationMessage').show();  
+                }
+	});
+}
+
+function filterReservations(){
+
+  var reservationServices = $('#services').val();
+  var reservationServicesText = $('#services option:selected').text();
+  var reservationDate = $('#fecha_reserva').val();
+  var reservationDateText = 'hoy';
+  if( reservationDate != '' ){
+    const fechaComoCadena = reservationDate+" 23:37:22"; // día lunes
+    const dias = [
+      'Domingo',
+      'Lunes',
+      'Martes',
+      'Miércoles',
+      'Jueves',
+      'Viernes',
+      'Sábado',
+    ];
+    var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    
+    const numeroDia = new Date(fechaComoCadena).getDay();
+    const nombreDia = dias[numeroDia];
+    const numeroMes = new Date(fechaComoCadena).getMonth();
+    const nombreMes = meses[numeroMes];
+    const anio = new Date(fechaComoCadena).getFullYear();
+    const dia = new Date(fechaComoCadena).getDate();
+    
+
+    reservationDateText = nombreDia+' '+dia+' de '+nombreMes+' '+anio;
+  }
+  $('#ServiceText').html('<b>Espacios para '+reservationDateText+' '+reservationServicesText+' disponibilidad más cercana:</b>');
+  var reservationBarber = $('#barber').val();
+  var reservationFilterTime = $('#reservation_time').val();
+  $.ajax({
+                type: 'POST', 
+                url: 'load_reservations', 
+                data: 'reservationDate='+reservationDate+'&reservationServices='+reservationServices+'&reservationBarber='+reservationBarber+'&reservationTime='+reservationFilterTime,
+                beforeSend:function() {  
+                  $('#loading').addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(services) {
+                 
+                 const res = JSON.parse(services);
+                 var reservationTime = '';
+                  var reservationService = '';
+                  var reservationDuration = '';
+                  var reservationPrice = '';
+                  var reservationBarbers = '';
+                  var responseHtml = '';
+                  var reservationNumber = 0;
+                  var barberNumber = 0;
+                  Object.entries(res).forEach((entry) => {
+                    reservationTime = entry[1].Time;
+                    reservationService = entry[1].Service;
+                    reservationServiceId = entry[1].ServiceId;
+                    reservationDuration = entry[1].Duration;
+                    reservationPrice = entry[1].Price;
+                    reservationBarbers = entry[1].Barbers;
+                    if( reservationBarbers.length > 0 ){
+                      responseHtml += '<li class="ticket-on-sale"><span class="number">Hora: '+reservationTime+'</span>';
+                      responseHtml += '<input type="hidden" name="time_'+reservationNumber+'" id="time_'+reservationNumber+'" value="'+reservationTime+'">';
+                      
+                      responseHtml += '<span class="price">Servicio: '+reservationService+'</span>';
+                      responseHtml += '<input type="hidden" name="service_'+reservationNumber+'" id="service_'+reservationNumber+'" value="'+reservationServiceId+'">';
+                        
+                      responseHtml += '<span class="price">Tiempo: '+reservationDuration+' minutos</span>';
+                      responseHtml += '<span class="price">Precio: ₡'+reservationPrice+'</span>';
+                      responseHtml += '<span class="price">Barberos disponibles:</span></br>';
+                      responseHtml += '<span class="price">';
+                      Object.entries(reservationBarbers).forEach((barber) => {
+                        //console.log(barber);
+                        responseHtml += '<input type="radio" name="barbero_'+reservationNumber+'" id="barbero_'+reservationNumber+'" value="'+barber[1].User.id+'">'+barber[1].User.name+'</br>';
+                        barberNumber++;
+                      });
+                      
+                      responseHtml += '</br><button type="button" class="btn btn-success" id="button'+reservationNumber+'" onclick="reservar('+reservationNumber+')"><a>Reservar </a> <span class="spinner-border-sm" id="loadingReservation'+reservationNumber+'"></span></button>';
+                      responseHtml += '</br><span id="messageReservation'+reservationNumber+'" class="blink_me" style="color:white; display:none">Reservación creada con exito!</span>';
+                      responseHtml += '</li>';
+                      reservationNumber++;
+                    }
+                  });
+                  $('#loading').removeClass('spinner-border');
+                  $('.ticket-list').html(responseHtml);  
+                 notificationTime(reservationFilterTime,reservationDateText);
+                }
+	});
+}
+
+
+
+
+var checkNumber = false;
+function notificationTime(time,reservationDateText){
+  if( time != 0 ){
+    $('#notificationMessage').hide(); 
+    var time = time.split(':');
+    var timeTo = parseFloat(time[0]) + 1; 
+    var timeFrom = parseFloat(time[0]) -1; 
+    $('#notificaciones_check').show();
+    if( reservationDateText != 'hoy' ){
+      reservationDateText = 'el '+reservationDateText;
+    }
+    $("#notificaciones_text").html('<b>Notificarme si se libera un espacio en el rango de '+timeFrom+':00 a '+timeTo+':00 para '+reservationDateText+'</b>');
+  }
+ }
 
   function changeDate(){
     $('#fecha_reserva_admin').attr('type','date');
@@ -263,6 +451,151 @@ function notificationTime(time){
 }, "500");
   
   }
+
+  function checkPhone(userPhone){
+
+$.ajax({
+              type: 'POST', 
+              url: 'Pages/getPhone', 
+              data: 'phone='+userPhone,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(existPhone) {
+                if(existPhone == 1 ){
+                  event.preventDefault();
+                  checkNumber = true;
+                  $('#error-mail').show();
+                  $('#signupPhone').css('border','2px solid red');
+                } else{
+                  checkNumber = false;
+                  $('#error-mail').hide();
+                  $('#signupPhone').css('border','');
+                }
+              }
+});
+}
+
+
+function login(){
+  var logNumber = $('#loginNumber').val();
+  var logPassword = $('#loginPass').val();
+  $.ajax({
+              type: 'POST', 
+              url: 'Pages/loginUser', 
+              data: 'loginNumber='+logNumber+'&loginPass='+logPassword,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(userExist) {
+                if(userExist == 1 ){
+                  $('#login-error').hide();
+                  window.location.reload();
+                } else{
+                  event.preventDefault();
+                  $('#login-error').show();
+                }
+              }
+          });
+}
+
+
+
+$( "#createUser" ).on( "submit", function( event ) {
+  var nombre = $('#signupName').val();
+  var celular = $('#signupPhone').val();
+  var genero = $('#signupGender').val();
+  //var userEmail = $('#signupEmail').val();
+  var userContrasena = $('#signupPassword1').val();
+  var confirmContrasena = $('#signupPassword2').val();
+  var mayuscula = false;
+  checkPhone(celular);
+ 
+  if(userContrasena.match(/[A-Z]/)){
+    mayuscula = true;
+  }
+
+  if( nombre == '' || celular == '' || genero == '' || checkNumber == true ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
+    event.preventDefault();
+    
+    if( userContrasena != confirmContrasena ){
+      $('#error-pass').show();
+      $('#signupPassword2').css('border','2px solid red');
+      $('#signupPassword1').css('border','2px solid red');
+    }else{
+      $('#error-pass').hide();
+      $('#signupPassword2').css('border','');
+      $('#signupPassword1').css('border','');
+    }
+    $showError = false;
+    if( nombre == '' ){
+      $('#signupName').css('border','2px solid red');
+      $showError = true;
+    }else{
+       $('#signupName').css('border','');
+    }
+    if( genero == '' ){
+      $('#signupGender').css('border','2px solid red');
+      $showError = true;
+    }else{
+       $('#signupGender').css('border','');
+    }
+    if( celular == '' ){
+      $showError = true;
+      $('#signupPhone').css('border','2px solid red');
+    }else{
+       $('#signupPhone').css('border','');
+    }
+    if( checkNumber == true ){
+      $('#error-mail').show();
+      $('#signupPhone').css('border','2px solid red');
+    }else{
+      $('#error-mail').hide();
+      $('#signupPhone').css('border','');
+    }
+    if( (userContrasena.length < 9) || (mayuscula == false) ){
+      $('#signupPassword1').css('border','2px solid red');
+      $('#error-passChar').show();
+    }else{
+       $('#signupPassword1').css('border','');
+       $('#error-passChar').hide();
+    }
+    if ($showError){
+      $('#error-empty').show();
+    }else{
+      $('#error-empty').hide();
+    }
+  }else{
+    window.scrollTo(0, 0);
+    $('.close').click();
+    $('#userCreated').show();
+        setInterval(function() {
+            $('#userCreated').hide('2000');
+            $('#login').show();
+          }, 10000);
+    
+  }
+  
+});
+
+var input = document.getElementById("loginPass");
+input.addEventListener("keypress", function(event) {
+  // If the user presses the "Enter" key on the keyboard
+  if (event.key === "Enter") {
+    // Cancel the default action, if needed
+    event.preventDefault();
+    // Trigger the button element with a click
+    document.getElementById("loginNumbers").click();
+  }
+});
 
 </script>
 

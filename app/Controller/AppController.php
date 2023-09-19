@@ -32,6 +32,36 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
+    public $uses = array('Service','Duration','User');
 
-    
-}
+    function beforeFilter() {
+     
+            @session_start();
+            //$user = $this->Session->read('User');
+            
+            
+            //if (($this->Session->check('User')) && (is_array($this->Session->read('User')))) {
+            if( !empty($_SESSION['User']) ){
+                $user = $_SESSION['User'];	
+                //$userSession = $this->Session->read('User');
+                $userSession = $_SESSION['User'];
+                $this->set('userSessionFront',$userSession);
+                $services = $this->Service->find('all');
+                $this->set('services',$services);
+                $users = $this->User->find('all',array('conditions'=>array(
+                                            'OR'=> array(
+                                                        array('User.type'=>1),
+                                                        array('User.type'=>2)
+                                                        )
+                                                    )
+                                                )
+                                            );
+                $this->set('users',$users);
+                $clients = array();
+                $clients = $this->User->find('all',array('conditions'=>array('User.type'=>3)));
+                $this->set('clients',$clients);
+            }
+            
+        }
+    }
+
