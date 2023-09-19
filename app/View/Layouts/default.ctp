@@ -13,10 +13,6 @@
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
   <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-
-    
-
-  
   <link rel="stylesheet" href="//code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
 
 <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
@@ -59,7 +55,7 @@
            <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
            <?php 
            if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '2' ){ ?> 
-           <a class="ticket-btn" id="calendar" href="calendar" type="button" >💈Vista del Calendario</a>
+           <a class="ticket-btn" id="calendar" href="calendario" type="button" >💈Vista del Calendario</a>
            <?php } ?>
           </div>
          </form>
