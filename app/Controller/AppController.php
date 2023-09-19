@@ -57,6 +57,9 @@ class AppController extends Controller {
                                                 )
                                             );
                 $this->set('users',$users);
+                $clients = array();
+                $clients = $this->User->find('all',array('conditions'=>array('User.type'=>3)));
+                $this->set('clients',$clients);
             }
             
         }

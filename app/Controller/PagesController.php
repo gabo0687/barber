@@ -49,7 +49,7 @@ public function home(){
 
 	$user = '';
 	$reservations = array();
-
+	$reservationResponse=array();
 	if(isset($_SESSION['User'])){
 		$conditions = array();
 		$user = $_SESSION['User'];
@@ -63,7 +63,7 @@ public function home(){
 		$reservations = $this->Reservation->find('all',array('fields'=>
 																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
 																		  'Service.id','Service.service_name','Service.price',
-																		  'Barber.id','Barber.name',
+																		  'Barber.id','Barber.name','Barber.color',
 																		  'User.id','User.name','User.phone',
 																		  ),
 															 'conditions'=>
@@ -94,14 +94,14 @@ public function home(){
 																),
 															 'order'=>array('Reservation.reservation_date'=>'ASC','Reservation.reservation_time'=>'ASC')
 															));
-
-	}
-	$reservationResponse=array();
 	foreach( $reservations as $reservation ){
 		$duration = $this->Duration->find('first',array('fields'=>array('Duration.id','Duration.duration'),'conditions'=>array('Duration.barber'=>$reservation['Barber']['id'],'Duration.service_id'=>$reservation['Service']['id'])));
 		array_push($reservation,$duration);
 		array_push($reservationResponse,$reservation);
 	}
+	Cache::write('reservationResponse'.$_SESSION['User']['User']['id'], $reservationResponse);
+	}
+	
 	
 	$this->set('reservations',$reservationResponse);
 	$this->set('user',$user);
@@ -518,10 +518,111 @@ function saveUser(){
 		$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
 		$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
 		if($this->Reservation->save($data)){
+			Cache::clear();
 			echo 1;
 		}else{
 			echo 0;
 		}
+	}
+
+	public function save_reservation_calendar(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		if( $_POST['reservation_date'] == '' ){
+			$reservationDate = date('Y-m-d'); 
+		}else{
+			$reservationDate = $_POST['reservation_date'];
+		}
+		$this->Reservation->create();
+		$data['Reservation']['reservation_date'] = $reservationDate;
+		$data['Reservation']['reservation_time'] = $_POST['reservation_time'];
+		$data['Reservation']['reservation_user'] = $_POST['reservation_client'];
+		$data['Reservation']['reservation_service'] = $_POST['reservation_service'];
+		$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
+		$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
+		if($this->Reservation->save($data)){
+			Cache::clear();
+			echo 1;
+		}else{
+			echo 0;
+		}
+	}
+
+	public function calendar(){
+		$this->layout = 'ajax';
+		$events= array();
+		$reservations = Cache::read('reservationResponse'.$_SESSION['User']['User']['id']);
+		if( !$reservations ){
+
+			$this->reservations();
+			$reservations = Cache::read('reservationResponse'.$_SESSION['User']['User']['id']);
+			
+		}
+		foreach( $reservations as $reservation ){
+			$reservationId = $reservation['Reservation']['id'];
+			$reservationdate = $reservation['Reservation']['reservation_date'];
+			$reservationtimeStart = $reservation['Reservation']['reservation_time'];
+			
+			$time= date('H:i:s',strtotime($reservationtimeStart));
+			$duration = $reservation[0]['Duration']['duration'];
+			$duration = strval($duration);
+			$sumarTime = strtotime('+'.$duration.' minute',strtotime($time));
+			$reservationtimeEnd= date('H:i:s',$sumarTime);
+			
+			$userId = $reservation['User']['id'];
+			$userName = $reservation['User']['name'];
+			$service = $reservation['Service']['service_name'];
+			$barberName = $reservation['Barber']['name'];
+			$barbercolor = $reservation['Barber']['color'];
+			
+			$event = array('groupId'=>$reservationId,'id'=>$service,'title'=>$userName,'start'=>$reservationdate.'T'.$reservationtimeStart,'end'=>$reservationdate.'T'.$reservationtimeEnd,'color'=>$barbercolor);
+			array_push($events , $event);
+		}
+		$this->set('events',$events);
+	}
+
+	public function reservations(){
+		$reservations = $this->Reservation->find('all',array('fields'=>
+																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
+																		  'Service.id','Service.service_name','Service.price',
+																		  'Barber.id','Barber.name','Barber.color',
+																		  'User.id','User.name','User.phone',
+																		  ),
+															 'joins' =>
+															 array(
+																 array(
+																	 'table' => 'services',
+																	 'alias' => 'Service',
+																	 'type' => 'inner',
+																	 'foreignKey' => false,
+																	 'conditions'=> array('Service.id = Reservation.reservation_service'),
+																 ),
+																 array(
+																	'table' => 'users',
+																	'alias' => 'Barber',
+																	'type' => 'inner',
+																	'foreignKey' => false,
+																	'conditions'=> array('Barber.id = Reservation.reservation_barber')
+																),
+																array(
+																   'table' => 'users',
+																   'alias' => 'User',
+																   'type' => 'inner',
+																   'foreignKey' => false,
+																   'conditions'=> array('User.id = Reservation.reservation_user')
+															   )          
+																),
+															 'order'=>array('Reservation.reservation_date'=>'ASC','Reservation.reservation_time'=>'ASC')
+															));
+		$reservationResponse = array();													
+		foreach( $reservations as $reservation ){
+			$duration = $this->Duration->find('first',array('fields'=>array('Duration.id','Duration.duration'),'conditions'=>array('Duration.barber'=>$reservation['Barber']['id'],'Duration.service_id'=>$reservation['Service']['id'])));
+			array_push($reservation,$duration);
+			array_push($reservationResponse,$reservation);
+		}
+		
+		Cache::write('reservationResponse'.$_SESSION['User']['User']['id'], $reservationResponse);
+		
 	}
 
 }
