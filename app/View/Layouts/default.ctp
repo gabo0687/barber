@@ -188,21 +188,26 @@
       <div class="modal-body">
         <label>Seleccione la fecha que deseas reservar</label>
         <input class="form-control" type="text" onchange="filterReservations()" onfocus="changeReservationDate()" placeholder="<?php echo date('m/d/Y');?>" name="fecha_reserva" id="fecha_reserva">
+        <input type="hidden" name="user_type" id="user_type" value="<?php echo $user['User']['type'];?>">
       
-        <?php if( $user == 'Berman' ){ ?>  
+        <?php 
+        if( $user['User']['type'] == 1 || $user['User']['type'] == 2 ){ ?>  
       <span class="description">Cliente:</span>                
       <span class="tax">
 
-        <input type="search" list="clients" class="form-control" name="client" placeholder="Escribe el nombre del cliente">
+        <input type="search" list="clients" class="form-control" id="client" name="client" placeholder="Escribe el nombre del cliente">
 
         <datalist id="clients">
-          <option value="1 - Gabriel Aguilar | +50683481182" />
-          <option value="2 - Jael Mora | +50682607313" />
-          <option value="3 - Eithzan Aguilar | +50683589621" />
-          <option value="4 - Abigail Aguilar | +50683459127" />
+          <?php foreach( $clients as $client ){?>
+          <option value="<?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?>" />
+          <?php } ?>
         </datalist>
       </span>
       <?php } ?>
+      <span id="clientError" style="display:none; color:red">Selecciona un cliente</br></span>
+      <span id="clientFormatError" style="display:none; color:red">Debes seleccionar a un cliente de la lista</br></span>
+      
+      
 
       <span class="description">Servicio:</span>
       <span class="tax">
@@ -280,28 +285,76 @@ function reservar(reservationNumber){
   var reservationBarber  = $("#barbero_"+reservationNumber+":checked").val();
   var reservationService = $('#service_'+reservationNumber).val();
   var reservationTime    = $('#time_'+reservationNumber).val();
-  $.ajax({
-                type: 'POST', 
-                url: 'save_reservation', 
-                data: 'reservation_date='+reservationDate+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
-                beforeSend:function() {  
-                  $('#loadingReservation'+reservationNumber).addClass('spinner-border');
-                },
-                error: function(){
+  var user_type = $('#user_type').val();
+  var client = 0;
+  var clientEmpty = true;
+  var clientFormat = true;
+  if( user_type == 1 || user_type == 2 ){
+    client    = $('#client').val();
+    if( $('#client').val() == '' ){
+      clientEmpty = false;
+    }else{
+      var splitClient = client.split('-');
+      if( splitClient.length < 2 )
+        clientFormat = false;
+      }
+    
+  }
+  
+  if( undefined != reservationBarber && clientEmpty && clientFormat ){
+   
+    $.ajax({
+                  type: 'POST', 
+                  url: 'save_reservation', 
+                  data: 'reservation_date='+reservationDate+'&client='+client+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
+                  beforeSend:function() {  
+                    $('#loadingReservation'+reservationNumber).addClass('spinner-border');
+                  },
+                  error: function(){
+                      
+                  alert('No hay internet');    
+                  },
+                  success: function(notification) {
+                    if( notification == 3 ){
+                      $('#messageReservationError'+reservationNumber).hide();
+                      $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
+                      $('#messageValidate'+reservationNumber).show();
+                    }else{
+                      $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
+                    $('#messageReservation'+reservationNumber).show();
+                    $('#button'+reservationNumber).hide();
+                    $('#messageReservationError'+reservationNumber).hide();
+                    $('#clientError').hide();
+                    $('#client').val('');
+                    setInterval(function() {
+                      location.reload();
+                    }, 2000);
+                    }
+                     
                     
-                alert('No hay internet');    
-                },
-                success: function(notification) {
-                  $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
-                  $('#messageReservation'+reservationNumber).show();
-                  $('#button'+reservationNumber).hide();
-                  setInterval(function() {
-                    location.reload();
-                  }, 3000); 
-                  
-                }
-	});
+                  }
+    });
+ }else{
+  if( !clientFormat ){
+    $('#clientFormatError').show();
+    $('#compraModal').scrollTop(0);
+  }else{
+    $('#clientFormatError').hide();
+  }
 
+  if( !clientEmpty ){
+    $('#clientError').show();
+    $('#compraModal').scrollTop(0);
+  }else{
+    $('#clientError').hide();
+  }
+  if( undefined == reservationBarber ){
+    $('#messageReservationError'+reservationNumber).show();
+  }else{
+    $('#messageReservationError'+reservationNumber).hide();
+  }
+  
+ }
 }
 
 function saveNotification(){
@@ -329,7 +382,7 @@ function saveNotification(){
 }
 
 function filterReservations(){
-
+  
   var reservationServices = $('#services').val();
   var reservationServicesText = $('#services option:selected').text();
   var reservationDate = $('#fecha_reserva').val();
@@ -408,6 +461,9 @@ function filterReservations(){
                       
                       responseHtml += '</br><button type="button" class="btn btn-success" id="button'+reservationNumber+'" onclick="reservar('+reservationNumber+')"><a>Reservar </a> <span class="spinner-border-sm" id="loadingReservation'+reservationNumber+'"></span></button>';
                       responseHtml += '</br><span id="messageReservation'+reservationNumber+'" class="blink_me" style="color:white; display:none">Reservación creada con exito!</span>';
+                      responseHtml += '</br><span id="messageReservationError'+reservationNumber+'" class="blink_me" style="color:white; display:none">Error! Por favor selecciona un barbero</span>';
+                      responseHtml += '</br><span id="messageValidate'+reservationNumber+'" class="" style="color:white; display:none">Error! el cliente ya tiene 2 reservaciones activas, si desea realizar otra reservación contactenos<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
+                      
                       responseHtml += '</li>';
                       reservationNumber++;
                     }
