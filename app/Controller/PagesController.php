@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Service','Duration','User','Reservation','Notification');
+	public $uses = array('Service','Duration','User','Reservation','Notification','Customer');
 	public $components = array('Encrypt');
 /**
  * Displays a view
@@ -60,6 +60,8 @@ public function home(){
 				$conditions['Reservation.reservation_barber'] = $user['User']['id'];
 			}		
 		}
+		$conditions['Reservation.reservation_date >='] = date('Y-m-d');
+		$conditions['Reservation.reservation_status <>'] = 2;
 		$reservations = $this->Reservation->find('all',array('fields'=>
 																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
 																		  'Service.id','Service.service_name','Service.price',
@@ -313,9 +315,10 @@ function saveUser(){
 		
 		
 		$reservationTime 	 = $_POST['reservationTime'];
-
+		
 		$reservations = $this->Reservation->find('all',array('conditions'=>array(
-																'Reservation.reservation_date'=>$reservationDate
+																'Reservation.reservation_date'=>$reservationDate,
+																'Reservation.reservation_status <>'=>2
 																),
 																'order'=>array('Reservation.reservation_time'=>'ASC')
 															));
@@ -381,7 +384,14 @@ function saveUser(){
 							}
 						}
 						if( $barberExist == false && $filterBarber == $barberResponse['User']['id'] ){
-							array_push($reservationBarberResponse , $barberResponse);
+							/**
+							 * Validar si el babero da el servicio o no
+							 */
+							$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
+							if( $validateBarberService ){
+								array_push($reservationBarberResponse , $barberResponse);
+							}
+							
 						}
 						
 					}
@@ -395,7 +405,10 @@ function saveUser(){
 							}
 						}
 						if( $barberExist == false ){
-							array_push($reservationBarberResponse , $barberResponse);
+							$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
+							if( $validateBarberService ){
+								array_push($reservationBarberResponse , $barberResponse);
+							}
 						}
 						
 					}
@@ -408,18 +421,36 @@ function saveUser(){
 				if( $filterBarber != 0 ){
 					foreach( $barbers as $barberResponse){
 						if( $filterBarber == $barberResponse['User']['id'] ){
-							array_push($reservationBarberResponse , $barberResponse);
+							$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
+							if( $validateBarberService ){
+								array_push($reservationBarberResponse , $barberResponse);
+							}
 						}
 					}
 					$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
 				}else{
+					foreach( $barbers as $barberResponse){
+						$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
+							if( $validateBarberService ){
+								array_push($reservationBarberResponse , $barberResponse);
+							}
+					}
 					$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
-									'Barbers'=>$barbers);
+									'Barbers'=>$reservationBarberResponse);
 				}
 				
 			}
 			return $reservationAvailable;
+	}
+	public function validateBarberService($service, $barber){
+		$validateService = $this->Duration->find('first',array('conditions'=>array('Duration.service_id'=>$service,'Duration.barber'=>$barber)));
+		
+		if( $validateService['Duration']['duration'] == '' || $validateService['Duration']['duration'] == '0' ){
+			return false;
+		}
+			return true;
+		
 	}
 
 	public function time_open(){
@@ -510,18 +541,40 @@ function saveUser(){
 		}else{
 			$reservationDate = $_POST['reservation_date'];
 		}
-		$this->Reservation->create();
-		$data['Reservation']['reservation_date'] = $reservationDate;
-		$data['Reservation']['reservation_time'] = $_POST['reservation_time'];
-		$data['Reservation']['reservation_user'] = $_SESSION['User']['User']['id'];
-		$data['Reservation']['reservation_service'] = $_POST['reservation_service'];
-		$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
-		$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
-		if($this->Reservation->save($data)){
-			Cache::clear();
-			echo 1;
+		if( $_POST['client'] != 0 ){
+			$client = explode('-',$_POST['client']);
+			$reservationUser = $client[0];
+			
 		}else{
-			echo 0;
+			$reservationUser = $_SESSION['User']['User']['id'];
+		}
+		/**
+		 * Validar no más de 2 reservaciones activas
+		 */
+		$validateReservation = $this->validateReservations($reservationUser);
+		if( $validateReservation ){
+
+			$this->Reservation->create();
+			$data['Reservation']['reservation_date'] = $reservationDate;
+			$data['Reservation']['reservation_time'] = $_POST['reservation_time'];
+			$data['Reservation']['reservation_user'] = $reservationUser;
+			$data['Reservation']['reservation_service'] = $_POST['reservation_service'];
+			$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
+			$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
+			if($this->Reservation->save($data)){
+				$this->Customer->query('delete from customers where user_id='.$reservationUser);
+				$this->Customer->create();
+				$data['Customer']['last_appointment'] = $reservationDate;
+				$data['Customer']['user_id'] = $reservationUser;
+				$data['Customer']['fecha_creacion'] = date('Y-m-d H:i:s');
+				$this->Customer->save($data);
+				Cache::clear();
+				echo 1;
+			}else{
+				echo 0;
+			}
+		}else{
+			echo 3;
 		}
 	}
 
@@ -541,6 +594,12 @@ function saveUser(){
 		$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
 		$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
 		if($this->Reservation->save($data)){
+			$this->Customer->query('delete from customers where user_id='.$_POST['reservation_client']);
+			$this->Customer->create();
+			$data['Customer']['last_appointment'] = $reservationDate;
+			$data['Customer']['user_id'] = $_POST['reservation_client'];
+			$data['Customer']['fecha_creacion'] = date('Y-m-d H:i:s');
+			$this->Customer->save($data);
 			Cache::clear();
 			echo 1;
 		}else{
@@ -582,12 +641,16 @@ function saveUser(){
 	}
 
 	public function reservations(){
+		$conditions['Reservation.reservation_status <>'] = 2;
+		
 		$reservations = $this->Reservation->find('all',array('fields'=>
 																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
 																		  'Service.id','Service.service_name','Service.price',
 																		  'Barber.id','Barber.name','Barber.color',
 																		  'User.id','User.name','User.phone',
 																		  ),
+															 'conditions'=>
+																	array($conditions),
 															 'joins' =>
 															 array(
 																 array(
@@ -624,5 +687,77 @@ function saveUser(){
 		Cache::write('reservationResponse'.$_SESSION['User']['User']['id'], $reservationResponse);
 		
 	}
+
+	function validateReservations($reservationUser){
+		
+		$activeReservations = $this->Reservation->find('all',array('conditions'=>array('Reservation.reservation_user'=>$reservationUser,'Reservation.reservation_status <>'=>2,'Reservation.reservation_date >= '=>date('Y-m-d'))));
+		
+		if( count($activeReservations) < 2 ){
+			return true;
+		}else{
+			return false;
+		}
+	}
+
+	function cancel_appointment(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$appointmentId = $_POST['reservation_id'];
+		$appointmentId = $_POST['reservation_id'];
+		$this->Reservation->id = $appointmentId;
+		$data['Reservation']['reservation_status'] = 2;
+		if($this->Reservation->save($data)){
+			Cache::clear();
+		}
+		
+	}
+
+	function confirm_appointment(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$appointmentId = $_POST['reservation_id'];
+		$this->Reservation->id = $appointmentId;
+		$data['Reservation']['reservation_status'] = 1;
+		if($this->Reservation->save($data)){
+			Cache::clear();
+		}
+	}
+
+	function load_appointment(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$appointmentId = $_POST['reservation_id'];
+		$conditions['Reservation.id'] = $appointmentId;
+		$conditions['Reservation.reservation_status <>'] = 2;
+		$reservation = $this->Reservation->find('first',array('fields'=>
+																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
+																		  'Service.id','Service.service_name','Service.price',
+																		  'Barber.id','Barber.name','Barber.color',
+																		  ),
+															 'conditions'=>
+																	array($conditions),
+															 'joins' =>
+															 array(
+																 array(
+																	 'table' => 'services',
+																	 'alias' => 'Service',
+																	 'type' => 'inner',
+																	 'foreignKey' => false,
+																	 'conditions'=> array('Service.id = Reservation.reservation_service'),
+																 ),
+																array(
+																   'table' => 'users',
+																   'alias' => 'Barber',
+																   'type' => 'inner',
+																   'foreignKey' => false,
+																   'conditions'=> array('Barber.id = Reservation.reservation_barber')
+															   )          
+																)
+															));
+		echo json_encode($reservation);
+		
+	}
+
+	
 
 }

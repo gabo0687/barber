@@ -3,8 +3,8 @@
 <head>
 <meta charset='utf-8' />
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
+<title>A lo fresa</title>
+<link rel="icon" type="image/png" sizes="16x16"  href="img/layout/favicon-16x16.png">
 <script type="text/javascript" src="js/jquery-3.7.0.min.js"></script>
 <script type="text/javascript" src="js/bootstrap.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
@@ -119,11 +119,12 @@
                 <div id="modalBody" class="modal-body">
                 <span class="description"><b>Barbero:</b> </span><span id="appointmentTitle"></span></br>
                 <span class="description"><b>Servicio:</b> </span><span id="appointmentService"></span></br>
-                <span class="description"><b>Precio:</b> </span><span id="appointmentTitle">10 000</span></br>
+                <span class="description"><b>Hora:</b> </span><span id="appointmentTime"></span></br>
+                <span class="description"><b>Precio:</b> </span><span id="appointmentPrice"></span></br>
                 <input type="hidden" name="appointmentId" id="appointmentId" value="0"/>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="cancelAppointment()">Cancelar Cita</button>
+                    <button type="button" class="btn btn-default" id="CancelAppointment" onclick="">Cancelar Cita</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeModal()">Cerrar</button>
                 </div>
             </div>
@@ -139,7 +140,9 @@
                 <div id="modalBody" class="modal-body">
                 <span class="tax">
                 <div class="dropdown">
-                  <button onclick="myFunction()" class="dropbtn">Clientes</button>
+                  <button onclick="myFunction()" class="dropbtn">Clientes</button></br>
+                  <span style="color:red; display:none;" id="errorCliente">Debes seleccionar a un cliente de la lista</span>
+                  <span style="color:red; display:none;" id="errorClienteFormat">Debes seleccionar a un cliente de la lista</span>
                   
                     
                   <div id="myDropdown" class="dropdown-content">
@@ -211,7 +214,7 @@
                 <div class="modal-footer">
                 
                     <input type="hidden" id="reservationDate" name="reservationDate" value="" ></br>
-                    <button type="button" class="btn btn-default" data-dismiss="modal" onclick="saveAppointment()">Guardar Cita<span class="spinner-border-sm" id="loadingReservation"></span></button>
+                    <button type="button" class="btn btn-default" id="saveAppointmentButton" onclick="saveAppointment()">Guardar Cita<span class="spinner-border-sm" id="loadingReservation"></span></button>
                     <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeModalAdd()">Cerrar</button>
                 </div>
             </div>
@@ -300,6 +303,7 @@ function filterFunction() {
         reservationDateText = nombreDia+' '+dia+' de '+nombreMes+' '+anio;
         $('#modal-title-date').html('Cita '+reservationDateText);
         cleanUsers();
+
         $('#calendarModalAdd').modal("show");
        // var title = prompt('Event Title:');
        /*var title ='asd';
@@ -315,9 +319,9 @@ function filterFunction() {
       },
       eventClick: function(arg) {
         $('#modal-title').html('Cita '+arg.event.title);
-        $('#appointmentTitle').html(arg.event.title);
+        loadAppointment(arg.event.groupId);
         $('#appointmentId').val(arg.event.groupId);
-        $('#appointmentService').html(arg.event.id);
+        
         
         $('#calendarModal').modal("show");
         //alert(arg.event.groupId);
@@ -335,6 +339,59 @@ function filterFunction() {
 
 </script>
 <script>
+  function loadAppointment(appointmentId){
+    //alert(appointmentId);
+   
+    $('#CancelAppointment').attr('onclick','cancelAppointment('+appointmentId+')');
+    $.ajax({
+                type: 'POST', 
+                url: 'load_appointment', 
+                data: 'reservation_id='+appointmentId,
+                beforeSend:function() {  
+                  //$('#loadingNotification').addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(reservation) {
+                  const res = JSON.parse(reservation);
+                  console.log(res.Barber);
+                  console.log(res.Service);
+                  console.log(res.Reservation);
+                  $('#appointmentService').html(res.Service.service_name);
+                  $('#appointmentTitle').html(res.Barber.name);
+                  $('#appointmentTime').html(res.Reservation.reservation_time);
+                  $('#appointmentPrice').html(res.Service.price);
+                }
+	});
+  }
+  function cancelAppointment(appointmentId){
+    
+                const response = confirm("Esta seguro que quiere Eliminar la cita?");
+
+                if (response) {
+                  $.ajax({
+                    type: 'POST', 
+                    url: 'cancel_appointment', 
+                    data: 'reservation_id='+appointmentId,
+                    beforeSend:function() {  
+                      //$('#loadingNotification').addClass('spinner-border');
+                    },
+                    error: function(){
+                        
+                    alert('No hay internet');    
+                    },
+                    success: function(reservation) {
+                      window.location.reload();
+                    }
+	                });
+                } else {
+                   // alert("Cancel was pressed");
+                }
+            
+    
+  }
   function closeModal(){
     $('#calendarModal').modal("hide");
   }
@@ -372,27 +429,43 @@ function saveAppointment(){
  var reservationService = $('#services').val();
  var reservationTime    = $('#reservationTime').val();
  var reservation_client = $('#reservation_client').val();
- $.ajax({
-               type: 'POST', 
-               url: 'save_reservation_calendar', 
-               data: 'reservation_date='+reservationDate+'&reservation_client='+reservation_client+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
-               beforeSend:function() {  
-                 $('#loadingReservation').addClass('spinner-border');
-               },
-               error: function(){
-                   
-               alert('No hay internet');    
-               },
-               success: function(notification) {
-                //$('#loadingReservation'+reservationNumber).removeClass('spinner-border');
-                // $('#messageReservation'+reservationNumber).show();
-                // $('#button'+reservationNumber).hide();
-                 setInterval(function() {
-                   location.reload();
-                 }, 3000); 
-                 
-               }
- });
 
+ if( reservation_client != '' ){
+  var client = $('#reservation_client_text').val();
+  var splitClient = client.split('|');
+  if( splitClient.length < 2 ){
+    $('#errorClienteFormat').hide();
+  }else{
+    $.ajax({
+                  type: 'POST', 
+                  url: 'save_reservation_calendar', 
+                  data: 'reservation_date='+reservationDate+'&reservation_client='+reservation_client+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
+                  beforeSend:function() {  
+                    $('#saveAppointmentButton').prop('disabled', true);
+                    $('#loadingReservation').addClass('spinner-border');
+                  },
+                  error: function(){
+                      
+                  alert('No hay internet');    
+                  },
+                  success: function(notification) {
+                    //$('#loadingReservation'+reservationNumber).removeClass('spinner-border');
+                    // $('#messageReservation'+reservationNumber).show();
+                    // $('#button'+reservationNumber).hide();
+                    
+                    $('#errorCliente').hide();
+                    $('#errorClienteFormat').hide();
+                    setInterval(function() {
+                      
+                    $('#saveAppointmentButton').prop('disabled', false);
+                      location.reload();
+                    }, 3000); 
+                    
+                  }
+    });
+}
+ }else{
+  $('#errorCliente').show();
+ }
 }
   </script>
