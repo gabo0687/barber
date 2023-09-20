@@ -32,7 +32,11 @@ if( $user != '' ){ ?>
         <section class="event-list-section">
             <ul class="eventlist" id="eventlist">
                
-            <?php foreach( $reservations as $reservation ){ 
+            <?php 
+            
+            if( !empty($reservations) ){
+            
+            foreach( $reservations as $reservation ){ 
                 $date = $reservation['Reservation']['reservation_date'];
                 $day  = date('w', strtotime($date));
                 $days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
@@ -43,6 +47,7 @@ if( $user != '' ){ ?>
                 $dayOfTheWeek = $days[$day];
                 
                 ?>
+                <form name="subirArchivo<?php echo $reservation['Reservation']['id'];?>" action="" method="post" enctype="multipart/formdata" >
                 <li>
                     <span class="event-list-item-content">
                     <div class="event-list-info">
@@ -65,23 +70,71 @@ if( $user != '' ){ ?>
                     <p>Subir comprobante de pago:</p>    
                     <input type="file"  class="form-control" name="comprobante" id="comprobante">
                     </br>  
-                    <?php if( $user == 'Berman' ){ ?>
-                    <button type="button" class="btn btn-success"><a>Cita finalizada</a></button>
-                    <?php }else{ ?>
-                    <button type="button" class="btn btn-secondary"><a>Confirmar Cita</a></button>
-                    <?php } ?>
-                    <button type="button" class="btn btn-danger"><a>Cancelar Cita</a></button>
+                   <?php 
+                        if( $reservation['Reservation']['reservation_status'] == 0 ){?>
+                    <button type="button" class="btn btn-secondary" onclick="confirmAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Confirmar Cita</a></button>
+                    <?php
+                         }else{?>
+                    <button type="submit" class="btn btn-success"><a>Subir Comprobante</a></button>
+                    <?php
+                         }
+                     ?>
+                    <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Eliminar</a></button>
                     </div>
                     </span>
                     
                 </li>
-                <?php } ?>
+                </form>
+                <?php }
+                }else{
+                    echo '<span style="color:white">No hay Citas programadas</span>';
+                } ?>
             </ul>
 
         </section>
 <?php } ?>
 <script>
    // window.scrollTo(0, document.body.scrollHeight);
+   function confirmAppointment(appointmentId){
+            $.ajax({
+                type: 'POST', 
+                url: 'confirm_appointment', 
+                data: 'reservation_id='+appointmentId,
+                beforeSend:function() {  
+                //$('#loadingNotification').addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(reservation) {
+                window.location.reload();
+                }
+            });
+   }
+   function cancelAppointment(appointmentId){
+        const response = confirm("Esta seguro que quiere Eliminar la cita?");
+
+        if (response) {
+        $.ajax({
+            type: 'POST', 
+            url: 'cancel_appointment', 
+            data: 'reservation_id='+appointmentId,
+            beforeSend:function() {  
+            //$('#loadingNotification').addClass('spinner-border');
+            },
+            error: function(){
+                
+            alert('No hay internet');    
+            },
+            success: function(reservation) {
+            window.location.reload();
+            }
+            });
+        } else {
+        // alert("Cancel was pressed");
+        }
+    }
   </script>
     
     
