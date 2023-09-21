@@ -40,6 +40,10 @@
 	Router::connect('/calendario', array('controller' => 'pages', 'action' => 'calendar'));
 	Router::connect('/home', array('controller' => 'pages', 'action' =>  'home'));
 	Router::connect('/save_reservation_calendar', array('controller' => 'pages', 'action' => 'save_reservation_calendar'));
+	Router::connect('/customers', array('controller' => 'pages', 'action' =>  'customers'));
+	Router::connect('/add_customer', array('controller' => 'pages', 'action' =>  'add_customer'));
+	Router::connect('/load_customer', array('controller' => 'pages', 'action' =>  'load_customer'));
+	Router::connect('/edit_customer', array('controller' => 'pages', 'action' =>  'edit_customer'));
 
 	
 /**

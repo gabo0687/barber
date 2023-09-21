@@ -139,14 +139,6 @@
             <input type="number" class="form-control" id="signupPhone" name="signupPhone"  onblur="checkPhone(this.value)" placeholder="Telefono" >
           </div>
           <div class="form-group">
-          <label for="signupGender">Genero*</label>
-            <select name="signupGender" id="signupGender">
-              <option value="1">Maculino</option>
-              <option value="2">Femenino</option>
-              <option value="3">indefinido</option>
-            </select>
-          </div>
-          <div class="form-group">
             <label for="signupName">Contraseña*</label>
             <input type="password" class="form-control" id="signupPassword1" name="signupPassword1" placeholder="Contraseña">
           </div>
@@ -512,7 +504,6 @@ function login(){
 $( "#createUser" ).on( "submit", function( event ) {
   var nombre = $('#signupName').val();
   var celular = $('#signupPhone').val();
-  var genero = $('#signupGender').val();
   //var userEmail = $('#signupEmail').val();
   var userContrasena = $('#signupPassword1').val();
   var confirmContrasena = $('#signupPassword2').val();
@@ -523,7 +514,7 @@ $( "#createUser" ).on( "submit", function( event ) {
     mayuscula = true;
   }
 
-  if( nombre == '' || celular == '' || genero == '' || checkNumber == true ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
+  if( nombre == '' || celular == '' ||checkNumber == true ||( userContrasena != confirmContrasena ) || userContrasena.length < 9 || mayuscula == false){
     event.preventDefault();
     
     if( userContrasena != confirmContrasena ){
@@ -541,12 +532,6 @@ $( "#createUser" ).on( "submit", function( event ) {
       $showError = true;
     }else{
        $('#signupName').css('border','');
-    }
-    if( genero == '' ){
-      $('#signupGender').css('border','2px solid red');
-      $showError = true;
-    }else{
-       $('#signupGender').css('border','');
     }
     if( celular == '' ){
       $showError = true;
