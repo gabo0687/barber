@@ -9,10 +9,14 @@ Profesionales en cuidado personal para caballero</span></p>
 
 </section>
 
-<?php if( $user != '' ){ ?>
+<?php 
+if($user != ''){?>
     <div class="event-info-buttons"> 
-<a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
-</div>    
+        <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
+    </div>
+<?php 
+if( $user['User']['type'] == 1 ){ ?>
+         
 <label style="color:white">Seleccione la fecha que desea consultar</label>
 <input  placeholder="MM/DD/YYYY" onfocus="changeDate()" class="form-control" type="text" name="fecha_reserva_admin" id="fecha_reserva_admin">
 </br>
@@ -24,6 +28,7 @@ Profesionales en cuidado personal para caballero</span></p>
     <option value="3">Dey</option>
 </select>  
 <?php 
+}
 }
 if( $user != '' ){ ?> 
 </br> 

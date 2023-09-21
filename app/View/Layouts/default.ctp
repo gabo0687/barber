@@ -319,19 +319,31 @@ function reservar(reservationNumber){
                       $('#messageReservationError'+reservationNumber).hide();
                       $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
                       $('#messageValidate'+reservationNumber).show();
+                      $('#messageValidateTaken'+reservationNumber).hide();
                     }else{
-                      $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
-                    $('#messageReservation'+reservationNumber).show();
-                    $('#button'+reservationNumber).hide();
-                    $('#messageReservationError'+reservationNumber).hide();
-                    $('#clientError').hide();
-                    $('#client').val('');
-                    setInterval(function() {
-                      location.reload();
-                    }, 2000);
+                      if( notification == 4 ){
+                        $('#messageReservationError'+reservationNumber).hide();
+                        $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
+                        $('#messageValidate'+reservationNumber).hide();
+                        $('#messageValidateTaken'+reservationNumber).show();
+                        setTimeout(() => {
+                          filterReservations();
+                        }, "4000");
+                      }else{
+                        $('#loadingReservation'+reservationNumber).removeClass('spinner-border');
+                        $('#messageReservation'+reservationNumber).show();
+                        $('#button'+reservationNumber).hide();
+                        $('#messageReservationError'+reservationNumber).hide();
+                        $('#messageValidate'+reservationNumber).hide();
+                        $('#messageValidateTaken'+reservationNumber).hide();
+                        $('#clientError').hide();
+                        $('#client').val('');
+                        setTimeout(() => {
+                          location.reload();
+                        }, "2000");
                     }
                      
-                    
+                  } 
                   }
     });
  }else{
@@ -463,6 +475,7 @@ function filterReservations(){
                       responseHtml += '</br><span id="messageReservation'+reservationNumber+'" class="blink_me" style="color:white; display:none">Reservación creada con exito!</span>';
                       responseHtml += '</br><span id="messageReservationError'+reservationNumber+'" class="blink_me" style="color:white; display:none">Error! Por favor selecciona un barbero</span>';
                       responseHtml += '</br><span id="messageValidate'+reservationNumber+'" class="" style="color:white; display:none">Error! el cliente ya tiene 2 reservaciones activas, si desea realizar otra reservación contactenos<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
+                      responseHtml += '</br><span id="messageValidateTaken'+reservationNumber+'" class="" style="color:white; display:none">Este horario ya fue reservado por alguien más, por favor cambie su elección<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
                       
                       responseHtml += '</li>';
                       reservationNumber++;
@@ -633,10 +646,10 @@ $( "#createUser" ).on( "submit", function( event ) {
     window.scrollTo(0, 0);
     $('.close').click();
     $('#userCreated').show();
-        setInterval(function() {
+    setTimeout(() => {
             $('#userCreated').hide('2000');
             $('#login').show();
-          }, 10000);
+          }, '10000');
     
   }
   

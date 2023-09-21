@@ -14,6 +14,11 @@
 <link href="css/bootstrap.min.css" rel="stylesheet" type="text/css">
 <script type="text/javascript" src="js/index.global.js"></script>
 
+<script src='http://fullcalendar.io/js/fullcalendar-2.1.1/lib/moment.min.js'></script>
+<script src='http://fullcalendar.io/js/fullcalendar-2.1.1/lib/jquery.min.js'></script>
+<script src="http://fullcalendar.io/js/fullcalendar-2.1.1/lib/jquery-ui.custom.min.js"></script>
+<script src='http://fullcalendar.io/js/fullcalendar-2.1.1/fullcalendar.min.js'></script>
+
 <style>
   .event-warning{
     --fc-event-border-color:#fff;
@@ -108,7 +113,7 @@
 </div>
 </div>
 </div>
-  <div id='calendar'></div>
+  <div id="calendar"></div>
 
         <div id="calendarModal" class="modal fade">
         <div class="modal-dialog">
@@ -143,6 +148,7 @@
                   <button onclick="myFunction()" class="dropbtn">Clientes</button></br>
                   <span style="color:red; display:none;" id="errorCliente">Debes seleccionar a un cliente de la lista</span>
                   <span style="color:red; display:none;" id="errorClienteFormat">Debes seleccionar a un cliente de la lista</span>
+                  <span style="color:red; display:none;" id="alreadytaken">Este horario ya fue reservado por alguien más, por favor cambie su elección</span>
                   
                     
                   <div id="myDropdown" class="dropdown-content">
@@ -226,6 +232,7 @@
 </html>
 <script>
 
+//setInterval(function () { loadReservations(); }, 5000);
 
 function cleanUsers(){
   $('#reservation_client_text').val('');
@@ -261,81 +268,107 @@ function filterFunction() {
   }
 }
 
+
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
-    var calendar = new FullCalendar.Calendar(calendarEl, {
-      headerToolbar: {
-        left: 'prev,next',
-        center: 'title',
-        right: 'timeGridDay'
-      },
-      initialDate: '<?php echo date('Y-m-d');?>',
-      initialView: 'timeGridDay',
-      navLinks: true, // can click day/week names to navigate views
-      selectable: true,
-      selectMirror: true,
-      select: function(arg) {
-        const fechaComoCadena = arg.start; // día lunes
-        const dias = [
-          'Domingo',
-          'Lunes',
-          'Martes',
-          'Miércoles',
-          'Jueves',
-          'Viernes',
-          'Sábado',
-        ];
-        var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
-        
-        const numeroDia = new Date(fechaComoCadena).getDay();
-        const nombreDia = dias[numeroDia];
-        const numeroMes = new Date(fechaComoCadena).getMonth();
-        const nombreMes = meses[numeroMes];
-        const anio = new Date(fechaComoCadena).getFullYear();
-        const dia = new Date(fechaComoCadena).getDate();
-        const timeReservation = new Date(fechaComoCadena).getTime();
-        var reservationDate = formatDate(new Date(timeReservation));
-        var reservationTime = formatTime(new Date(timeReservation));
-        $('#reservationDate').val(reservationDate);
-        $('#reservationTime').val(reservationTime);
-        //fecha_reserva
-        reservationDateText = nombreDia+' '+dia+' de '+nombreMes+' '+anio;
-        $('#modal-title-date').html('Cita '+reservationDateText);
-        cleanUsers();
+        var calendar = new FullCalendar.Calendar(calendarEl, {
+        headerToolbar: {
+          left: 'prev,next',
+          center: 'title',
+          right: 'timeGridDay'
+        },
+        initialDate: '<?php echo date('Y-m-d');?>',
+        initialView: 'timeGridDay',
+        navLinks: true, // can click day/week names to navigate views
+        selectable: true,
+        selectMirror: true,
+        select: function(arg) {
+          const fechaComoCadena = arg.start; // día lunes
+          const dias = [
+            'Domingo',
+            'Lunes',
+            'Martes',
+            'Miércoles',
+            'Jueves',
+            'Viernes',
+            'Sábado',
+          ];
+          var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+          
+          const numeroDia = new Date(fechaComoCadena).getDay();
+          const nombreDia = dias[numeroDia];
+          const numeroMes = new Date(fechaComoCadena).getMonth();
+          const nombreMes = meses[numeroMes];
+          const anio = new Date(fechaComoCadena).getFullYear();
+          const dia = new Date(fechaComoCadena).getDate();
+          const timeReservation = new Date(fechaComoCadena).getTime();
+          var reservationDate = formatDate(new Date(timeReservation));
+          var reservationTime = formatTime(new Date(timeReservation));
+          $('#reservationDate').val(reservationDate);
+          $('#reservationTime').val(reservationTime);
+          //fecha_reserva
+          reservationDateText = nombreDia+' '+dia+' de '+nombreMes+' '+anio;
+          $('#modal-title-date').html('Cita '+reservationDateText);
+          cleanUsers();
 
-        $('#calendarModalAdd').modal("show");
-       // var title = prompt('Event Title:');
-       /*var title ='asd';
-        if (title) {
-          calendar.addEvent({
-            title: title,
-            start: arg.start,
-            end: arg.end,
-            allDay: arg.allDay
-          })
-        }*/
-        calendar.unselect()
-      },
-      eventClick: function(arg) {
-        $('#modal-title').html('Cita '+arg.event.title);
-        loadAppointment(arg.event.groupId);
-        $('#appointmentId').val(arg.event.groupId);
-        
-        
-        $('#calendarModal').modal("show");
-        //alert(arg.event.groupId);
-        /*if (confirm('Are you sure you want to delete this event?')) {
-          arg.event.remove()
-        }*/
-      },
-      editable: false,
-      dayMaxEvents: true, // allow "more" link when too many events
-      events: <?php echo json_encode($events);?>
-    });
+          $('#calendarModalAdd').modal("show");
+        // var title = prompt('Event Title:');
+        /*var title ='asd';
+          if (title) {
+            calendar.addEvent({
+              title: title,
+              start: arg.start,
+              end: arg.end,
+              allDay: arg.allDay
+            })
+          }*/
+          calendar.unselect()
+        },
+        eventClick: function(arg) {
+          $('#modal-title').html('Cita '+arg.event.title);
+          loadAppointment(arg.event.groupId);
+          $('#appointmentId').val(arg.event.groupId);
+          
+          
+          $('#calendarModal').modal("show");
+          //alert(arg.event.groupId);
+          /*if (confirm('Are you sure you want to delete this event?')) {
+            arg.event.remove()
+          }*/
+        },
+        editable: false,
+        dayMaxEvents: true, // allow "more" link when too many events
+        events: <?php echo json_encode($events);?>
+      });
 
-    calendar.render();
+      calendar.render();
   });
+
+  
+
+
+ 
+
+  function loadReservations(){
+    
+   $.ajax({
+                type: 'POST', 
+                url: 'reservation_events', 
+                data: 'reservationDate=0',
+                beforeSend:function() {  
+                  //$('#loadingNotification').addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(reservation_events) {
+                  $('#calendar').fullCalendar('refetchEventSources', reservation_events)
+                }
+	});
+  }
+  
 
 </script>
 <script>
@@ -393,10 +426,15 @@ function filterFunction() {
     
   }
   function closeModal(){
-    $('#calendarModal').modal("hide");
+ 
+    
+   $('#calendarModal').modal("hide");
+    
   }
   function closeModalAdd(){
+    
     $('#calendarModalAdd').modal("hide");
+    location.reload();
   }
  
   function padTo2Digits(num) {
@@ -448,18 +486,26 @@ function saveAppointment(){
                       
                   alert('No hay internet');    
                   },
-                  success: function(notification) {
-                    //$('#loadingReservation'+reservationNumber).removeClass('spinner-border');
-                    // $('#messageReservation'+reservationNumber).show();
-                    // $('#button'+reservationNumber).hide();
+                  success: function(response) {
                     
-                    $('#errorCliente').hide();
-                    $('#errorClienteFormat').hide();
-                    setInterval(function() {
-                      
-                    $('#saveAppointmentButton').prop('disabled', false);
-                      location.reload();
-                    }, 3000); 
+                    if( response == 4 ){
+                      $('#alreadytaken').show();
+                      $('#errorCliente').hide();
+                      $('#errorClienteFormat').hide();
+                      $('#saveAppointmentButton').prop('disabled', false);
+                      $('#loadingReservation').removeClass('spinner-border');
+                    }else{
+                      $('#alreadytaken').hide();
+                      $('#errorCliente').hide();
+                      $('#errorClienteFormat').hide();
+                      setTimeout(() => {
+                        
+                      $('#saveAppointmentButton').prop('disabled', false);
+                        location.reload();
+                      }, '3000'); 
+                    }
+                    
+                    
                     
                   }
     });
