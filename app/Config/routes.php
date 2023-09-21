@@ -44,9 +44,10 @@
 	Router::connect('/cancel_appointment', array('controller' => 'pages', 'action' => 'cancel_appointment'));
 	Router::connect('/confirm_appointment', array('controller' => 'pages', 'action' => 'confirm_appointment'));
 	Router::connect('/reservation_events', array('controller' => 'pages', 'action' => 'reservation_events'));
-	
-	
-	
+	Router::connect('/customers', array('controller' => 'pages', 'action' =>  'customers'));
+	Router::connect('/add_customer', array('controller' => 'pages', 'action' =>  'add_customer'));
+	Router::connect('/load_customer', array('controller' => 'pages', 'action' =>  'load_customer'));
+	Router::connect('/edit_customer', array('controller' => 'pages', 'action' =>  'edit_customer'));
 
 	
 /**
