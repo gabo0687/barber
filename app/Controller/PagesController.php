@@ -281,14 +281,12 @@ function saveUser(){
 		//Initialize
 		$nombreUsuario = $_POST['signupName'];
 		$celular = $_POST['signupPhone'];
-		$genero = $_POST['signupGender'];
 		//$userEmail = $_POST['signupEmail'];
 		$userContrasena = $_POST['signupPassword1'];
-		//Save Product
+		//Save user
 		$this->User->create();
 		$data['User']['name'] = $nombreUsuario;
 		$data['User']['phone'] = $celular;
-		$data['User']['gender'] = $genero;
 		//$data['User']['email'] = trim($userEmail);
 		$data['User']['type'] = 3;
 		$data['User']['status'] = 1;
@@ -768,6 +766,89 @@ function saveUser(){
 		Cache::write('reservationResponse'.$_SESSION['User']['User']['id'], $reservationResponse);
 		
 	}
+	public function customers(){
+		$user = '';
+		$customers = $this->Customer->find('all');
+		$this->set('customers',$customers);
+		$userCustomers = $this->User->find('all',array('conditions'=>array(
+			'OR'=> array(
+						array('User.type'=>3),
+						)
+					)
+				)
+			);
+		
+		$this->set('userCustomers',$userCustomers);
+		if(isset($_SESSION['user'])){
+			$user = $_SESSION['user'];
+		}
+		$this->set('user',$user);
+	}
+
+	
+public function load_customer(){
+	$this->autoRender = false;
+	$this->layout = 'ajax';
+	$idCustomer = $_POST['idCustomer'];
+	//seria bueno agregar el barbero en customers, para saber quien fue el ultimo barbero que atendio a un cliente
+	$customer = $this->User->find('all',array(
+	'fields' => array('Customer.user_id','Customer.last_appointment','User.user_id','User.name','User.phone','User.status'),
+	'conditions'=>array('.id'=>$idCustomer),
+	'joins' =>
+		array(
+			array(
+				'table' => 'customers',
+				'alias' => 'Customer',
+				'type' => 'inner',
+				'foreignKey' => false,
+				'conditions'=> array('User.id = Customer.user_id')
+			)          
+			),
+	'recursive' => 2	
+	));
+
+	echo json_encode($customer);
+}
+
+public function add_customer(){
+	$this->layout = 'ajax';
+	if ($this->request->is('post')) {
+		$this->User->create();
+		$data['User']['name'] = $_POST['name'];
+		$data['User']['phone'] = $_POST['phone'];
+		$data['User']['type'] = 3;
+		$data['User']['status'] = 1;
+		$data['User']['creation_date'] = date('Y-m-d');
+		if($this->User->save($data)){
+		$userId = $this->User->getLastInsertID();
+		$last_appointment = $_POST['last_appointment'];
+		
+			$this->Customer->create();
+			$data['Customer']['last_appointment'] = $last_appointment;
+			$data['Customer']['user_id'] = $userId;
+			$this->Customer->save($data);
+
+		$this->redirect(array('action' => '../customers'));
+		}
+	}
+}
+
+public function edit_customer(){
+	$this->layout = 'ajax';
+	if ($this->request->is('post')) {
+		
+		$this->User->id = $_POST['id_edit'];
+		$data['User']['name'] = $_POST['name_edit'];
+		$data['User']['phone'] = $_POST['phone_edit'];
+		$data['User']['status'] = $_POST['status_edit'];
+		$this->Customer->user_id = $_POST['id_edit'];
+		$datac['Customer']['last_appointment'] = $_POST['last_appointment_edit'];
+		if($this->Customer->save($datac)){
+		
+		$this->redirect(array('action' => '../customers'));
+		}
+	}
+}
 
 	function validateReservations($reservationUser){
 		

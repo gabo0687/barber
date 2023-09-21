@@ -48,6 +48,10 @@
 	Router::connect('/filter_barber', array('controller' => 'pages', 'action' => 'filter_barber'));
 	
 	
+	Router::connect('/customers', array('controller' => 'pages', 'action' =>  'customers'));
+	Router::connect('/add_customer', array('controller' => 'pages', 'action' =>  'add_customer'));
+	Router::connect('/load_customer', array('controller' => 'pages', 'action' =>  'load_customer'));
+	Router::connect('/edit_customer', array('controller' => 'pages', 'action' =>  'edit_customer'));
 
 	
 /**
