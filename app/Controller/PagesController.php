@@ -47,6 +47,25 @@ class PagesController extends AppController {
  */
 public function home(){
 
+
+	if ($this->request->is('post')) {
+		
+		$reservaId = $_POST['idReservation'];
+		$dataBill = array();
+		$this->Reservation->id = $reservaId;
+		if ( $_FILES['comprobante'.$reservaId]['name'] != "" ){
+			$pathImage = WWW_ROOT . 'bills' . DIRECTORY_SEPARATOR ;
+            $imageName = $reservaId.'_'.$_FILES['comprobante'.$reservaId]['name'];
+			if (move_uploaded_file($_FILES['comprobante'.$reservaId]['tmp_name'], $pathImage . $imageName)) {
+				$dataBill['Reservation']['reservation_bill'] = $_FILES['comprobante'.$reservaId]['name'];
+			}
+		}
+		
+		
+		$dataBill['Reservation']['payment_type'] = $_POST['tipoPago'.$reservaId];
+		$this->Reservation->save($dataBill);
+	}
+
 	$user = '';
 	$reservations = array();
 	$reservationResponse=array();
@@ -63,7 +82,7 @@ public function home(){
 		$conditions['Reservation.reservation_date >='] = date('Y-m-d');
 		$conditions['Reservation.reservation_status <>'] = 2;
 		$reservations = $this->Reservation->find('all',array('fields'=>
-																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
+																	array('Reservation.id','Reservation.reservation_bill','Reservation.payment_type','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
 																		  'Service.id','Service.service_name','Service.price',
 																		  'Barber.id','Barber.name','Barber.color',
 																		  'User.id','User.name','User.phone',
@@ -107,7 +126,7 @@ public function home(){
 	
 	$this->set('reservations',$reservationResponse);
 	$this->set('user',$user);
-
+	
 
 }
 
@@ -698,7 +717,7 @@ function saveUser(){
 			$event = array('groupId'=>$reservationId,'id'=>$service,'title'=>$userName,'start'=>$reservationdate.'T'.$reservationtimeStart,'end'=>$reservationdate.'T'.$reservationtimeEnd,'color'=>$barbercolor);
 			array_push($events , $event);
 		}
-		//echo json_encode($events); die;
+		
 		$this->set('events',$events);
 	}
 	
@@ -820,6 +839,127 @@ function saveUser(){
 		
 	}
 
+	public function filter_barber(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$user = $_SESSION['User'];
+		if( $_POST['barber'] != 0 ){
+			$conditions['Reservation.reservation_barber'] = $_POST['barber'];
+		}
+		if( $user['User']['type'] == 2 ){
+			$conditions['Reservation.reservation_barber'] = $user['User']['id'];
+		}
+		if( $_POST['filter_date'] != '' ){
+			$conditions['Reservation.reservation_date'] = $_POST['filter_date'];
+		}else{
+			$conditions['Reservation.reservation_date >='] = date('Y-m-d');
+		}
+		
+		$conditions['Reservation.reservation_status <>'] = 2;
+		$reservations = array();
+		$reservations = $this->Reservation->find('all',array('fields'=>
+																	array('Reservation.id','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
+																		  'Service.id','Service.service_name','Service.price',
+																		  'Barber.id','Barber.name','Barber.color',
+																		  'User.id','User.name','User.phone',
+																		  ),
+															 'conditions'=>
+																	array($conditions),
+															 'joins' =>
+															 array(
+																 array(
+																	 'table' => 'services',
+																	 'alias' => 'Service',
+																	 'type' => 'inner',
+																	 'foreignKey' => false,
+																	 'conditions'=> array('Service.id = Reservation.reservation_service'),
+																 ),
+																 array(
+																	'table' => 'users',
+																	'alias' => 'Barber',
+																	'type' => 'inner',
+																	'foreignKey' => false,
+																	'conditions'=> array('Barber.id = Reservation.reservation_barber')
+																),
+																array(
+																   'table' => 'users',
+																   'alias' => 'User',
+																   'type' => 'inner',
+																   'foreignKey' => false,
+																   'conditions'=> array('User.id = Reservation.reservation_user')
+															   )          
+																),
+															 'order'=>array('Reservation.reservation_date'=>'ASC','Reservation.reservation_time'=>'ASC')
+															));
+	$reservationResponse = array();														
+	foreach( $reservations as $reservationFirst ){
+		$duration = $this->Duration->find('first',array('fields'=>array('Duration.id','Duration.duration'),'conditions'=>array('Duration.barber'=>$reservationFirst['Barber']['id'],'Duration.service_id'=>$reservationFirst['Service']['id'])));
+																
+		
+		array_push($reservationFirst,$duration);
+		
+		array_push($reservationResponse,$reservationFirst);
+		
+	}
+
 	
+	$response = '';
+	
+	 if( !empty($reservationResponse) ){
+            
+			foreach( $reservationResponse as $reservation ){ 
+				$date = $reservation['Reservation']['reservation_date'];
+				$day  = date('w', strtotime($date));
+				$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+				$year = date('Y', strtotime($date));
+				$month = date('m', strtotime($date));
+				$months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+				$currentDay = date('d', strtotime($date));
+				$dayOfTheWeek = $days[$day];
+				
+				
+				$response .= '<form name="subirArchivo'.$reservation['Reservation']['id'].'" action="" method="post" enctype="multipart/formdata" >';
+				$response .= '<li><span class="event-list-item-content">
+								<div class="event-list-info">
+								<h3>'.$reservation['Service']['service_name'].'</h3>
+								<p>Fecha : '.$dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year.'</p>
+								<p>Hora : '.$reservation['Reservation']['reservation_time'].'</p>
+								<p>Barbero : '.$reservation['Barber']['name'].'</p>
+								<p>Cliente : '.$reservation['User']['name'].' <a taget="_blank" href="https://api.whatsapp.com/send?phone=506'.$reservation['User']['phone'].'&text=Hola '.$reservation['User']['name'].'!
+
+								💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
+								<p>Tiempo : '.$reservation[0]['Duration']['duration'].' minutos</p>';
+				$response .=    '<p>Estatus de la cita :'; 
+								if( $reservation['Reservation']['reservation_status'] == 0 ){ $response .= 'Sin Confirmar'; }
+								if( $reservation['Reservation']['reservation_status'] == 1 ){ $response .= 'Confirmada'; }
+				$response .=    '</p>';
+				$response .=    '<p>Precio : ₡'.number_format($reservation['Service']['price']).'</p>';
+				$response .=    '<p>Selecciona el tipo de pago:</p>  
+								<select class="form-control" name="tipoPago" id="tipoPago">
+								<option value="0">SINPE Movil</option>
+								<option value="1">Efectivo</option>
+								</select>    
+								</br> 
+								<p>Subir comprobante de pago:</p>    
+								<input type="file"  class="form-control" name="comprobante" id="comprobante">
+								</br>';  
+								if( $reservation['Reservation']['reservation_status'] == 0 ){
+				$response .=   '<button type="button" class="btn btn-secondary" onclick="confirmAppointment('.$reservation['Reservation']['id'].')"><a>Confirmar Cita</a></button>';
+								}else{
+				$response .=    '<button type="submit" class="btn btn-success"><a>Subir Comprobante</a></button>';
+					
+								}
+					
+				$response .=    '<button type="button" class="btn btn-danger" onclick="cancelAppointment('.$reservation['Reservation']['id'].')"><a>Eliminar</a></button>
+								</div>
+								</span>
+								</li>
+								</form>';
+			}
+		}else{
+				$response .=    '<span style="color:white">No hay Citas programadas</span>';
+		}
+		echo $response;
+	}
 
 }
