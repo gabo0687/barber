@@ -232,7 +232,7 @@
 </html>
 <script>
 
-//setInterval(function () { loadReservations(); }, 5000);
+setInterval(function () { loadReservations(); }, 10000);
 
 function cleanUsers(){
   $('#reservation_client_text').val('');
@@ -267,12 +267,12 @@ function filterFunction() {
     }
   }
 }
-
+var calendar = '';
 
   document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('calendar');
 
-        var calendar = new FullCalendar.Calendar(calendarEl, {
+        calendar = new FullCalendar.Calendar(calendarEl, {
         headerToolbar: {
           left: 'prev,next',
           center: 'title',
@@ -339,7 +339,7 @@ function filterFunction() {
         },
         editable: false,
         dayMaxEvents: true, // allow "more" link when too many events
-        events: <?php echo json_encode($events);?>
+        events: 'events'
       });
 
       calendar.render();
@@ -348,13 +348,11 @@ function filterFunction() {
   
 
 
- 
-
   function loadReservations(){
     
    $.ajax({
                 type: 'POST', 
-                url: 'reservation_events', 
+                url: 'events', 
                 data: 'reservationDate=0',
                 beforeSend:function() {  
                   //$('#loadingNotification').addClass('spinner-border');
@@ -364,7 +362,8 @@ function filterFunction() {
                 alert('No hay internet');    
                 },
                 success: function(reservation_events) {
-                  $('#calendar').fullCalendar('refetchEventSources', reservation_events)
+                  calendar.refetchEvents();
+                  //$('#calendar').fullCalendar('refetchEvents');
                 }
 	});
   }

@@ -44,6 +44,7 @@
 	Router::connect('/cancel_appointment', array('controller' => 'pages', 'action' => 'cancel_appointment'));
 	Router::connect('/confirm_appointment', array('controller' => 'pages', 'action' => 'confirm_appointment'));
 	Router::connect('/reservation_events', array('controller' => 'pages', 'action' => 'reservation_events'));
+	Router::connect('/events', array('controller' => 'pages', 'action' => 'events'));
 	
 	
 	
