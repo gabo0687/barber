@@ -635,7 +635,7 @@ function saveUser(){
 	}
     
 
-	 public function reservation_events(){
+	 public function events(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$events= array();
@@ -698,9 +698,10 @@ function saveUser(){
 			$event = array('groupId'=>$reservationId,'id'=>$service,'title'=>$userName,'start'=>$reservationdate.'T'.$reservationtimeStart,'end'=>$reservationdate.'T'.$reservationtimeEnd,'color'=>$barbercolor);
 			array_push($events , $event);
 		}
+		//echo json_encode($events); die;
 		$this->set('events',$events);
 	}
-
+	
 	public function reservations(){
 		$conditions['Reservation.reservation_status <>'] = 2;
 		
