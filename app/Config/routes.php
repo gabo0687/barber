@@ -45,7 +45,7 @@
 	Router::connect('/confirm_appointment', array('controller' => 'pages', 'action' => 'confirm_appointment'));
 	Router::connect('/reservation_events', array('controller' => 'pages', 'action' => 'reservation_events'));
 	Router::connect('/events', array('controller' => 'pages', 'action' => 'events'));
-	
+	Router::connect('/filter_barber', array('controller' => 'pages', 'action' => 'filter_barber'));
 	
 	
 

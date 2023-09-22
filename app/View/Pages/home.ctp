@@ -18,16 +18,23 @@ if($user != ''){?>
 if( $user['User']['type'] == 1 ){ ?>
          
 <label style="color:white">Seleccione la fecha que desea consultar</label>
-<input  placeholder="MM/DD/YYYY" onfocus="changeDate()" class="form-control" type="text" name="fecha_reserva_admin" id="fecha_reserva_admin">
+<input  placeholder="MM/DD/YYYY" onchange="filterBarber()" onfocus="changeDate()" oncc class="form-control" type="text" name="fecha_reserva_admin" id="fecha_reserva_admin">
 </br>
 <label style="color:white">Filtrar por Barbero</label>
-<select class="form-control" name="barbero_admin" id="barbero_admin">
+<select class="form-control" onchange="filterBarber()" name="barbero_admin" id="barbero_admin">
     <option value="0">Todos</option>
-    <option value="1">Berman</option>
-    <option value="2">Joss</option>
-    <option value="3">Dey</option>
+    <?php foreach( $users as $user ){ ?>
+        <option value="<?php echo $user['User']['id'];?>"><?php echo $user['User']['name'];?></option>
+    <?php }?>
 </select>  
 <?php 
+}else{
+    if( $user['User']['type'] == 2 ){ ?>
+<label style="color:white">Seleccione la fecha que desea consultar</label>
+<input  placeholder="MM/DD/YYYY" onchange="filterBarber()" onfocus="changeDate()" class="form-control" type="text" name="fecha_reserva_admin" id="fecha_reserva_admin">
+
+    <?php 
+    }
 }
 }
 if( $user != '' ){ ?> 
@@ -52,7 +59,7 @@ if( $user != '' ){ ?>
                 $dayOfTheWeek = $days[$day];
                 
                 ?>
-                <form name="subirArchivo<?php echo $reservation['Reservation']['id'];?>" action="" method="post" enctype="multipart/formdata" >
+                <form name="subirArchivo" action="" method="post" enctype="multipart/form-data">
                 <li>
                     <span class="event-list-item-content">
                     <div class="event-list-info">
@@ -66,14 +73,17 @@ if( $user != '' ){ ?>
                         <p>Tiempo : <?php echo $reservation[0]['Duration']['duration'];?> minutos</p>
                         <p>Estatus de la cita : <?php if( $reservation['Reservation']['reservation_status'] == 0 ){ echo 'Sin Confirmar'; }if( $reservation['Reservation']['reservation_status'] == 1 ){ echo 'Confirmada'; }?></p>
                         <p>Precio : ₡<?php echo number_format($reservation['Service']['price']);?></p>
+
+                    <?php if( $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  ){?>    
                     <p>Selecciona el tipo de pago:</p>  
-                    <select class="form-control" name="tipoPago" id="tipoPago">
-                    <option value="0">SINPE Movil</option>
-                    <option value="1">Efectivo</option>
+                    <select class="form-control" name="tipoPago<?php echo $reservation['Reservation']['id'];?>" id="tipoPago<?php echo $reservation['Reservation']['id'];?>">
+                    <option value="1">SINPE Movil</option>
+                    <option value="2">Efectivo</option>
                     </select>    
                     </br> 
                     <p>Subir comprobante de pago:</p>    
-                    <input type="file"  class="form-control" name="comprobante" id="comprobante">
+                    <input type="file"  class="form-control" name="comprobante<?php echo $reservation['Reservation']['id'];?>" id="comprobante<?php echo $reservation['Reservation']['id'];?>">
+                    <input type="hidden" name="idReservation" id="idReservation" value="<?php echo $reservation['Reservation']['id'];?>">
                     </br>  
                    <?php 
                         if( $reservation['Reservation']['reservation_status'] == 0 ){?>
@@ -87,7 +97,7 @@ if( $user != '' ){ ?>
                     <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Eliminar</a></button>
                     </div>
                     </span>
-                    
+                    <?php } ?>
                 </li>
                 </form>
                 <?php }
@@ -139,6 +149,30 @@ if( $user != '' ){ ?>
         } else {
         // alert("Cancel was pressed");
         }
+    }
+
+    function filterBarber(barber){
+        var date_filter = $('#fecha_reserva_admin').val();
+        var barber = $('#barbero_admin').val();
+        if( barber == undefined ){
+            barber = 0;
+        }
+        $.ajax({
+            type: 'POST', 
+            url: 'filter_barber', 
+            data: 'barber='+barber+'&filter_date='+date_filter,
+            beforeSend:function() {  
+            //$('#loadingNotification').addClass('spinner-border');
+            },
+            error: function(){
+                
+            alert('No hay internet');    
+            },
+            success: function(reservation) {
+               
+             $('#eventlist').html(reservation);
+            }
+            });
     }
   </script>
     
