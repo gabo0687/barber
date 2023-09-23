@@ -1,52 +1,50 @@
 <section class="event-detail">
     <article id="profile">
-      <h2>Clientes</h2>
-      <div class="list-group" id="myList" role="tablist">
-      <a class="list-group-item list-group-item-action active" data-toggle="list" href="#home" role="tab" style="color:black;">Agregar cliente Nuevo</a>
-        
-      
-      <div class="tab-content" id="pills-tabContent">
-        <div class="tab-pane fade show" id="edit" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <h4 class="offset-sm-3">Editar cliente</h4>
-          <form action="edit_customer" method="post" class="col-sm-6 offset-sm-3">
-            <div class="form-group">
-              <label for="accountInputUser">Nombre</label>
-              <input type="text" class="form-control" id="name_edit" name="name_edit" aria-describedby="emailHelp" placeholder="Nombre">
-            </div>
-            <div class="form-group">
-              <label for="accountInputEmail">Telefono</label>
-              <input type="number" class="form-control" id="phone_edit" name="phone_edit" aria-describedby="emailHelp" placeholder="Telefono">
-            </div>
-            <div class="form-group">
-              <label for="accountInputEmail">ultima cita</label>
-              <input type="date" class="form-control" id="last_appointment_edit" name="last_appointment_edit" aria-describedby="emailHelp" placeholder="Fecha">
-            </div>
-            
-            <div class="form-group">
-              <label for="accountInputPassword">Estado</label>
-              <select name="status_edit" class="form-control" id="status_edit">
-              <option value="1">Activo</option>
-              <option value="0">Inactivo</option>
-              </select>
-            </div>
-            <div class="form-group text-right">
-            <input type="hidden" id="id_edit" name="id_edit" value="0">
-              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
-            </div>
-          </form>
-        </div>
+    <h2>Clientes</h2>
+      <ul class="nav nav-pills text-end">
+       <?php if( $user['User']['type'] == '1' ){?>
+       <li class="nav-item"><a class="nav-link fa fa-calendar" aria-hidden="true" id="calendar" href="calendar" type="button" > Calendario</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-scissors" aria-hidden="true" id="calendar" href="services" type="button" > Servicios</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-id-card" aria-hidden="true" id="calendar" href="users" type="button" > Usuarios</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-users" aria-hidden="true" id="calendar" href="customers" type="button" > Clientes</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-product-hunt" aria-hidden="true" id="calendar" href="products" type="button" > Productos</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-clock-o" aria-hidden="true" id="calendar" href="work" type="button" > Horas de trabajo</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-book" aria-hidden="true" id="calendar" href="expenses" type="button" > Gastos</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-line-chart" aria-hidden="true" id="calendar" href="sales" type="button" > Ventas</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-usd" aria-hidden="true" id="calendar" href="product_sales" type="button" > Reporte Productos</a></li>
+       <li class="nav-item"><a class="nav-link fa fa-money" aria-hidden="true" id="calendar" href="expenses_sales" type="button" > Reporte Gastos</a></li>
+       <?php } ?>
+      </ul>
+       </br>
+      <div class="form-group text-left">
+      <button type="button" onclick="showAddForm()" class="btn btn-primary">Agregar cliente Nuevo</button>
+      <button type="button" onclick="showEditForm()" class="btn btn-primary">Editar Cliente</button>
       </div>
+      <div style="display:none;" id="userUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Cliente actualizado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+        <hr>
+      </div>
+      <form method="post" id="searchUser" style="display:none;" class="col-sm-6 offset-sm-3">
+      <div class="form-group text-left">
+      <label for="accountInputUser">Buscar cliente</label>
+      <input type="text" class="form-control" id="searchCustomer" name="searchCustomer" aria-describedby="emailHelp" placeholder="Nombre/telefono">
+      </div>
+      <div class="form-group text-left">
+      <button type="button" onclick="search()" class="btn btn-primary">Buscar</button>
+      </div>
+      </form>
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <h4 class="offset-sm-3">Agregar cliente nuevo</h4>
           <form action="add_customer" method="post" id="createCustomer" class="col-sm-6 offset-sm-3">
+          <h4 class="offset-sm-3">Agregar cliente nuevo</h4>
             <div class="form-group">
               <label for="accountInputUser">Nombre</label>
               <input type="text" class="form-control" id="name" name="name" aria-describedby="emailHelp" placeholder="Nombre">
             </div>
             <div class="form-group">
               <label for="accountInputEmail">Telefono</label>
-              <input type="number" class="form-control" id="phone" name="phone" aria-describedby="emailHelp" onblur="checkPhone(this.value)" placeholder="Telefono">
+              <input type="number" class="form-control" id="phone" name="phone" onblur="checkPhone(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
             </div>
             <div class="form-group">
               <label for="accountInputEmail">ultima cita</label>
@@ -59,8 +57,8 @@
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
             </div>
             <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
-        <h4 class="alert-heading">Usuario creado! </h4>
-        <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
+        <h4 class="alert-heading">Cliente creado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
         <hr>
       </div>
             <div class="form-group text-right">
@@ -69,16 +67,108 @@
           </form>
         </div>
       </div>
+
+      <div class="list-group" id="customersList" role="tablist">
+      </div>
+
+      <div class="tab-content" id="pills-tabContent">
+        <div class="tab-pane fade show active" id="home_edit" style="display:none;" role="tabpanel" aria-labelledby="nav-profile-tab">
+          <form action="update_customer" method="post" id="editCustomer" class="col-sm-6 offset-sm-3">
+          <h4 class="offset-sm-3">Editar cliente</h4>
+          <div class="form-group" style="display:none;">
+              <label for="accountInputUser">id</label>
+              <input type="text" class="form-control" id="idEdit" name="idEdit" aria-describedby="emailHelp" placeholder="Nombre">
+            </div>
+            <div class="form-group">
+              <label for="accountInputUser">Nombre</label>
+              <input type="text" class="form-control" id="nameEdit" name="nameEdit" aria-describedby="emailHelp" placeholder="Nombre">
+            </div>
+            <div class="form-group">
+              <label for="accountInputEmail">Telefono</label>
+              <input type="number" class="form-control" id="phoneEdit" name="phoneEdit" onblur="checkPhoneEdit(idEdit.value,this.value)" aria-describedby="emailHelp"  placeholder="Telefono">
+            </div>
+            <div class="form-group">
+              <label for="accountInputUser">Estado</label>
+              <select name="statusEdit" id="statusEdit" class="form-control">
+              <option value="0">Inactivo</option>
+              <option value="1">Activo</option>
+              </select>
+              
+            </div>
+            <div class="form-group" style="display:none;">
+              <label for="accountInputUser">Contraseña</label>
+              <input type="text" class="form-control" id="passwordEditEncrypt" name="passwordEditEncrypt" aria-describedby="emailHelp" placeholder="Estado">
+            </div>
+            <div class="form-group">
+              <label for="accountInputUser">Contraseña</label>
+              <input type="text" class="form-control" id="passwordEdit" name="passwordEdit" aria-describedby="emailHelp" placeholder="Contraseña">
+            </div>
+            <div class="form-group">
+              <label for="accountInputEmail">ultima cita</label>
+              <input type="date" class="form-control" id="lastAppointmentEdit" name="lastAppointmentEdit" aria-describedby="emailHelp" placeholder="Fecha">
+            </div>
+            <div class="form-group" id="error-phoneEdit" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este numero ya esta siendo utilizado por otro usuario.</b></span></label>
+            </div>
+            <div class="form-group" id="error-emptyEdit" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
+            </div>
+            <div class="form-group" id="error-passChar" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>La contraseña debe ser mayor a 7 caracteres y tener al menos 1 letra en Mayúscula.</b></span></label>
+            </div>
+            <div class="form-group text-center">
+              <button type="submit" class="btn btn-primary">Editar</button>
+            </div>  
+          </form>
+        </div>
+      </div>
     </article>
   </section>
   <script>
+
+
+    $('#searchUser').on('submit', function (e) {
+      e.preventDefault();
+      search();
+    });
+
     var checkNumber = false;
+    var NumberEditExist = false;
 
     window.scrollTo(0, document.body.scrollHeight);
     $('#myList a').on('click', function (e) {
-      e.preventDefault()
-      $(this).tab('show')
+      e.preventDefault();
+      $(this).tab('show');
     });
+
+function showAddForm(){
+  $('#createCustomer').show();
+  $('#home_list').hide();
+  $('#home_edit').hide();
+  $('#customersList').hide();
+  $('#searchUser').hide();
+  
+}
+
+function showEditForm(){
+  $('#customersList').html('');
+  $('#searchCustomer').val('');
+  $('#editCustomer').hide();
+  $('#createCustomer').hide();
+  $('#home_list').show();
+  $('#customersList').show();
+  $('#searchUser').show();
+  $('#idEdit').val('');
+  $('#nameEdit').val('');
+  $('#phoneEdit').val('');
+  $('#passwordEditEncrypt').val('');
+  $('#passwordEdit').val('');
+  $('#lastAppointmentEdit').val('');
+  $('#statusEdit').val('');
+  $('#home_edit').hide();
+  
+  
+}
 
     function checkPhone(userPhone){
 
@@ -108,13 +198,40 @@ $.ajax({
 });
 }
 
+function checkPhoneEdit(userId,userPhone){
+
+$.ajax({
+              type: 'POST', 
+              url: 'Pages/getPhoneEdit', 
+              data: 'user_id='+userId+'&phone='+userPhone,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(existPhone) {
+                if(existPhone == 1 ){
+                  event.preventDefault();
+                  NumberEditExist = true;
+                  $('#error-phoneEdit').show();
+                  $('#phoneEdit').css('border','2px solid red');
+                } else{
+                  NumberEditExist = false;
+                  $('#error-phoneEdit').hide();
+                  $('#phoneEdit').css('border','');
+                }
+              }
+});
+}
+
 $( "#createCustomer" ).on( "submit", function( event ) {
   var nombre = $('#name').val();
   var celular = $('#phone').val();
   var cita = $('#last_appointment').val();
   checkPhone(celular);
- 
- 
+  
   if( nombre == '' || celular == '' ||checkNumber == true){
     event.preventDefault();
     if( nombre == '' ){
@@ -142,20 +259,87 @@ $( "#createCustomer" ).on( "submit", function( event ) {
       $('#error-empty').hide();
     }
   }else{
+    $('#error-empty').hide();
+    $('#error-phone').hide();
     window.scrollTo(0, 0);
     $('.close').click();
     $('#userCreated').show();
         setInterval(function() {
             $('#userCreated').hide('2000');
-          }, 10000);
+          }, 2000);
+        }  
+});
+
+$( "#editCustomer" ).on( "submit", function( event ) {
+  var id = $('#idEdit').val();
+  var nombre = $('#nameEdit').val();
+  var celular = $('#phoneEdit').val();
+  var pass = $('#passwordEdit').val();
+  var cita = $('#lastAppointmenEdit').val();
+  var updatePassError = false;
+  checkPhoneEdit(id,celular);
+  if(pass !== ''){
+    if(pass.match(/[A-Z]/) && pass.length > 8){
+       updatePassError = false;
+    }else{
+      updatePassError = true;
+    }
+  }
+
+  if( NumberEditExist == true || nombre == '' || celular == '' || updatePassError == true ){ 
+    event.preventDefault();
+    if( nombre == '' ){
+      $('#nameEdit').css('border','2px solid red');
+      $showError = true;
+    }else{
+       $('#nameEdit').css('border','');
+    }
+    if( celular == '' ){
+      $showError = true;
+      $('#phoneEdit').css('border','2px solid red');
+    }else{
+       $('#phoneEdit').css('border','');
+    }
+
+    if( (updatePassError == true) ){
+      $('#passwordEdit').css('border','2px solid red');
+      $('#error-passChar').show();
+    }else{
+       $('#passwordEdit').css('border','');
+       $('#error-passChar').hide();
+    }
+    if( NumberEditExist == true ){
+      $('#error-phoneEdit').show();
+      $('#phoneEdit').css('border','2px solid red');
+    }else{
+      $('#error-phoneEdit').hide();
+      $('#phoneEdit').css('border','');
+    }
+    if ($showError){
+      $('#error-emptyEdit').show();
+    }else{
+      $('#error-emptyEdit').hide();
+    }
+  }else{
+    $('#error-passChar').hide();
+    $('#error-phoneEdit').hide();
+    window.scrollTo(0, 0);
+    $('.close').click();
+    $('#userUpdated').show();
+        setInterval(function() {
+            $('#userUpdated').hide('2000');
+          }, 2000);
         }  
 });
 
 
-    function editClient(CustomerId){
+    function showEditClient(CustomerId){
+      $('.list-group-item').removeClass('active');
+      $('#edit_'+CustomerId).addClass('active');
+      $('#home_edit').show();
       $.ajax({
                 type: 'POST', 
-                url: 'load_customer', 
+                url: 'edit_customer', 
                 data: 'idCustomer='+CustomerId,
                 beforeSend:function() {  
 
@@ -166,32 +350,57 @@ $( "#createCustomer" ).on( "submit", function( event ) {
                 },
                 success: function(customers) {
                   const res = JSON.parse(customers);
-                  //console.log(res);
-                 var idServicio = '';
-                  var nombreServicio = '';
-                  var precioServicio = '';
-                  var generoServicio = '';
-                  var i = 0;
-                  Object.entries(res).forEach((entry) => {
-                    idServicio = entry[1].Service.id;
-                    nombreServicio = entry[1].Service.service_name;
-                    precioServicio = entry[1].Service.price;
-                    generoServicio = entry[1].Service.gender;
-                    console.log(entry[1]);
-                    $('#duracion_edit'+entry[1].Duration.barber).val(entry[1].Duration.duration);
-                    $('#duracionId_edit'+entry[1].Duration.barber).val(entry[1].Duration.id);
-                    i++;
-                    //const [key, value] = entry;
-                    //console.log(`${key}: ${value}`);
-                  });
-                  
-                  $('#id_edit').val(CustomerId); 
-                  $('#nombre_edit').val(nombreServicio);
-                  $('#precio_edit').val(precioServicio);
-                  //$('select>option>value('+generoServicio+')').prop('selected', true);
-                  $('#tiposervicio_edit').val(generoServicio);
+
+                    $('#idEdit').val(res["User"]["id"]);
+                    $('#nameEdit').val(res["User"]["name"]);
+                    $('#phoneEdit').val(res["User"]["phone"]);
+                    $('#statusEdit').val(res["User"]["status"]);
+                    $('#passwordEditEncrypt').val(res["User"]["password"]);
+                    $('#lastAppointmentEdit').val(res["Customer"]["last_appointment"]);
                 }
 	});
     }
-   
+    
+
+    function search(){
+      var customer = $('#searchCustomer').val();
+      $('#createCustomer').hide();
+      $('#home_list').show();
+      $('#customersList').show();
+      $('#editCustomer').show();
+      $('#home_edit').hide();
+      $.ajax({
+                type: 'POST', 
+                url: 'search_customer', 
+                data: 'searchCustomer='+customer,
+                beforeSend:function() {  
+
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(customers) {
+                  const res = JSON.parse(customers);
+                 var idCustomer = '';
+                  var nombreCustomer = '';
+                  var telefonoCustomer = '';
+                  var estadoCustomer = '';
+                  var i = 0;
+                  let list = document.getElementById("customersList");
+                  var boton = '';
+                  Object.entries(res).forEach((entry) => {
+                    
+                    idCustomer = entry[1].User.id;
+                    nombreCustomer = entry[1].User.name + " / " + entry[1].User.phone;
+                    boton += ' <a class="list-group-item list-group-item-action" id="edit_'+idCustomer+'" data-toggle="list" onclick="showEditClient('+idCustomer+')" role="tab" style="color:black;">'+nombreCustomer+'</a>';
+                   
+                    i++;
+                  });
+                  $('#customersList').html(boton);
+                
+                }
+	});
+    }
+
   </script>
