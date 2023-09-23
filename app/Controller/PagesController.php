@@ -281,14 +281,12 @@ function saveUser(){
 		//Initialize
 		$nombreUsuario = $_POST['signupName'];
 		$celular = $_POST['signupPhone'];
-		$genero = $_POST['signupGender'];
 		//$userEmail = $_POST['signupEmail'];
 		$userContrasena = $_POST['signupPassword1'];
-		//Save Product
+		//Save user
 		$this->User->create();
 		$data['User']['name'] = $nombreUsuario;
 		$data['User']['phone'] = $celular;
-		$data['User']['gender'] = $genero;
 		//$data['User']['email'] = trim($userEmail);
 		$data['User']['type'] = 3;
 		$data['User']['status'] = 1;
@@ -313,6 +311,17 @@ function saveUser(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$storedPhone = $this->User->find('first',array('conditions'=>array('User.phone'=>$_POST['phone'],'User.status'=>1)));
+    	if(empty($storedPhone)){
+			echo 0;
+		} else {
+			echo 1;
+		}
+	}
+
+	public function getPhoneEdit(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$storedPhone = $this->User->find('first',array('conditions'=>array('User.phone'=> $_POST['phone'],'User.id !='=> $_POST['user_id'])));
     	if(empty($storedPhone)){
 			echo 0;
 		} else {
@@ -768,6 +777,132 @@ function saveUser(){
 		Cache::write('reservationResponse'.$_SESSION['User']['User']['id'], $reservationResponse);
 		
 	}
+	public function customers(){
+	}
+
+	
+public function load_customer(){
+	$this->autoRender = false;
+	$this->layout = 'ajax';
+	$idCustomer = $_POST['idCustomer'];
+	//seria bueno agregar el barbero en customers, para saber quien fue el ultimo barbero que atendio a un cliente
+	$customer = $this->User->find('all',array(
+	'fields' => array('Customer.user_id','Customer.last_appointment','User.user_id','User.name','User.phone','User.status'),
+	'conditions'=>array('.id'=>$idCustomer),
+	'joins' =>
+		array(
+			array(
+				'table' => 'customers',
+				'alias' => 'Customer',
+				'type' => 'inner',
+				'foreignKey' => false,
+				'conditions'=> array('User.id = Customer.user_id')
+			)          
+			),
+	'recursive' => 2	
+	));
+
+	echo json_encode($customer);
+}
+
+public function search_customer(){
+	$this->autoRender = false;
+	$this->layout = 'ajax';
+	$searchCustomer = $_POST['searchCustomer'];
+	$customer = $this->User->find('all',array(
+	'fields' => array('Customer.user_id','Customer.last_appointment','User.id','User.name','User.phone','User.status'),
+	'conditions'=>array('OR'=> array(
+		array('User.name LIKE'=> "%$searchCustomer%" ),
+		array('User.phone'=>$searchCustomer)
+		)),
+	'joins' =>
+		array(
+			array(
+				'table' => 'customers',
+				'alias' => 'Customer',
+				'type' => 'inner',
+				'foreignKey' => false,
+				'conditions'=> array('User.id = Customer.user_id')
+			)          
+			),
+	'recursive' => 2	
+	));
+	echo json_encode($customer);
+}
+
+public function edit_customer(){
+	$this->autoRender = false;
+	$this->layout = 'ajax';
+	$searchCustomer = $_POST['idCustomer'];
+	$customer = $this->User->find('first',array(
+	'fields' => array('Customer.user_id','Customer.last_appointment','User.id','User.name','User.phone','User.status','User.password'),
+	'conditions'=>array('User.id'=>$searchCustomer),
+	'joins' =>
+		array(
+			array(
+				'table' => 'customers',
+				'alias' => 'Customer',
+				'type' => 'inner',
+				'foreignKey' => false,
+				'conditions'=> array('User.id = Customer.user_id')
+			)          
+			),
+	'recursive' => 2	
+	));
+	echo json_encode($customer);
+}
+
+
+public function add_customer(){
+	$this->layout = 'ajax';
+	if ($this->request->is('post')) {
+		$this->User->create();
+		$data['User']['name'] = $_POST['name'];
+		$data['User']['phone'] = $_POST['phone'];
+		$data['User']['type'] = 3;
+		$data['User']['status'] = 1;
+		$data['User']['creation_date'] = date('Y-m-d');
+		if($this->User->save($data)){
+		$userId = $this->User->getLastInsertID();
+		$last_appointment = $_POST['last_appointment'];
+		
+			$this->Customer->create();
+			$data['Customer']['last_appointment'] = $last_appointment;
+			$data['Customer']['user_id'] = $userId;
+			$this->Customer->save($data);
+		sleep(3);
+		$this->redirect(array('action' => '../customers'));
+		}
+	}
+}
+
+public function update_customer(){
+	$this->layout = 'ajax';
+	if ($this->request->is('post')) {
+		$this->User->id = $_POST['idEdit'];
+		$data['User']['name'] = $_POST['nameEdit'];
+		$data['User']['phone'] = $_POST['phoneEdit'];
+		$data['User']['status'] = $_POST['statusEdit'];
+		if(empty($_POST['passwordEdit'])){
+			$data['User']['password'] = $_POST['passwordEditEncrypt'];
+		}else{
+			$pass = $this->Encrypt->encrypt($_POST['passwordEdit']);
+			$data['User']['password'] = $pass;
+		}
+
+		if($this->User->save($data)){
+			$this->Customer->user_id = $_POST['idEdit'];
+			$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
+			$datac['Customer']['user_id'] = $_POST['idEdit'];
+			$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
+			if($this->Customer->save($datac)){
+			sleep(3);
+			$this->redirect(array('action' => '../customers'));
+			}
+		}
+		
+	}
+}
 
 	function validateReservations($reservationUser){
 		
