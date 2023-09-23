@@ -45,7 +45,7 @@ class AppController extends Controller {
                 $user = $_SESSION['User'];	
                 //$userSession = $this->Session->read('User');
                 $userSession = $_SESSION['User'];
-                $this->set('userSessionFront',$userSession);
+                $this->set('user',$userSession);
                 $services = $this->Service->find('all');
                 $this->set('services',$services);
                 $users = $this->User->find('all',array('conditions'=>array(
