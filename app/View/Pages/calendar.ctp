@@ -327,7 +327,14 @@ var calendar = '';
         },
         eventClick: function(arg) {
           $('#modal-title').html('Cita '+arg.event.title);
-          loadAppointment(arg.event.groupId);
+          const fechaComoCadena = arg.event.start; // día lunes
+                
+          const timeReservation = new Date(fechaComoCadena).getTime();
+          var reservationDate = formatDate(new Date(timeReservation));
+          var reservationTime = formatTime(new Date(timeReservation));
+          var reservation_time = reservationTime;
+          var reservation_date = reservationDate;
+          loadAppointment(arg.event.groupId,reservation_time,reservation_date);
           $('#appointmentId').val(arg.event.groupId);
           
           
@@ -371,10 +378,10 @@ var calendar = '';
 
 </script>
 <script>
-  function loadAppointment(appointmentId){
+  function loadAppointment(appointmentId,reservation_time,reservation_date){
     //alert(appointmentId);
    
-    $('#CancelAppointment').attr('onclick','cancelAppointment('+appointmentId+')');
+    $('#CancelAppointment').attr('onclick','cancelAppointment('+appointmentId+',"'+reservation_time+'","'+reservation_date+'")');
     $.ajax({
                 type: 'POST', 
                 url: 'load_appointment', 
@@ -388,9 +395,7 @@ var calendar = '';
                 },
                 success: function(reservation) {
                   const res = JSON.parse(reservation);
-                  console.log(res.Barber);
-                  console.log(res.Service);
-                  console.log(res.Reservation);
+                 
                   $('#appointmentService').html(res.Service.service_name);
                   $('#appointmentTitle').html(res.Barber.name);
                   $('#appointmentTime').html(res.Reservation.reservation_time);
@@ -398,15 +403,15 @@ var calendar = '';
                 }
 	});
   }
-  function cancelAppointment(appointmentId){
-    
-                const response = confirm("Esta seguro que quiere Eliminar la cita?");
+  function cancelAppointment(appointmentId,reservation_time,reservation_date){
 
+                const response = confirm("Esta seguro que quiere Eliminar la cita?");
+                
                 if (response) {
                   $.ajax({
                     type: 'POST', 
                     url: 'cancel_appointment', 
-                    data: 'reservation_id='+appointmentId,
+                    data: 'reservation_id='+appointmentId+'&reservation_time='+reservation_time+'&reservation_date='+reservation_date,
                     beforeSend:function() {  
                       //$('#loadingNotification').addClass('spinner-border');
                     },

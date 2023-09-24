@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Service','Duration','User','Reservation','Notification','Customer');
+	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove');
 	public $components = array('Encrypt');
 /**
  * Displays a view
@@ -120,7 +120,7 @@ public function home(){
 		array_push($reservation,$duration);
 		array_push($reservationResponse,$reservation);
 	}
-	Cache::write('reservationResponse'.$_SESSION['User']['User']['id'], $reservationResponse);
+
 	}
 	
 	
@@ -919,13 +919,36 @@ public function update_customer(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$appointmentId = $_POST['reservation_id'];
-		$appointmentId = $_POST['reservation_id'];
+		$reservation_time = $_POST['reservation_time'];
+		$reservation_date = $_POST['reservation_date']; 
 		$this->Reservation->id = $appointmentId;
 		$data['Reservation']['reservation_status'] = 2;
 		if($this->Reservation->save($data)){
+			//Guardar Notification
+			$this->validate_cancel($appointmentId,$reservation_time,$reservation_date);
 			Cache::clear();
 		}
 		
+	}
+	public function validate_cancel($appointmentId,$reservation_time,$reservation_date){
+		$currentDate = date('Y-m-d');
+		$reservationTime= date($reservation_time); 
+		$timeLess = strtotime ( '-1 hour' , strtotime ($reservationTime) ) ; 
+		$timePlus = strtotime ( '+1 hour' , strtotime ($reservationTime) ) ; 
+		$newTimeLess = date ( 'H' , $timeLess);
+		$newTimePlus = date ( 'H' , $timePlus);
+		$newTimeLess = $newTimeLess.':00';
+		$newTimePlus = $newTimePlus.':00';	
+		$data = array();
+		$this->Remove->create();
+		$data['Remove']['id_reservation'] = $appointmentId;
+		$data['Remove']['time_from'] = $newTimeLess;
+		$data['Remove']['reservation_time'] = $reservationTime;
+		$data['Remove']['time_to'] = $newTimePlus;
+		$data['Remove']['reservation_date'] = date('Y-m-d',strtotime($reservation_date));
+		$data['Remove']['date_creation'] = date('Y-m-d H:i:s');
+		$this->Remove->save($data);
+	
 	}
 
 	function confirm_appointment(){
@@ -1096,5 +1119,360 @@ public function update_customer(){
 		}
 		echo $response;
 	}
+
+	/**
+	 * Run onces a day
+	 */
+
+	public function notification_biweekly(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+		$customers = $this->Customer->query('SELECT DATEDIFF(CURDATE(),clientes.last_appointment) as dias_transcurridos,clientes.user_id,usuarios.name,usuarios.phone from customers as clientes INNER JOIN users as usuarios ON clientes.user_id=usuarios.id where DATEDIFF(CURDATE(),clientes.last_appointment) = 15');
+		foreach( $customers as $customer ){
+			$nombre = $customer["usuarios"]["name"];
+			//$phone = $customer["usuarios"]["phone"];
+			$info = base64_encode($customer["clientes"]["user_id"]);
+			$phone = '83481182';
+			$data = array();
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'quince',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+											)
+						)
+			);
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			var_dump($server_output);
+			curl_close($ch);
+			
+		}
+	}
+
+	/**
+	 * Run every minute
+	 */
+	public function notification_confirm(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+		$currentDate = date('Y-m-d');
+		$currentTime= date('H:i:s'); 
+		$newTime = strtotime ( '+3 hour' , strtotime ($currentTime) ) ; 
+		$newTime = date ( 'H:i' , $newTime);
+		$newTime = $newTime.':00';
+		
+		$reservations = $this->Reservation->find('all',array('fields'=>array('Reservation.id,Reservation.reservation_date,Reservation.reservation_time,User.id,User.name,User.phone'),
+															 'conditions'=>array(
+																				'Reservation.reservation_time'=>$newTime,'Reservation.reservation_date'=>$currentDate,'Reservation.reservation_status <>'=>2
+																				),
+															 'joins' =>																			array(
+																		array(
+																			'table' => 'users',
+																			'alias' => 'User',
+																			'type' => 'inner',
+																			'foreignKey' => false,
+																			'conditions'=> array('User.id = Reservation.reservation_user'),
+																		)
+																	)));
+		
+		foreach( $reservations as $reservation ){
+			$data = array();
+			$nombre = $reservation['User']['name'];
+			//$phone = $reservation['User']['phone'];
+			$phone = '83481182';
+			$info = base64_encode($reservation['Reservation']['id']);
+			$hora = $reservation['Reservation']['reservation_time'];
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'recordar_cita',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														),
+														array(
+															'type'=>'text',
+															'text'=> $hora
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+													array(
+														'type'=>'button',
+														"index"=> "1",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													)
+											)
+						)
+			);
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			var_dump($server_output);
+			curl_close($ch);
+		}
+		
+		
+	}
+
+	/**
+	 * everytime cancel reservation every 1 min
+	 */
+	public function notification_cancel(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+		$reservations = array();
+		$currentDate = date('Y-m-d');
+		$reservations = $this->Remove->find('all',array('fields'=>array('Remove.id','Remove.id_reservation','Remove.reservation_time','Remove.reservation_date','Notification.user_id','Notification.reservation_date','User.name','User.phone'),
+														'conditions'=>array(
+																			'Remove.reservation_date >='=>$currentDate,
+																			'Remove.reservation_date = Notification.reservation_date'
+																			),
+														 'joins'=>
+														 array(
+															 array(
+																 'table' => 'notifications',
+																 'alias' => 'Notification',
+																 'type' => 'inner',
+																 'foreignKey' => false,
+																 'conditions'=> array('Notification.reservation_time >= Remove.time_from','Notification.reservation_time <= Remove.time_to'),
+															 ),
+															 array(
+																'table' => 'users',
+																'alias' => 'User',
+																'type' => 'inner',
+																'foreignKey' => false,
+																'conditions'=> array('Notification.user_id = User.id'),
+															)         
+															)
+														));
+	
+
+
+
+		foreach( $reservations as $reservation ){
+
+			
+			$removeId = $reservation['Remove']['id'];
+			$date = $reservation['Remove']['reservation_date'];
+			$day  = date('w', strtotime($date));
+			$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+			$year = date('Y', strtotime($date));
+			$month = date('m', strtotime($date));
+			$months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+			$currentDay = date('d', strtotime($date));
+			$dayOfTheWeek = $days[$day];
+			$dateFormat = $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;
+			
+			$data = array();
+			$nombre = $reservation['User']['name'];
+			//$phone = $reservation['User']['phone'];
+			$phone = '72795112';
+			$info = base64_encode($phone);
+			$hora = $dateFormat.' a las '.$reservation['Remove']['reservation_time'];
+			
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '+506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'reagendar',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														),
+														array(
+															'type'=>'text',
+															'text'=> $hora
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+											)
+						)
+			);
+
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			var_dump($server_output);
+			curl_close($ch);
+			$this->Remove->query('delete from removes where id='.$removeId);
+		}
+		
+
+	}
+	
+	public function testWhatsapp(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+		$phone = '83481182';
+		$data = array(
+			'messaging_product' => 'whatsapp',
+			'to' => '506'.$phone,
+			'type' => 'template',
+			'template' => array(
+					'name' => 'prueba',
+					 'language' => array( 'code' => 'es_MX')
+			));
+		
+
+
+		$payload = json_encode($data);
+		curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		$server_output = curl_exec($ch);
+		var_dump($server_output);
+		curl_close($ch);
+
+
+		
+	}
+
+	/**
+	 * Crear cronjob que corra a media noche que limpie la tabla notificationes, registros de hoy y mas viejos
+	 * igual para la tabla removes
+	 * crear tabla de reservaciones activas , se carga , se limpia y se edita igual que la original
+	 * pero solamente tiene las reservaciones activas de ahi se toma para el cronjob notification_confirm
+	 */
+
+	
+
 
 }

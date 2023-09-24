@@ -93,8 +93,10 @@ if( $user != '' ){ ?>
                     <button type="submit" class="btn btn-success"><a>Subir Comprobante</a></button>
                     <?php
                          }
+                         $reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
+                         $reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
                      ?>
-                    <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Eliminar</a></button>
+                    <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>,<?php echo $reservatioTime;?>,<?php echo $reservatioDate;?>)"><a>Eliminar</a></button>
                     </div>
                     </span>
                     <?php } ?>
@@ -127,14 +129,14 @@ if( $user != '' ){ ?>
                 }
             });
    }
-   function cancelAppointment(appointmentId){
+   function cancelAppointment(appointmentId,reservation_time,reservation_date){
         const response = confirm("Esta seguro que quiere Eliminar la cita?");
 
         if (response) {
         $.ajax({
             type: 'POST', 
             url: 'cancel_appointment', 
-            data: 'reservation_id='+appointmentId,
+            data: 'reservation_id='+appointmentId+'&reservation_time='+reservation_time+'&reservation_date='+reservation_date,
             beforeSend:function() {  
             //$('#loadingNotification').addClass('spinner-border');
             },
