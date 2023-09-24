@@ -46,6 +46,7 @@
 	Router::connect('/reservation_events', array('controller' => 'pages', 'action' => 'reservation_events'));
 	Router::connect('/events', array('controller' => 'pages', 'action' => 'events'));
 	Router::connect('/filter_barber', array('controller' => 'pages', 'action' => 'filter_barber'));
+	Router::connect('/remove_block', array('controller' => 'pages', 'action' => 'remove_block'));
 	
 	/**
 	 * Routes para Notificationes
@@ -57,6 +58,7 @@
 	Router::connect('/cancel/*', array('controller' => 'pages', 'action' => 'cancel'));
 	Router::connect('/confirm/*', array('controller' => 'pages', 'action' => 'confirm'));
 	Router::connect('/testWhatsapp/*', array('controller' => 'pages', 'action' => 'testWhatsapp'));
+	
 	
 
 

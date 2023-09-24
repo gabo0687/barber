@@ -32,7 +32,7 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
-    public $uses = array('Service','Duration','User');
+    public $uses = array('Service','Duration','User', 'Block');
 
     function beforeFilter() {
      
@@ -61,6 +61,8 @@ class AppController extends Controller {
                 $clients = array();
                 $clients = $this->User->find('all',array('conditions'=>array('User.type'=>3)));
                 $this->set('clients',$clients);
+                
+                
             }
             
         }
