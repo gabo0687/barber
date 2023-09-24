@@ -53,17 +53,17 @@ date_default_timezone_set('America/Costa_Rica');
                  <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
                  <?php } ?>
              </div>
-         <?php if(!empty($_SESSION['User'])){ ?>     
+         <?php if(!empty($_SESSION['User'])){ ?>
          <form class="header-search">   
-           <div class="event-info-buttons"> 
+         <div class="event-info-buttons"> 
            <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
            <?php 
            if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '2' ){ ?> 
            <a class="ticket-btn" id="calendar" href="calendario" type="button" >💈Vista del Calendario</a>
-           <?php } ?>
-          </div>
-         </form>
-         <?php } ?>
+           </div>
+          </form>
+         <?php }
+              } ?>
 
         
         </div>
@@ -183,7 +183,7 @@ date_default_timezone_set('America/Costa_Rica');
       </div>
       <div class="modal-body">
         <label>Seleccione la fecha que deseas reservar</label>
-        <input class="form-control" type="text" onchange="filterReservations()" onfocus="changeReservationDate()" placeholder="<?php echo date('m/d/Y');?>" name="fecha_reserva" id="fecha_reserva">
+        <input class="form-control" type="text" onchange="filterReservations()" onfocus="changeReservationDate()" placeholder="<?php echo date('m/d/Y');?>" name="fecha_reserva" id="fecha_reserva" >
         <input type="hidden" name="user_type" id="user_type" value="<?php echo $user['User']['type'];?>">
       
         <?php 
@@ -433,54 +433,70 @@ function filterReservations(){
                 alert('No hay internet');    
                 },
                 success: function(services) {
-                 
-                 const res = JSON.parse(services);
-                 var reservationTime = '';
-                  var reservationService = '';
-                  var reservationDuration = '';
-                  var reservationPrice = '';
-                  var reservationBarbers = '';
-                  var responseHtml = '';
-                  var reservationNumber = 0;
-                  var barberNumber = 0;
-                  Object.entries(res).forEach((entry) => {
-                    reservationTime = entry[1].Time;
-                    reservationService = entry[1].Service;
-                    reservationServiceId = entry[1].ServiceId;
-                    reservationDuration = entry[1].Duration;
-                    reservationPrice = entry[1].Price;
-                    reservationBarbers = entry[1].Barbers;
-                    if( reservationBarbers.length > 0 ){
-                      responseHtml += '<li class="ticket-on-sale"><span class="number">Hora: '+reservationTime+'</span>';
-                      responseHtml += '<input type="hidden" name="time_'+reservationNumber+'" id="time_'+reservationNumber+'" value="'+reservationTime+'">';
-                      
-                      responseHtml += '<span class="price">Servicio: '+reservationService+'</span>';
-                      responseHtml += '<input type="hidden" name="service_'+reservationNumber+'" id="service_'+reservationNumber+'" value="'+reservationServiceId+'">';
-                        
-                      responseHtml += '<span class="price">Tiempo: '+reservationDuration+' minutos</span>';
-                      responseHtml += '<span class="price">Precio: ₡'+reservationPrice+'</span>';
-                      responseHtml += '<span class="price">Barberos disponibles:</span></br>';
-                      responseHtml += '<span class="price">';
-                      Object.entries(reservationBarbers).forEach((barber) => {
-                        //console.log(barber);
-                        responseHtml += '<input type="radio" name="barbero_'+reservationNumber+'" id="barbero_'+reservationNumber+'" value="'+barber[1].User.id+'">'+barber[1].User.name+'</br>';
-                        barberNumber++;
-                      });
-                      
-                      responseHtml += '</br><button type="button" class="btn btn-success" id="button'+reservationNumber+'" onclick="reservar('+reservationNumber+')"><a>Reservar </a> <span class="spinner-border-sm" id="loadingReservation'+reservationNumber+'"></span></button>';
-                      responseHtml += '</br><span id="messageReservation'+reservationNumber+'" class="blink_me" style="color:white; display:none">Reservación creada con exito!</span>';
-                      responseHtml += '</br><span id="messageReservationError'+reservationNumber+'" class="blink_me" style="color:white; display:none">Error! Por favor selecciona un barbero</span>';
-                      responseHtml += '</br><span id="messageValidate'+reservationNumber+'" class="" style="color:white; display:none">Error! el cliente ya tiene 2 reservaciones activas, si desea realizar otra reservación contactenos<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
-                      responseHtml += '</br><span id="messageValidateTaken'+reservationNumber+'" class="" style="color:white; display:none">Este horario ya fue reservado por alguien más, por favor cambie su elección<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
-                      
-                      responseHtml += '</li>';
-                      reservationNumber++;
-                    }
-                  });
-                  $('#loading').removeClass('spinner-border');
-                  $('.ticket-list').html(responseHtml);  
-                 notificationTime(reservationFilterTime,reservationDateText);
-                }
+               
+                  
+                        $('#ServiceText').show();
+                        const res = JSON.parse(services);
+                        if( res.length != 0 ){
+                        var reservationTime = '';
+                        var reservationService = '';
+                        var reservationDuration = '';
+                        var reservationPrice = '';
+                        var reservationBarbers = '';
+                        var responseHtml = '';
+                        var reservationNumber = 0;
+                        var barberNumber = 0;
+                        Object.entries(res).forEach((entry) => {
+                          reservationTime = entry[1].Time;
+                          reservationService = entry[1].Service;
+                          reservationServiceId = entry[1].ServiceId;
+                          reservationDuration = entry[1].Duration;
+                          reservationPrice = entry[1].Price;
+                          reservationBarbers = entry[1].Barbers;
+                          if( reservationBarbers.length > 0 ){
+                            responseHtml += '<li class="ticket-on-sale"><span class="number">Hora: '+reservationTime+'</span>';
+                            responseHtml += '<input type="hidden" name="time_'+reservationNumber+'" id="time_'+reservationNumber+'" value="'+reservationTime+'">';
+                            
+                            responseHtml += '<span class="price">Servicio: '+reservationService+'</span>';
+                            responseHtml += '<input type="hidden" name="service_'+reservationNumber+'" id="service_'+reservationNumber+'" value="'+reservationServiceId+'">';
+                              
+                            responseHtml += '<span class="price">Tiempo: '+reservationDuration+' minutos</span>';
+                            responseHtml += '<span class="price">Precio: ₡'+reservationPrice+'</span>';
+                            responseHtml += '<span class="price">Barberos disponibles:</span></br>';
+                            responseHtml += '<span class="price">';
+                            Object.entries(reservationBarbers).forEach((barber) => {
+                              
+                              responseHtml += '<input type="radio" name="barbero_'+reservationNumber+'" id="barbero_'+reservationNumber+'" value="'+barber[1].User.id+'">'+barber[1].User.name+'</br>';
+                              barberNumber++;
+                            });
+                            
+                            responseHtml += '</br><button type="button" class="btn btn-success" id="button'+reservationNumber+'" onclick="reservar('+reservationNumber+')"><a>Reservar </a> <span class="spinner-border-sm" id="loadingReservation'+reservationNumber+'"></span></button>';
+                            responseHtml += '</br><span id="messageReservation'+reservationNumber+'" class="blink_me" style="color:white; display:none">Reservación creada con exito!</span>';
+                            responseHtml += '</br><span id="messageReservationError'+reservationNumber+'" class="blink_me" style="color:white; display:none">Error! Por favor selecciona un barbero</span>';
+                            responseHtml += '</br><span id="messageValidate'+reservationNumber+'" class="" style="color:white; display:none">Error! el cliente ya tiene 2 reservaciones activas, si desea realizar otra reservación contactenos<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
+                            responseHtml += '</br><span id="messageValidateTaken'+reservationNumber+'" class="" style="color:white; display:none">Este horario ya fue reservado por alguien más, por favor cambie su elección<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></span>';
+                            
+                            responseHtml += '</li>';
+                            reservationNumber++;
+                          }
+                        });
+                        $('#loading').removeClass('spinner-border');
+                        $('.ticket-list').html(responseHtml);  
+                        notificationTime(reservationFilterTime,reservationDateText);
+                       }else{
+                        $('#loading').removeClass('spinner-border');
+                          $('#ServiceText').hide();
+                          if( reservationDate == '' ){
+                            const date = new Date(); 
+                            let month= date.getMonth()+1; 
+                            let day= date.getDate(); 
+                            var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+                            reservationDate = day+' de '+meses[month-1];
+                          }
+                          $('.ticket-list').html('<h2>No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h2>');  
+                        }
+                      }
+                  
 	});
 }
 
