@@ -29,6 +29,10 @@
   }
 }
 </style>
+<?php
+date_default_timezone_set('America/Costa_Rica');
+
+?>
 </head>
 
 <body>
@@ -38,7 +42,7 @@
             <div class="sliderbox" id="sliderbox">
                 <div class="slide"></div>            
             </div>         
-                <a class="logo" href="index.php"></a>
+                <a class="logo" href="home"></a>
                 <div class="user">
 
                 <?php 

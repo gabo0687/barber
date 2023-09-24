@@ -39,9 +39,10 @@ class AppController extends Controller {
             @session_start();
             //$user = $this->Session->read('User');
             
-            
+            date_default_timezone_set('America/Costa_Rica');
             //if (($this->Session->check('User')) && (is_array($this->Session->read('User')))) {
             if( !empty($_SESSION['User']) ){
+                
                 $user = $_SESSION['User'];	
                 //$userSession = $this->Session->read('User');
                 $userSession = $_SESSION['User'];
