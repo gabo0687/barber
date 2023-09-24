@@ -47,6 +47,22 @@
 	Router::connect('/events', array('controller' => 'pages', 'action' => 'events'));
 	Router::connect('/filter_barber', array('controller' => 'pages', 'action' => 'filter_barber'));
 	
+	/**
+	 * Routes para Notificationes
+	 */
+	Router::connect('/notification_biweekly', array('controller' => 'pages', 'action' => 'notification_biweekly'));
+	Router::connect('/notification_cancel', array('controller' => 'pages', 'action' => 'notification_cancel'));
+	Router::connect('/notification_confirm', array('controller' => 'pages', 'action' => 'notification_confirm'));
+	Router::connect('/schedule/*', array('controller' => 'pages', 'action' => 'schedule'));
+	Router::connect('/cancel/*', array('controller' => 'pages', 'action' => 'cancel'));
+	Router::connect('/confirm/*', array('controller' => 'pages', 'action' => 'confirm'));
+	Router::connect('/testWhatsapp/*', array('controller' => 'pages', 'action' => 'testWhatsapp'));
+	
+
+
+
+
+	
 	
 
 	
