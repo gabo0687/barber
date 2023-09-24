@@ -72,6 +72,17 @@
 	Router::connect('/update_customer', array('controller' => 'pages', 'action' =>  'update_customer'));
 	Router::connect('/getPhoneEdit', array('controller' => 'pages', 'action' =>  'getPhoneEdit'));
 
+	Router::connect('/users', array('controller' => 'pages', 'action' =>  'users'));
+	Router::connect('/add_user', array('controller' => 'pages', 'action' =>  'add_user'));
+	Router::connect('/load_user', array('controller' => 'pages', 'action' =>  'load_user'));
+	Router::connect('/edit_user', array('controller' => 'pages', 'action' =>  'edit_user'));
+	Router::connect('/search_user', array('controller' => 'pages', 'action' =>  'search_user'));
+	Router::connect('/update_user', array('controller' => 'pages', 'action' =>  'update_user'));
+
+	Router::connect('/getColor', array('controller' => 'pages', 'action' =>  'getColor'));
+	Router::connect('/getColorEdit', array('controller' => 'pages', 'action' =>  'getColorEdit'));
+
+
 	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
