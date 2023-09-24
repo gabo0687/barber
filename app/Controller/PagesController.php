@@ -45,6 +45,12 @@ class PagesController extends AppController {
  * @throws NotFoundException When the view file could not be found
  *   or MissingViewException in debug mode.
  */
+
+ function beforeFilter() {
+	parent::beforeFilter();
+}
+
+
 public function home(){
 
 
@@ -132,12 +138,69 @@ public function home(){
 
 public function account(){
 
-	$user = '';
-	if(isset($_SESSION['User'])){
-		$user = $_SESSION['User'];
+
+    if ($this->request->is('post')) {
+		
+		$blockDate = $_POST['date_block'];
+		if($_POST['date_block'] == ''){
+			$blockDate = date('Y-m-d');
+		}
+		$this->Block->create();
+		$data['Block']['barber_id'] = $_POST['barber_block'];
+		$data['Block']['block_date'] = $blockDate;
+		$data['Block']['block_schedule'] = $_POST['schedule_block'];
+		$data['Block']['creation_date'] = date('Y-m-d');
+		$this->Block->save($data);
+	}
+
+	$barbers = $this->User->find('all',array('conditions'=>array(
+		'OR'=> array(
+					array('User.type'=>1),
+					array('User.type'=>2)
+					)
+				)
+			)
+		);
+	$this->set('barbers',$barbers);
+
+	$user = $_SESSION['User'];
+	$this->set('type',$user['User']['type']);
+	$current_date = date('Y-m-d');	
+	$blockReservations = $this->Block->find('all',array('conditions'=>array('Block.block_date >= '=>$current_date)));
+    $blockResult = array();
+	$blocks = array();
+
+	foreach( $blockReservations as $blockReservation ){
+		
+		foreach( $barbers as $barber ){
+			
+			$date = $blockReservation['Block']['block_date'];
+			$day  = date('w', strtotime($date));
+			$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+			$year = date('Y', strtotime($date));
+			$month = date('m', strtotime($date));
+			$months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+			$currentDay = date('d', strtotime($date));
+			$dayOfTheWeek = $days[$day];
+			$dayFormat = $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;
+			$schedules = ['Todo el día','Mañana','Tarde','Noche'];
+			$schedule = $schedules[$blockReservation['Block']['block_schedule']];
+			if( $blockReservation['Block']['barber_id'] == $barber['User']['id'] ){
+				$blocks = array('id'=>$blockReservation['Block']['id'],'BarberoId'=>$barber["User"]["id"],'Barbero'=>$barber["User"]["name"],'schedule'=>$schedule,'blockDate'=>$dayFormat);
+				break;
+			}else{
+				if( $blockReservation['Block']['barber_id'] == 0 ){
+					$blocks = array('id'=>$blockReservation['Block']['id'],'BarberoId'=>0,'Barbero'=>'Barberia','schedule'=>$schedule,'blockDate'=>$dayFormat);
+					break;
+				}
+			}
+		}
+		
+		array_push($blockResult,$blocks);
 	}
 	
-	$this->set('user',$user);
+	$this->set('blockReservations',$blockResult);	
+
 }
 public function services(){
 	$user = '';
@@ -343,6 +406,8 @@ function saveUser(){
 		
 		
 		$reservationTime 	 = $_POST['reservationTime'];
+
+		
 		
 		$reservations = $this->Reservation->find('all',array('conditions'=>array(
 																'Reservation.reservation_date'=>$reservationDate,
@@ -351,14 +416,133 @@ function saveUser(){
 																'order'=>array('Reservation.reservation_time'=>'ASC')
 															));
 	
-		$reservationsAvailable = $this->load_reservation_available($reservations,$reservationServices,$reservationBarber,$reservationTime);													
+		$reservationsAvailable = $this->load_reservation_available($reservations,$reservationServices,$reservationBarber,$reservationTime,$reservationDate);													
 		
 		echo json_encode($reservationsAvailable);
 		
 
 	}
 
-	public function load_reservation_available($reservations,$reservationService,$filterBarber,$reservationTime){
+	public function checkBlockBarber( $reservationDate ,$timeList,$barberResponse ){
+		
+		$blocks = $this->Block->find('all',array('conditions'=>array('Block.block_date'=>$reservationDate,'Block.barber_id'=>$barberResponse['User']['id'],'Block.barber_id <>'=>0)));
+		$blockReservations = '';
+		$hour = explode(':',$timeList );
+		if( $hour[0] < 10 ){
+			$timeList = '0'.$timeList;
+		}
+		$current_time = $timeList;
+		
+		foreach( $blocks as $block ){
+			switch ($block['Block']['block_schedule']) {
+				case 0:
+				/**
+				 * Block Barber Shop all day
+				 */
+				$blockReservations = 0;
+				break;
+				case 1:
+				/**
+				 * Block Barber Shop morning
+				 */
+				if( $current_time <= '11:59:59' ){
+					$blockReservations = 1;
+				}
+				break;
+				case 2:
+				/**
+				 * Block Barber Shop afternoon
+				 */
+				if( $current_time > '11:59:59' && $current_time <= '17:59:59' ){
+					$blockReservations = 2;    
+				}
+				break;
+				case 3:
+				/**
+				 * Block Barber Shop night
+				 */
+				if( $current_time > '17:59:59' && $current_time <= '23:59:59' ){
+					$blockReservations = 3;   
+				 }
+				 break;    
+			}
+		}
+		return $blockReservations;
+	}
+
+	public function checkBlockDayPass( $reservationDate ,$reservationTime ){
+		$blockReservations = '';
+		$current_date = date('Y-m-d');
+		  if( $reservationDate == $current_date ){
+			$hour = explode(':',$reservationTime );
+				if( $hour[0] < 10 ){
+					$reservationTime = '0'.$reservationTime;
+				}
+
+				$current_time = date('H:i:s'); 
+				
+				$blockReservations = '';
+				
+				if( $reservationTime < $current_time ){
+					$blockReservations = 1;
+				}
+		  }
+				
+           return $blockReservations;
+	}
+
+	public function checkBlockAllDay( $reservationDate ,$reservationTime ){
+		$blockReservations = '';
+				$hour = explode(':',$reservationTime );
+				if( $hour[0] < 10 ){
+					$reservationTime = '0'.$reservationTime;
+				}
+                    $current_time = $reservationTime;
+					
+                    $blockReservations = '';
+                    $blocks = $this->Block->find('all',array('conditions'=>array('Block.block_date'=>$reservationDate,'Block.barber_id'=>0)));
+                    foreach( $blocks as $block ){
+                        
+                            switch ($block['Block']['block_schedule']) {
+                                case 0:
+                                /**
+                                 * Block Barber Shop all day
+                                 */
+								$blockReservations = 0;
+                                break;
+                                case 1:
+                                /**
+                                 * Block Barber Shop morning
+                                 */
+                                if( $current_time <= '11:59:59' ){
+									$blockReservations = 1;
+                                }
+                                break;
+                                case 2:
+                                /**
+                                 * Block Barber Shop afternoon
+                                 */
+                                if( $current_time > '11:59:59' && $current_time <= '17:59:59' ){
+                                    $blockReservations = 2;    
+                                }
+                                break;
+                                case 3:
+                                /**
+                                 * Block Barber Shop night
+                                 */
+                                if( $current_time > '17:59:59' && $current_time <= '23:59:59' ){
+                                    $blockReservations = 3;   
+                                 }
+                                 break;    
+                            }
+                            
+                    }
+                
+               
+                return $blockReservations;
+	}
+
+	public function load_reservation_available($reservations,$reservationService,$filterBarber,$reservationTime,$reservationDate){
 	
 		$timeLists = $this->time_open();
 		$reservationsResponse =array();
@@ -369,10 +553,10 @@ function saveUser(){
 
 			if($reservationTime != 0 ){
 				if( strtotime($timeList) >= strtotime($reservationTime) ){
-					$reservationAvailable = $this->reservationsFilter($timeList,$reservations,$reservationService,$filterBarber,$reservationTime);
+					$reservationAvailable = $this->reservationsFilter($timeList,$reservations,$reservationService,$filterBarber,$reservationTime,$reservationDate);
 				}
 			}else{
-				$reservationAvailable = $this->reservationsFilter($timeList,$reservations,$reservationService,$filterBarber,$reservationTime);
+				$reservationAvailable = $this->reservationsFilter($timeList,$reservations,$reservationService,$filterBarber,$reservationTime,$reservationDate);
 			}
 			if( !empty($reservationAvailable) ){
 				array_push($reservationsResponse,$reservationAvailable);
@@ -382,11 +566,11 @@ function saveUser(){
 		
 	}
 
-	public function reservationsFilter($timeList,$reservations,$reservationService,$filterBarber,$reservationTime){
+	public function reservationsFilter($timeList,$reservations,$reservationService,$filterBarber,$reservationTime,$reservationDate){
 		
 		$barbers = $this->load_barbers();
 		$service = $this->load_service_reservation($reservationService);
-		
+		$reservationAvailable = array();
 		$reservationsResponse =array();
 		$reservationBarbers =array();
 		$timeCompare = strtotime($timeList); 
@@ -417,7 +601,10 @@ function saveUser(){
 							 */
 							$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 							if( $validateBarberService ){
-								array_push($reservationBarberResponse , $barberResponse);
+								$blockBarber = $this->checkBlockBarber( $reservationDate ,$timeList,$barberResponse );
+								if( $blockBarber == '' ){
+									array_push($reservationBarberResponse , $barberResponse);
+								}
 							}
 							
 						}
@@ -435,15 +622,25 @@ function saveUser(){
 						if( $barberExist == false ){
 							$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 							if( $validateBarberService ){
-								array_push($reservationBarberResponse , $barberResponse);
+								$blockBarber = $this->checkBlockBarber( $reservationDate ,$timeList,$barberResponse );
+								if( $blockBarber == '' ){
+									array_push($reservationBarberResponse , $barberResponse);
+								}
 							}
 						}
 						
 					}
 				}
+				if( $reservationDate == '' ){
+					$reservationDate = date('Y-m-d');
+				}
 				
+				$blockAllDay = $this->checkBlockAllDay( $reservationDate ,$timeList );
+				$checkDayPass = $this->checkBlockDayPass( $reservationDate , $timeList );
+				if( $blockAllDay == '' && $checkDayPass == '' ){
 				$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
+				}						
 				
 			}else{
 				if( $filterBarber != 0 ){
@@ -451,21 +648,41 @@ function saveUser(){
 						if( $filterBarber == $barberResponse['User']['id'] ){
 							$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 							if( $validateBarberService ){
-								array_push($reservationBarberResponse , $barberResponse);
+								$blockBarber = $this->checkBlockBarber( $reservationDate ,$timeList,$barberResponse );
+								if( $blockBarber == '' ){
+									array_push($reservationBarberResponse , $barberResponse);
+								}
 							}
 						}
 					}
+					if( $reservationDate == '' ){
+						$reservationDate = date('Y-m-d');
+					}
+					$blockAllDay = $this->checkBlockAllDay( $reservationDate ,$timeList );
+					$checkDayPass = $this->checkBlockDayPass( $reservationDate , $timeList );
+					if( $blockAllDay == '' && $checkDayPass == '' ){
 					$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
+					}
 				}else{
 					foreach( $barbers as $barberResponse){
 						$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 							if( $validateBarberService ){
-								array_push($reservationBarberResponse , $barberResponse);
+								$blockBarber = $this->checkBlockBarber( $reservationDate ,$timeList,$barberResponse );
+								if( $blockBarber == '' ){
+									array_push($reservationBarberResponse , $barberResponse);
+								}	
 							}
 					}
+					if( $reservationDate == '' ){
+						$reservationDate = date('Y-m-d');
+					}
+					$blockAllDay = $this->checkBlockAllDay( $reservationDate ,$timeList );
+					$checkDayPass = $this->checkBlockDayPass( $reservationDate , $timeList );
+					if( $blockAllDay == '' && $checkDayPass == '' ){
 					$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
+					}
 				}
 				
 			}
@@ -1463,6 +1680,14 @@ public function update_customer(){
 
 
 		
+	}
+
+
+	public function remove_block(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$this->Block->query('delete from blocks where id='.$_POST['blockId']);
+		echo $_POST['blockId'];
 	}
 
 	/**
