@@ -51,6 +51,10 @@
               <input type="password" class="form-control" id="password" name="password" aria-describedby="emailHelp" placeholder="Contraseña">
             </div>
             <div class="form-group">
+              <label for="accountInputUser">Contraseña</label>
+              <input type="text" class="form-control" id="password" name="password" aria-describedby="emailHelp" placeholder="Contraseña">
+            </div>
+            <div class="form-group">
               <label for="accountInputEmail">ultima cita</label>
               <input type="date" class="form-control" id="last_appointment" name="last_appointment" aria-describedby="emailHelp" placeholder="Fecha">
             </div>
