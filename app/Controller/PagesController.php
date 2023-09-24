@@ -393,6 +393,29 @@ function saveUser(){
 		}
 	}
 
+	public function getColorEdit(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$storedColor = $this->User->find('first',array('conditions'=>array('User.color'=> $_POST['color'],'User.id !='=> $_POST['user_id'])));
+    	if(empty($storedColor)){
+			echo 0;
+		} else {
+			echo 1;
+		}
+	}
+
+	public function getColor(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$storedColor = $this->User->find('first',array('conditions'=>array('User.color'=>$_POST['color'])));
+    	if(empty($storedColor)){
+			echo 0;
+		} else {
+			echo 1;
+		}
+	}
+
+
 	public function load_reservations(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
@@ -1181,6 +1204,107 @@ public function update_customer(){
 		
 	}
 }
+
+public function users(){
+}
+
+
+public function load_user(){
+$this->autoRender = false;
+$this->layout = 'ajax';
+$iduser = $_POST['iduser'];
+//seria bueno agregar el barbero en customers, para saber quien fue el ultimo barbero que atendio a un cliente
+$user = $this->User->find('all',array(
+'fields' => array('Customer.user_id','Customer.last_appointment','User.user_id','User.name','User.phone','User.status'),
+'conditions'=>array('.id'=>$iduser),
+'joins' =>
+	array(
+		array(
+			'table' => 'users',
+			'alias' => 'User',
+			'type' => 'inner',
+			'foreignKey' => false,
+			'conditions'=> array('User.id = Customer.user_id')
+		)          
+		),
+'recursive' => 2	
+));
+
+echo json_encode($customer);
+}
+
+public function search_user(){
+$this->autoRender = false;
+$this->layout = 'ajax';
+$searchUser = $_POST['searchUser'];
+$user = $this->User->find('all',array(
+'fields' => array('User.id','User.name','User.phone','User.type'),
+'conditions'=>array('User.type !='=> 3,'OR'=> array(
+	array('User.name LIKE'=> "%$searchUser%" ),
+	array('User.phone'=>$searchUser)
+	)),
+'recursive' => 2	
+));
+echo json_encode($user);
+}
+
+public function edit_user(){
+$this->autoRender = false;
+$this->layout = 'ajax';
+$searchUser = $_POST['idUser'];
+$user = $this->User->find('first',array(
+'fields' => array('User.id','User.name','User.phone','User.status','User.password','User.type','User.color'),
+'conditions'=>array('User.id'=>$searchUser),
+'recursive' => 2	
+));
+echo json_encode($user);
+}
+
+
+public function add_user(){
+$this->layout = 'ajax';
+if ($this->request->is('post')) {
+	$this->User->create();
+	$data['User']['name'] = $_POST['nameAdd'];
+	$data['User']['phone'] = $_POST['phoneAdd'];
+	$data['User']['color'] = $_POST['colorAdd'];
+	$data['User']['type'] = $_POST['typeAdd'];
+	$pass = $this->Encrypt->encrypt($_POST['passwordAdd']);
+	$data['User']['password'] = $pass;
+	$data['User']['status'] = 1;
+	$data['User']['creation_date'] = date('Y-m-d');
+	if($this->User->save($data)){
+	sleep(3);
+	$this->redirect(array('action' => '../users'));
+	}
+}
+}
+
+public function update_user(){
+$this->layout = 'ajax';
+if ($this->request->is('post')) {
+	$this->User->id = $_POST['idEdit'];
+	$data['User']['name'] = $_POST['nameEdit'];
+	$data['User']['phone'] = $_POST['phoneEdit'];
+	$data['User']['status'] = $_POST['statusEdit'];
+	$data['User']['type'] = $_POST['typeEdit'];
+	$data['User']['color'] = $_POST['colorEdit'];
+
+	if(empty($_POST['passwordEdit'])){
+		$data['User']['password'] = $_POST['passwordEditEncrypt'];
+	}else{
+		$pass = $this->Encrypt->encrypt($_POST['passwordEdit']);
+		$data['User']['password'] = $pass;
+	}
+
+	if($this->User->save($data)){
+		sleep(3);
+		$this->redirect(array('action' => '../users'));
+		}
+	}
+	
+}
+
 
 	function validateReservations($reservationUser){
 		
