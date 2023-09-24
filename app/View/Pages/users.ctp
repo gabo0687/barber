@@ -328,11 +328,10 @@ $( "#createNewUser" ).on( "submit", function( event ) {
       updatePassError = true;
     }
   }
-
-
   
   if( nombre == '' || celular == '' || checkNumber == true || existColor == true || updatePassError == true || pass == ''){
     event.preventDefault();
+    $showError = false;
     if( nombre == '' ){
       $('#nameAdd').css('border','2px solid red');
       $showError = true;
@@ -408,6 +407,7 @@ $( "#editUser" ).on( "submit", function( event ) {
 
   if( NumberEditExist == true || nombre == '' || celular == '' || updatePassError == true ){ 
     event.preventDefault();
+    $showError = false;
     if( nombre == '' ){
       $('#nameEdit').css('border','2px solid red');
       $showError = true;
