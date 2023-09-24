@@ -882,6 +882,8 @@ public function add_customer(){
 		$this->User->create();
 		$data['User']['name'] = $_POST['name'];
 		$data['User']['phone'] = $_POST['phone'];
+		$pass = $this->Encrypt->encrypt($_POST['password']);
+		$data['User']['password'] = $pass;
 		$data['User']['type'] = 3;
 		$data['User']['status'] = 1;
 		$data['User']['creation_date'] = date('Y-m-d');
