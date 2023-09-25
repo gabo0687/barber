@@ -122,13 +122,19 @@
                     <h4 class="modal-title" id="modal-title"></h4>
                 </div>
                 <div id="modalBody" class="modal-body">
-                <span class="description"><b>Barbero:</b> </span><span id="appointmentTitle"></span></br>
+                <span class="description"><b>Barbero:</b> </span>
+                <select class="form-control"  name="barberoAppointment" id="barberoAppointment">
+                  <?php foreach( $barbers as $barber ){ ?>
+                    <option value="<?php echo $barber['User']['id'];?>"><?php echo $barber['User']['name'];?></option>
+                    <?php } ?>
+                </select></br>
                 <span class="description"><b>Servicio:</b> </span><span id="appointmentService"></span></br>
                 <span class="description"><b>Hora:</b> </span><span id="appointmentTime"></span></br>
                 <span class="description"><b>Precio:</b> </span><span id="appointmentPrice"></span></br>
                 <input type="hidden" name="appointmentId" id="appointmentId" value="0"/>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="btn btn-default" id="editAppointment" onclick="">Editar Cita</button>
                     <button type="button" class="btn btn-default" id="CancelAppointment" onclick="">Cancelar Cita</button>
                     <button type="button" class="btn btn-default" data-dismiss="modal" onclick="closeModal()">Cerrar</button>
                 </div>
@@ -313,16 +319,7 @@ var calendar = '';
           cleanUsers();
 
           $('#calendarModalAdd').modal("show");
-        // var title = prompt('Event Title:');
-        /*var title ='asd';
-          if (title) {
-            calendar.addEvent({
-              title: title,
-              start: arg.start,
-              end: arg.end,
-              allDay: arg.allDay
-            })
-          }*/
+          
           calendar.unselect()
         },
         eventClick: function(arg) {
@@ -378,54 +375,81 @@ var calendar = '';
 
 </script>
 <script>
+  function editarAppointment(appointmentId){
+
+    const response = confirm("Esta seguro que quiere Editar la cita?");
+    if (response) {
+      
+      var barberId = $('#barberoAppointment').val();
+
+      $.ajax({
+        type: 'POST', 
+        url: 'edit_appointment', 
+        data: 'reservation_id='+appointmentId+'&barberId='+barberId,
+        beforeSend:function() {  
+          //$('#loadingNotification').addClass('spinner-border');
+        },
+        error: function(){
+            
+        alert('No hay internet');    
+        },
+        success: function(reservation) {
+          window.location.reload();
+        }
+      });
+    }
+  }
+
   function loadAppointment(appointmentId,reservation_time,reservation_date){
-    //alert(appointmentId);
+    
    
     $('#CancelAppointment').attr('onclick','cancelAppointment('+appointmentId+',"'+reservation_time+'","'+reservation_date+'")');
+    $('#editAppointment').attr('onclick','editarAppointment('+appointmentId+')');
     $.ajax({
-                type: 'POST', 
-                url: 'load_appointment', 
-                data: 'reservation_id='+appointmentId,
-                beforeSend:function() {  
-                  //$('#loadingNotification').addClass('spinner-border');
-                },
-                error: function(){
-                    
-                alert('No hay internet');    
-                },
-                success: function(reservation) {
-                  const res = JSON.parse(reservation);
-                 
-                  $('#appointmentService').html(res.Service.service_name);
-                  $('#appointmentTitle').html(res.Barber.name);
-                  $('#appointmentTime').html(res.Reservation.reservation_time);
-                  $('#appointmentPrice').html(res.Service.price);
-                }
-	});
+            type: 'POST', 
+            url: 'load_appointment', 
+            data: 'reservation_id='+appointmentId,
+            beforeSend:function() {  
+              //$('#loadingNotification').addClass('spinner-border');
+            },
+            error: function(){
+                
+            alert('No hay internet');    
+            },
+            success: function(reservation) {
+              const res = JSON.parse(reservation);
+              
+              $('#appointmentService').html(res.Service.service_name);
+              $('#barberoAppointment').val(res.Barber.id);
+              $('#appointmentTime').html(res.Reservation.reservation_time);
+              $('#appointmentPrice').html(res.Service.price);
+            }
+	        });
   }
+
+  
+
   function cancelAppointment(appointmentId,reservation_time,reservation_date){
 
-                const response = confirm("Esta seguro que quiere Eliminar la cita?");
+        const response = confirm("Esta seguro que quiere Eliminar la cita?");
+        
+        if (response) {
+          $.ajax({
+            type: 'POST', 
+            url: 'cancel_appointment', 
+            data: 'reservation_id='+appointmentId+'&reservation_time='+reservation_time+'&reservation_date='+reservation_date,
+            beforeSend:function() {  
+              //$('#loadingNotification').addClass('spinner-border');
+            },
+            error: function(){
                 
-                if (response) {
-                  $.ajax({
-                    type: 'POST', 
-                    url: 'cancel_appointment', 
-                    data: 'reservation_id='+appointmentId+'&reservation_time='+reservation_time+'&reservation_date='+reservation_date,
-                    beforeSend:function() {  
-                      //$('#loadingNotification').addClass('spinner-border');
-                    },
-                    error: function(){
-                        
-                    alert('No hay internet');    
-                    },
-                    success: function(reservation) {
-                      window.location.reload();
-                    }
-	                });
-                } else {
-                   // alert("Cancel was pressed");
-                }
+            alert('No hay internet');    
+            },
+            success: function(reservation) {
+              window.location.reload();
+            }
+          });
+        }
             
     
   }
