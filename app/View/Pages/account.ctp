@@ -14,9 +14,6 @@
        <li class="nav-item"><a class="nav-link fa fa-usd" aria-hidden="true" id="calendar" href="product_sales" type="button" > Reporte Productos</a></li>
        <li class="nav-item"><a class="nav-link fa fa-money" aria-hidden="true" id="calendar" href="expenses_sales" type="button" > Reporte Gastos</a></li>
        <?php } ?>
-       
-       
-       
       </ul>
    
       <div class="tab-content" id="pills-tabContent">
@@ -90,8 +87,11 @@
                 <option value="3">Noche</option>
               </select> 
             </div>
+            <div class="form-group" id="blocker-error" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>No se puede ejecutar el bloqueo el usuario(s) tiene citas activas en ese horario</b></span></label>
+            </div>
             <div class="form-group text-right">
-              <button type="submit" class="btn btn-primary">Guardar Cambios</button>
+                <button type="button" onclick="blockCheck()" class="btn btn-primary">Guardar Cambios</button>
             </div>
           </form>
         </div>
@@ -101,6 +101,34 @@
   </section>
   <script>
     
+    function blockCheck(){
+      
+      var barber_block= $('#barber_block').val();
+      var date_block= $('#date_block').val();
+      var schedule_block= $('#schedule_block').val();
+      $('#blocker-error').hide();
+      $.ajax({
+                type: 'POST', 
+                url: 'block_check', 
+                data: 'barber_block='+barber_block+'&date_block='+date_block+'&schedule_block='+schedule_block,
+                beforeSend:function() {  
+                //$('#loadingNotification').addClass('spinner-border');
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(response) {
+                  if(response == 'no'){
+                    $('#blocker-error').show();
+                  }else{
+                    $("#block_form").submit();
+                  }
+                  
+                }
+            });
+     }
+
     function removeBlock(blockId){
       const response = confirm("Esta seguro que desea Eliminar?");
                 
