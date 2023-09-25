@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove');
+	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove','Activereservation');
 	public $components = array('Encrypt');
 /**
  * Displays a view
@@ -811,6 +811,17 @@ function saveUser(){
 			$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
 			$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
 			if($this->Reservation->save($data)){
+				$lastReservationId = $this->Reservation->getLastInsertID();
+				$this->Activereservation->create();
+				$data['Activereservation']['id_reservation'] = $lastReservationId;
+				$data['Activereservation']['reservation_date'] = $reservationDate;
+				$data['Activereservation']['reservation_time'] = $_POST['reservation_time'];
+				$data['Activereservation']['reservation_user'] = $reservationUser;
+				$data['Activereservation']['reservation_service'] = $_POST['reservation_service'];
+				$data['Activereservation']['reservation_barber'] = $_POST['reservation_barber'];
+				$data['Activereservation']['creation_date'] = date('Y-m-d H:i:s');
+				$this->Activereservation->save($data);
+				
 				$this->Customer->query('delete from customers where user_id='.$reservationUser);
 				$this->Customer->create();
 				$data['Customer']['last_appointment'] = $reservationDate;
@@ -862,6 +873,17 @@ function saveUser(){
 		$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
 		$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
 		if($this->Reservation->save($data)){
+			$lastReservationId = $this->Reservation->getLastInsertID();
+			$this->Activereservation->create();
+			$data['Activereservation']['id_reservation'] = $lastReservationId;
+			$data['Activereservation']['reservation_date'] = $reservationDate;
+			$data['Activereservation']['reservation_time'] = $_POST['reservation_time'];
+			$data['Activereservation']['reservation_user'] = $_POST['reservation_client'];
+			$data['Activereservation']['reservation_service'] = $_POST['reservation_service'];
+			$data['Activereservation']['reservation_barber'] = $_POST['reservation_barber'];
+			$data['Activereservation']['creation_date'] = date('Y-m-d H:i:s');
+			$this->Activereservation->save($data);
+
 			$this->Customer->query('delete from customers where user_id='.$_POST['reservation_client']);
 			$this->Customer->create();
 			$data['Customer']['last_appointment'] = $reservationDate;
@@ -914,6 +936,7 @@ function saveUser(){
 		echo json_encode($events);
 	 }
 	public function calendar(){
+		
 		$this->layout = 'ajax';
 		$events= array();
 		$reservations = Cache::read('reservationResponse'.$_SESSION['User']['User']['id']);
@@ -945,6 +968,16 @@ function saveUser(){
 		}
 		
 		$this->set('events',$events);
+
+		$barbers = $this->User->find('all',array('conditions'=>array(
+			'OR'=> array(
+						array('User.type'=>1),
+						array('User.type'=>2)
+						)
+					)
+				)
+			);
+		$this->set('barbers',$barbers);
 	}
 	
 	public function reservations(){
@@ -1141,11 +1174,21 @@ public function update_customer(){
 		$this->Reservation->id = $appointmentId;
 		$data['Reservation']['reservation_status'] = 2;
 		if($this->Reservation->save($data)){
+			$activeReservationid = $this->getActiveReservationId($appointmentId);
+			$this->Activereservation->id = $activeReservationid;
+			$data['Activereservation']['reservation_status'] = 2;
+			$this->Activereservation->save($data);
 			//Guardar Notification
 			$this->validate_cancel($appointmentId,$reservation_time,$reservation_date);
 			Cache::clear();
 		}
 		
+	}
+
+	public function getActiveReservationId($reservationId){
+		$activeReservation = $this->Activereservation->find('first',array('conditions'=>array('Activereservation.id_reservation'=>$reservationId)));
+		return $activeReservation['Activereservation']['id'];
+
 	}
 	public function validate_cancel($appointmentId,$reservation_time,$reservation_date){
 		$currentDate = date('Y-m-d');
@@ -1175,6 +1218,10 @@ public function update_customer(){
 		$this->Reservation->id = $appointmentId;
 		$data['Reservation']['reservation_status'] = 1;
 		if($this->Reservation->save($data)){
+			$activeReservationid = $this->getActiveReservationId($appointmentId);
+			$this->Activereservation->id = $activeReservationid;
+			$data['Activereservation']['reservation_status'] = 1;
+			$this->Activereservation->save($data);
 			Cache::clear();
 		}
 	}
@@ -1434,9 +1481,9 @@ public function update_customer(){
 		$newTime = date ( 'H:i' , $newTime);
 		$newTime = $newTime.':00';
 		
-		$reservations = $this->Reservation->find('all',array('fields'=>array('Reservation.id,Reservation.reservation_date,Reservation.reservation_time,User.id,User.name,User.phone'),
+		$reservations = $this->Activereservation->find('all',array('fields'=>array('Activereservation.id_reservation,Activereservation.reservation_date,Activereservation.reservation_time,User.id,User.name,User.phone'),
 															 'conditions'=>array(
-																				'Reservation.reservation_time'=>$newTime,'Reservation.reservation_date'=>$currentDate,'Reservation.reservation_status <>'=>2
+																				'Activereservation.reservation_time'=>$newTime,'Activereservation.reservation_date'=>$currentDate,'Activereservation.reservation_status <>'=>2
 																				),
 															 'joins' =>																			array(
 																		array(
@@ -1444,7 +1491,7 @@ public function update_customer(){
 																			'alias' => 'User',
 																			'type' => 'inner',
 																			'foreignKey' => false,
-																			'conditions'=> array('User.id = Reservation.reservation_user'),
+																			'conditions'=> array('User.id = Activereservation.reservation_user'),
 																		)
 																	)));
 		
@@ -1453,8 +1500,8 @@ public function update_customer(){
 			$nombre = $reservation['User']['name'];
 			//$phone = $reservation['User']['phone'];
 			$phone = '83481182';
-			$info = base64_encode($reservation['Reservation']['id']);
-			$hora = $reservation['Reservation']['reservation_time'];
+			$info = base64_encode($reservation['Activereservation']['id_reservation']);
+			$hora = $reservation['Activereservation']['reservation_time'];
 			$data = array(
 				'messaging_product' => 'whatsapp',
 				'to' => '506'.$phone,
@@ -1690,14 +1737,37 @@ public function update_customer(){
 		echo $_POST['blockId'];
 	}
 
-	/**
-	 * Crear cronjob que corra a media noche que limpie la tabla notificationes, registros de hoy y mas viejos
-	 * igual para la tabla removes
-	 * crear tabla de reservaciones activas , se carga , se limpia y se edita igual que la original
-	 * pero solamente tiene las reservaciones activas de ahi se toma para el cronjob notification_confirm
-	 */
+	public function edit_appointment(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$this->Reservation->id = $_POST['reservation_id'];
+		$data['Reservation']['reservation_barber'] = $_POST['barberId'];
+		if($this->Reservation->save($data)){
+			$activeReservationid = $this->getActiveReservationId($_POST['reservation_id']);
+			$this->Activereservation->id = $activeReservationid;
+			$data['Activereservation']['reservation_barber'] = $_POST['barberId'];
+			$this->Activereservation->save($data);
+			Cache::clear();
+			echo 1;
+		}
+	}
 
-	
+
+
+
+	/**
+	 * CronJob Run onces at midnight
+	 */
+	public function clean_notifications(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$currenDate = date('Y-m-d');
+		$currenDate = "'".$currenDate."'";
+		$this->Remove->query('delete from removes where reservation_date <='.$currenDate);
+		$this->Notification->query('delete from notifications where reservation_date <='.$currenDate);
+		$this->Activereservation->query('delete from activereservations where reservation_date <='.$currenDate);
+
+	}
 
 
 }
