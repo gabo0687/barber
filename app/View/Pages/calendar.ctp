@@ -190,9 +190,9 @@
                 <span class="description"><b>Escoger hora:</b> </span>
                 <select name="reservationTime" id="reservationTime" class="form-control" >
                 <?php 
-                  $time_hour = 8;
+                  $time_hour = 7;
                   $time_minute = '00';
-                  for($i=0; $i <= 28; $i++){ 
+                  for($i=0; $i <= 30; $i++){ 
                     if( $time_minute != 60 ){
                       if( $time_hour < 10 ){
                         if(strlen($time_hour) == 2){

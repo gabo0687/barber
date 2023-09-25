@@ -227,9 +227,9 @@ date_default_timezone_set('America/Costa_Rica');
       <select class="form-control" onchange="filterReservations()" name="reservation_time" id="reservation_time"> 
       <option value="0">Todas</option>              
       <?php 
-      $time_hour = 8;
+      $time_hour = 7;
       $time_minute = '00';
-      for($i=0; $i <= 28; $i++){ 
+      for($i=0; $i <= 30; $i++){ 
         if( $time_minute != 60 ){
         ?>    
       
@@ -544,7 +544,7 @@ $.ajax({
               },
               error: function(){
                   
-              alert('No hay internet');    
+              alert('No hay internet8');    
               },
               success: function(existPhone) {
                 if(existPhone == 1 ){

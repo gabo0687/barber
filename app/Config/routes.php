@@ -78,6 +78,10 @@
 	Router::connect('/getPhoneEdit', array('controller' => 'pages', 'action' =>  'getPhoneEdit'));
 
 	
+	Router::connect('/work', array('controller' => 'pages', 'action' => 'work'));
+	Router::connect('/block_check', array('controller' => 'pages', 'action' => 'block_check'));
+
+	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */

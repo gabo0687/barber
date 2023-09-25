@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove','Activereservation');
+	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove','Activereservation','Workhour');
 	public $components = array('Encrypt');
 /**
  * Displays a view
@@ -72,7 +72,7 @@ public function home(){
 		$this->Reservation->save($dataBill);
 	}
 
-	$user = '';
+	$user = array();
 	$reservations = array();
 	$reservationResponse=array();
 	if(isset($_SESSION['User'])){
@@ -138,7 +138,7 @@ public function home(){
 
 public function account(){
 
-
+	$this->checksession();
     if ($this->request->is('post')) {
 		
 		$blockDate = $_POST['date_block'];
@@ -203,6 +203,7 @@ public function account(){
 
 }
 public function services(){
+	$this->checksession();
 	$user = '';
 	$services = $this->Service->find('all');
 	$this->set('services',$services);
@@ -637,7 +638,8 @@ function saveUser(){
 				
 				$blockAllDay = $this->checkBlockAllDay( $reservationDate ,$timeList );
 				$checkDayPass = $this->checkBlockDayPass( $reservationDate , $timeList );
-				if( $blockAllDay == '' && $checkDayPass == '' ){
+				$checkTimeOpen = $this->checkOpenClose( $reservationDate , $timeList );
+				if( $blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '' ){
 				$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
 				}						
@@ -660,7 +662,8 @@ function saveUser(){
 					}
 					$blockAllDay = $this->checkBlockAllDay( $reservationDate ,$timeList );
 					$checkDayPass = $this->checkBlockDayPass( $reservationDate , $timeList );
-					if( $blockAllDay == '' && $checkDayPass == '' ){
+					$checkTimeOpen = $this->checkOpenClose( $reservationDate , $timeList );
+					if( $blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '' ){
 					$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
 					}
@@ -679,7 +682,8 @@ function saveUser(){
 					}
 					$blockAllDay = $this->checkBlockAllDay( $reservationDate ,$timeList );
 					$checkDayPass = $this->checkBlockDayPass( $reservationDate , $timeList );
-					if( $blockAllDay == '' && $checkDayPass == '' ){
+					$checkTimeOpen = $this->checkOpenClose( $reservationDate , $timeList );
+					if( $blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '' ){
 					$reservationAvailable =array('Time'=>$timeList,'Service'=>$service['Service']['service_name'],'ServiceId'=>$service['Service']['id'],'Duration'=>$service['Duration']['duration'],'Price'=>$service['Service']['price'],
 									'Barbers'=>$reservationBarberResponse);
 					}
@@ -698,11 +702,32 @@ function saveUser(){
 		
 	}
 
+	public function checkOpenClose( $reservationDate , $timeList ){
+		$dayofweek = date('w', strtotime($reservationDate));
+		if( $dayofweek == 0 ){
+			$dayofweek = 7;
+		}
+		$work_hours = $this->Workhour->find('first',array('conditions'=>array('Workhour.work_day'=>$dayofweek)));
+		$resultado = '';
+		
+		
+		if( strtotime($work_hours['Workhour']['work_open']) > strtotime($timeList) ){
+			$resultado = 'no';
+		}else{
+			if( strtotime($timeList) >= strtotime($work_hours['Workhour']['work_close']) ){
+				$resultado = 'no';
+			}
+		}
+		
+		
+		return $resultado;
+	}
+
 	public function time_open(){
 		$time_return = array();
-		$time_hour = 8;
+		$time_hour = 7;
 		$time_minute = '00';
-		for($i=0; $i <= 28; $i++){ 
+		for($i=0; $i <= 30; $i++){ 
 		  	if( $time_minute != 60 ){
 		  		array_push($time_return,$time_hour.':'.$time_minute);      
 			}
@@ -772,6 +797,7 @@ function saveUser(){
 		$data['Notification']['notification_type'] = 2;
 		$data['Notification']['date_creation'] = date('Y-m-d H:i:s');
 		if($this->Notification->save($data)){
+			Cache::clear();
 			echo 1;
 		}else{
 			echo 0;
@@ -939,6 +965,7 @@ function saveUser(){
 		
 		$this->layout = 'ajax';
 		$events= array();
+		$this->checksession();
 		$reservations = Cache::read('reservationResponse'.$_SESSION['User']['User']['id']);
 		if( !$reservations ){
 
@@ -1028,6 +1055,7 @@ function saveUser(){
 		
 	}
 	public function customers(){
+		$this->checksession();
 	}
 
 	
@@ -1462,6 +1490,7 @@ public function update_customer(){
 
 	/**
 	 * Run every minute
+	 * cachecron
 	 */
 	public function notification_confirm(){
 		$this->layout = 'ajax';
@@ -1481,6 +1510,10 @@ public function update_customer(){
 		$newTime = date ( 'H:i' , $newTime);
 		$newTime = $newTime.':00';
 		
+		$reservations = Cache::read('notification_confirm');
+		
+		if( !$reservations ){
+
 		$reservations = $this->Activereservation->find('all',array('fields'=>array('Activereservation.id_reservation,Activereservation.reservation_date,Activereservation.reservation_time,User.id,User.name,User.phone'),
 															 'conditions'=>array(
 																				'Activereservation.reservation_time'=>$newTime,'Activereservation.reservation_date'=>$currentDate,'Activereservation.reservation_status <>'=>2
@@ -1494,7 +1527,10 @@ public function update_customer(){
 																			'conditions'=> array('User.id = Activereservation.reservation_user'),
 																		)
 																	)));
-		
+		Cache::write('notification_confirm', $reservations);															
+																	
+		}
+
 		foreach( $reservations as $reservation ){
 			$data = array();
 			$nombre = $reservation['User']['name'];
@@ -1573,6 +1609,7 @@ public function update_customer(){
 
 	/**
 	 * everytime cancel reservation every 1 min
+	 * cachecron
 	 */
 	public function notification_cancel(){
 		$this->layout = 'ajax';
@@ -1587,6 +1624,10 @@ public function update_customer(){
 		curl_setopt($ch, CURLOPT_POST, 1);
 		$reservations = array();
 		$currentDate = date('Y-m-d');
+		$reservations = Cache::read('notification_cancel');
+		
+		if( !$reservations ){
+
 		$reservations = $this->Remove->find('all',array('fields'=>array('Remove.id','Remove.id_reservation','Remove.reservation_time','Remove.reservation_date','Notification.user_id','Notification.reservation_date','User.name','User.phone'),
 														'conditions'=>array(
 																			'Remove.reservation_date >='=>$currentDate,
@@ -1612,7 +1653,9 @@ public function update_customer(){
 														));
 	
 
-
+			Cache::write('notification_cancel', $reservations);															
+						
+		}												
 
 		foreach( $reservations as $reservation ){
 
@@ -1690,6 +1733,7 @@ public function update_customer(){
 			var_dump($server_output);
 			curl_close($ch);
 			$this->Remove->query('delete from removes where id='.$removeId);
+			Cache::clear();
 		}
 		
 
@@ -1766,8 +1810,86 @@ public function update_customer(){
 		$this->Remove->query('delete from removes where reservation_date <='.$currenDate);
 		$this->Notification->query('delete from notifications where reservation_date <='.$currenDate);
 		$this->Activereservation->query('delete from activereservations where reservation_date <='.$currenDate);
+		Cache::clear();
 
 	}
 
+	public function checksession(){
+		if( !isset($_SESSION['User']) ){
+			$this->redirect(array('action' => 'home'));
+		}
+		
+	}
+
+	public function work(){
+		$this->checksession();
+		if ($this->request->is('post')) {
+			$this->Workhour->query('delete from workhours');
+			$days = array('mon','tue','wed','thu','fri','sat','sun');
+			for( $i=1; $i<=7; $i++){
+				$current = $days[$i-1];
+				$this->Workhour->create();
+				$data['Workhour']['work_day'] = $i;
+				$data['Workhour']['work_open'] = $_POST[$current.'_open'];
+				$data['Workhour']['work_close'] = $_POST[$current.'_close'];
+				$data['Workhour']['date_creation'] = date('Y-m-d');
+				$this->Workhour->save($data);
+			}
+		}
+		$work_hours = $this->Workhour->find('all',array('order'=>'Workhour.work_day asc'));
+		$this->set('work_hours',$work_hours);
+	}
+
+	public function block_check(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$conditions = array();
+		$response = 'si';
+		$barber_block = $_POST['barber_block'];
+		if( $_POST['barber_block'] != 0 ){
+			$conditions['Reservation.reservation_barber'] = $barber_block;
+			$schedule_block = $_POST['schedule_block'];
+		
+			switch($schedule_block){
+				case 0:
+					/**
+					 * No necesita evalución
+					 */
+					break;
+				case 1:
+					
+					$conditions['Reservation.reservation_time <='] = date('H:i:s',strtotime('11:59:59'));
+					break;
+				case 2:
+					$conditions['Reservation.reservation_time >='] = date('H:i:s',strtotime('12:00:00'));
+					$conditions['Reservation.reservation_time <='] = date('H:i:s',strtotime('17:59:59'));
+					break;
+				case 2:
+					$conditions['Reservation.reservation_time >='] = date('H:i:s',strtotime('18:00:00'));
+					$conditions['Reservation.reservation_time <='] = date('H:i:s',strtotime('23:59:59'));
+					break;	
+			}
+		}
+		
+
+		$date_block = $_POST['date_block'];
+		if( $date_block == '' ){
+			$date_block = date('Y-m-d');
+		}
+		
+		
+		$reservation = $this->Reservation->find('first',array('conditions'=>array('Reservation.reservation_date'=>$date_block,'Reservation.reservation_status <>'=>2,$conditions)));
+		
+		if( !empty($reservation) ){
+			$response = 'no';
+		}
+		return $response;
+	}
+  /**
+   * $log = $this->Model->getDataSource()->getLog(false, false);
+   * echo '<pre>';
+   * var_dump($log);
+   * die;		
+   */
 
 }

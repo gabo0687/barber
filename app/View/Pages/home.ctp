@@ -10,11 +10,13 @@ Profesionales en cuidado personal para caballero</span></p>
 </section>
 
 <?php 
-if($user != ''){?>
+
+if( isset($user['User']['type']) ){?>
     <div class="event-info-buttons"> 
         <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
     </div>
 <?php 
+
 if( $user['User']['type'] == 1 ){ ?>
          
 <label style="color:white">Seleccione la fecha que desea consultar</label>
@@ -37,7 +39,7 @@ if( $user['User']['type'] == 1 ){ ?>
     }
 }
 }
-if( $user != '' ){ ?> 
+if( isset($user['User']) ){ ?> 
 </br> 
 <h1 style="color:white">Citas Activas</h1> 
    
@@ -122,7 +124,7 @@ if( $user != '' ){ ?>
                 },
                 error: function(){
                     
-                alert('No hay internet');    
+                alert('No hay internet2');    
                 },
                 success: function(reservation) {
                 window.location.reload();
@@ -142,7 +144,7 @@ if( $user != '' ){ ?>
             },
             error: function(){
                 
-            alert('No hay internet');    
+            alert('No hay internet1');    
             },
             success: function(reservation) {
             window.location.reload();
@@ -168,7 +170,7 @@ if( $user != '' ){ ?>
             },
             error: function(){
                 
-            alert('No hay internet');    
+            alert('No hay internet3');    
             },
             success: function(reservation) {
                
