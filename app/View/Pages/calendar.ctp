@@ -106,9 +106,10 @@
 <div class="pull-left form-inline">
 <div class="btn-group">
 <a class="btn btn-success" href="home">Regresar a página principal</a></br>
-<a class="btn btn-warning">Berman</a>
-<a class="btn btn-info">Joss</a>
-<a class="btn btn-success">Dey</a>
+
+<?php foreach( $barbers as $barber ){ ?>
+  <a class="btn" style="background-color:<?php echo $barber['User']['color'];?> ; color:white"><?php echo $barber['User']['name'];?></a>
+<?php } ?>
 </div>
 </div>
 </div>
