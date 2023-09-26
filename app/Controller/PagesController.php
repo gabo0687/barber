@@ -2081,11 +2081,9 @@ if ($this->request->is('post')) {
 		}
 		return $response;
 	}
-  /**
-   * $log = $this->Model->getDataSource()->getLog(false, false);
-   * echo '<pre>';
-   * var_dump($log);
-   * die;		
-   */
+
+	public function products(){
+		
+	}
 
 }

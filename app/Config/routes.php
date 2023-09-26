@@ -96,6 +96,9 @@
 	Router::connect('/work', array('controller' => 'pages', 'action' => 'work'));
 	Router::connect('/block_check', array('controller' => 'pages', 'action' => 'block_check'));
 
+	
+	Router::connect('/products', array('controller' => 'pages', 'action' =>  'products'));
+
 
 
 	
