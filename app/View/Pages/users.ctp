@@ -44,11 +44,11 @@
             </div>
             <div class="form-group">
               <label for="accountInputEmail">Telefono</label>
-              <input type="number" class="form-control" id="phoneAdd" name="phoneAdd" onblur="checkPhone(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
+              <input type="number" class="form-control" id="phoneAdd" name="phoneAdd" onblur="checkPhoneUsers(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Contraseña</label>
-              <input type="text" class="form-control" id="passwordAdd" name="passwordAdd" aria-describedby="emailHelp" placeholder="Contraseña">
+              <input type="password" class="form-control" id="passwordAdd" name="passwordAdd" aria-describedby="emailHelp" placeholder="Contraseña">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Tipo</label>
@@ -60,6 +60,10 @@
               <label for="accountInputEmail">Color</label>
               <input type="color" class="form-control" id="colorAdd" name="colorAdd" onblur="checkColor(this.value)" aria-describedby="emailHelp" placeholder="color">
             </div>
+            <h4>Servicios</h4>
+            <div class="form-group" id="servicesList" name="servicesList" role="tablist">
+            </div>
+
             <div class="form-group" id="error-phone" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este numero ya esta siendo utilizado por otro usuario.</b></span></label>
             </div>
@@ -118,19 +122,24 @@
             </div>
             <div class="form-group">
               <label for="accountInputEmail">Color</label>
-              <input type="color" class="form-control" id="colorEdit" name="colorEdit" onblur="checkColorEdit(this.value)" aria-describedby="emailHelp" placeholder="color">
+              <input type="color" class="form-control" id="colorEdit" name="colorEdit" onblur="checkColorEdit(this.value,idEdit.value)" aria-describedby="emailHelp" placeholder="color">
             </div>
             <div class="form-group" style="display:none;">
               <label for="accountInputUser">Contraseña</label>
-              <input type="text" class="form-control" id="passwordEditEncrypt" name="passwordEditEncrypt" aria-describedby="emailHelp" placeholder="Estado">
+              <input type="password" class="form-control" id="passwordEditEncrypt" name="passwordEditEncrypt" aria-describedby="emailHelp" placeholder="Estado">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Contraseña</label>
-              <input type="text" class="form-control" id="passwordEdit" name="passwordEdit" aria-describedby="emailHelp" placeholder="Contraseña">
+              <input type="password" class="form-control" id="passwordEdit" name="passwordEdit" aria-describedby="emailHelp" placeholder="Contraseña">
             </div>
-            <div class="form-group" id="error-color" style="display:none;">
+            <div class="form-group" id="error-colorEdit" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este Color ya esta siendo utilizado por otro usuario.</b></span></label>
             </div>
+
+            <h4>Servicios</h4>
+            <div class="form-group" id="servicesEditList" name="servicesEditList" role="tablist">
+            </div>
+
             <div class="form-group" id="error-phoneEdit" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este numero ya esta siendo utilizado por otro usuario.</b></span></label>
             </div>
@@ -158,7 +167,8 @@ function showColor(){
       search();
     });
 
-    var checkNumber = false;
+    searchServices();
+    var checkNumberUsers = false;
     var NumberEditExist = false;
     var existColor = false;
     var existColorEdit = false;
@@ -170,6 +180,7 @@ function showColor(){
     });
 
 function showAddForm(){
+    searchServices();
   $('#createNewUser').show();
   $('#home_list').hide();
   $('#home_edit').hide();
@@ -198,14 +209,12 @@ function showEditForm(){
   
 }
 
-    function checkPhone(userPhone){
-
+    function checkPhoneUsers(userPhone){
 $.ajax({
               type: 'POST', 
               url: 'Pages/getPhone', 
               data: 'phone='+userPhone,
               beforeSend:function() {  
-
               },
               error: function(){
                   
@@ -214,11 +223,11 @@ $.ajax({
               success: function(existPhone) {
                 if(existPhone == 1 ){
                   event.preventDefault();
-                  checkNumber = true;
+                  checkNumberUsers = true;
                   $('#error-phone').show();
                   $('#phoneAdd').css('border','2px solid red');
                 } else{
-                  checkNumber = false;
+                    checkNumberUsers = false;
                   $('#error-phone').hide();
                   $('#phoneAdd').css('border','');
                 }
@@ -256,7 +265,6 @@ $.ajax({
 
 
 function checkColor(userColor){
-
 $.ajax({
               type: 'POST', 
               url: 'Pages/getColor', 
@@ -283,12 +291,11 @@ $.ajax({
 });
 }
 
-function checkColorEdit(userId,userColor){
-
+function checkColorEdit(userColor,userId){
 $.ajax({
               type: 'POST', 
               url: 'Pages/getColorEdit', 
-              data: 'user_id='+userId+'&color='+userColor,
+              data: 'color='+userColor+'&user_id='+userId,
               beforeSend:function() {  
 
               },
@@ -296,8 +303,8 @@ $.ajax({
                   
               alert('No hay internet');    
               },
-              success: function(existColor) {
-                if(existColor == 1 ){
+              success: function(ColEditFound) {
+                if(ColEditFound == 1 ){
                   event.preventDefault();
                   existColorEdit = true;
                   $('#error-colorEdit').show();
@@ -317,7 +324,7 @@ $( "#createNewUser" ).on( "submit", function( event ) {
   var color = $('#colorAdd').val();
   var pass = $('#passwordAdd').val();
   //password
-  checkPhone(celular);
+  checkPhoneUsers(celular);
   checkColor(color);
 
   var updatePassError = false;
@@ -329,7 +336,7 @@ $( "#createNewUser" ).on( "submit", function( event ) {
     }
   }
   
-  if( nombre == '' || celular == '' || checkNumber == true || existColor == true || updatePassError == true || pass == ''){
+  if( nombre == '' || celular == '' || checkNumberUsers == true || existColor == true || updatePassError == true || pass == ''){
     event.preventDefault();
     $showError = false;
     if( nombre == '' ){
@@ -344,7 +351,7 @@ $( "#createNewUser" ).on( "submit", function( event ) {
     }else{
        $('#phoneAdd').css('border','');
     }
-    if( checkNumber == true ){
+    if( checkNumberUsers == true ){
       $('#error-phone').show();
       $('#phoneAdd').css('border','2px solid red');
     }else{
@@ -394,9 +401,10 @@ $( "#editUser" ).on( "submit", function( event ) {
   var nombre = $('#nameEdit').val();
   var celular = $('#phoneEdit').val();
   var pass = $('#passwordEdit').val();
-  var cita = $('#lastAppointmenEdit').val();
+  var col = $('#colorEdit').val();
   var updatePassError = false;
   checkPhoneEdit(id,celular);
+  checkColorEdit(col,id);
   if(pass !== ''){
     if(pass.match(/[A-Z]/) && pass.length > 8){
        updatePassError = false;
@@ -405,7 +413,7 @@ $( "#editUser" ).on( "submit", function( event ) {
     }
   }
 
-  if( NumberEditExist == true || nombre == '' || celular == '' || updatePassError == true ){ 
+  if( NumberEditExist == true || existColorEdit == true || nombre == '' || celular == '' || updatePassError == true ){ 
     event.preventDefault();
     $showError = false;
     if( nombre == '' ){
@@ -435,6 +443,13 @@ $( "#editUser" ).on( "submit", function( event ) {
       $('#error-phoneEdit').hide();
       $('#phoneEdit').css('border','');
     }
+    if( existColorEdit == true ){
+      $('#error-colorEdit').show();
+      $('#colorEdit').css('border','2px solid red');
+    }else{
+      $('#error-colorEdit').hide();
+      $('#colorEdit').css('border','');
+    }
     if ($showError){
       $('#error-emptyEdit').show();
     }else{
@@ -457,6 +472,8 @@ $( "#editUser" ).on( "submit", function( event ) {
       $('.list-group-item').removeClass('active');
       $('#edit_'+UserId).addClass('active');
       $('#home_edit').show();
+      
+     
       $.ajax({
                 type: 'POST', 
                 url: 'edit_user', 
@@ -470,7 +487,6 @@ $( "#editUser" ).on( "submit", function( event ) {
                 },
                 success: function(users) {
                   const res = JSON.parse(users);
-
                     $('#idEdit').val(res["User"]["id"]);
                     $('#nameEdit').val(res["User"]["name"]);
                     $('#phoneEdit').val(res["User"]["phone"]);
@@ -478,7 +494,11 @@ $( "#editUser" ).on( "submit", function( event ) {
                     $('#typeEdit').val(res["User"]["type"]);
                     $('#passwordEditEncrypt').val(res["User"]["password"]);
                     $('#colorEdit').val(res["User"]["color"]);
+                    searchDuration(UserId);
+                    
+                    
                 }
+               
 	});
     }
     
@@ -490,6 +510,7 @@ $( "#editUser" ).on( "submit", function( event ) {
       $('#usersList').show();
       $('#editUser').show();
       $('#home_edit').hide();
+      
       $.ajax({
                 type: 'POST', 
                 url: 'search_user', 
@@ -527,5 +548,86 @@ $( "#editUser" ).on( "submit", function( event ) {
                 }
 	});
     }
+
+    function searchServices(){
+      $.ajax({
+                type: 'POST', 
+                url: 'search_Services', 
+                //data: 'searchService',
+                beforeSend:function() {  
+
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(service) {
+                  const res = JSON.parse(service);
+                 var idService = '';
+                  var nameService = '';
+                  
+                  var i = 0;
+                  let list = document.getElementById("servicesList");
+                  var boton = '';
+                  Object.entries(res).forEach((entry) => {
+                    idService = entry[1].Service.id;
+                    nameService = entry[1].Service.service_name;
+                   
+                    //nombreUsers = entry[1].User.name + " / " + entry[1].User.phone + " / " + idType;
+
+                    boton +=' <label for="accountInputEmail">'+nameService+'</label> <input type="number" class="form-control" id="inputService_'+idService+'" name="inputService_'+idService+'" aria-describedby="emailHelp" placeholder="duracion"> </br>';
+                   
+                    //boton += ' <a class="form-control" id="services_'+idService+'" name="services_'+idService+' ">'+nameService+'</a> <input type="number" class="form-control" id="inputService_'+idService+'" name="inputService_'+idService+'" aria-describedby="emailHelp" placeholder="duracion">';
+                   
+                    i++;
+                  });
+                  $('#servicesList').html(boton);
+                
+                }
+	});
+    }
+
+    function searchDuration(idBarber){
+        
+        
+      $.ajax({
+                type: 'POST', 
+                url: 'search_duration', 
+                data: 'searchDuration='+idBarber,
+                beforeSend:function() {  
+
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(service) {
+                  const res = JSON.parse(service);
+                 var idService = '';
+                  var nameService = '';
+                  var duration = '';
+                  var i = 0;
+                  let list = document.getElementById("servicesEditList");
+                  var boton = '';
+                  Object.entries(res).forEach((entry) => {
+                    idService = entry[1].Service.id;
+                    nameService = entry[1].Service.service_name;
+                    duration = entry[1].Duration.duration;
+                    //nombreUsers = entry[1].User.name + " / " + entry[1].User.phone + " / " + idType;
+
+                    boton +=' <label for="accountInputEmail">'+nameService+'</label> <input type="number" value="'+duration+'" class="form-control" id="inputEditService_'+idService+'" name="inputEditService_'+idService+'" aria-describedby="emailHelp" placeholder="duracion"> </br>';
+                   
+                    //boton += ' <a class="form-control" id="services_'+idService+'" name="services_'+idService+' ">'+nameService+'</a> <input type="number" class="form-control" id="inputService_'+idService+'" name="inputService_'+idService+'" aria-describedby="emailHelp" placeholder="duracion">';
+                   
+                    i++;
+                  });
+                  $('#servicesEditList').html(boton);
+                
+                }
+	});
+
+    }
+
+
 
   </script>

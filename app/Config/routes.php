@@ -81,6 +81,10 @@
 
 	Router::connect('/getColor', array('controller' => 'pages', 'action' =>  'getColor'));
 	Router::connect('/getColorEdit', array('controller' => 'pages', 'action' =>  'getColorEdit'));
+	Router::connect('/search_Services', array('controller' => 'pages', 'action' =>  'search_Services'));
+	Router::connect('/search_duration', array('controller' => 'pages', 'action' =>  'search_duration'));
+	
+	
 
 
 	

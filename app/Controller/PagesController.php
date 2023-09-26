@@ -140,7 +140,7 @@ public function account(){
 	$this->set('user',$user);
 }
 public function services(){
-	$user = '';
+	
 	$services = $this->Service->find('all');
 	$this->set('services',$services);
 	$barbers = $this->User->find('all',array('conditions'=>array(
@@ -153,10 +153,10 @@ public function services(){
 		);
 	
 	$this->set('barbers',$barbers);
-	if(isset($_SESSION['user'])){
-		$user = $_SESSION['user'];
-	}
-	$this->set('user',$user);
+
+		
+	
+	
 }
 function loginUser(){
 
@@ -332,8 +332,8 @@ function saveUser(){
 	public function getColorEdit(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
-		$storedColor = $this->User->find('first',array('conditions'=>array('User.color'=> $_POST['color'],'User.id !='=> $_POST['user_id'])));
-    	if(empty($storedColor)){
+		$storedCol = $this->User->find('first',array('conditions'=>array('User.color'=> $_POST['color'],'User.id !='=> $_POST['user_id'])));
+    	if(empty($storedCol)){
 			echo 0;
 		} else {
 			echo 1;
@@ -982,8 +982,44 @@ $user = $this->User->find('first',array(
 'recursive' => 2	
 ));
 echo json_encode($user);
+
+
+
 }
 
+public function search_Services(){
+	$this->autoRender = false;
+	$this->layout = 'ajax';
+	$service = $this->Service->find('all',array(
+	'fields' => array('Service.id','Service.service_name')));
+	echo json_encode($service);
+	}
+
+public function search_duration(){
+		$this->autoRender = false;
+		$this->layout = 'ajax';
+		$searchUser = $_POST['searchDuration'];
+		$duration = $this->Duration->find('all',array(
+			'fields' => array('Duration.id','Duration.duration','Duration.barber','Duration.service_id','Service.id','Service.service_name'),
+			'conditions'=>array('Duration.barber'=>$searchUser),
+			'joins' =>
+				array(
+					array(
+						'table' => 'services',
+						'alias' => 'Service',
+						'type' => 'inner',
+						'foreignKey' => false,
+						'conditions'=> array('Duration.service_id = Service.id')
+					)          
+					),
+			'recursive' => 2	
+			));
+		echo json_encode($duration);
+		
+		
+		
+		
+}
 
 public function add_user(){
 $this->layout = 'ajax';
@@ -998,6 +1034,23 @@ if ($this->request->is('post')) {
 	$data['User']['status'] = 1;
 	$data['User']['creation_date'] = date('Y-m-d');
 	if($this->User->save($data)){
+	$services = $this->Service->find('all',array(
+		'fields' => array('Service.id')
+		));	
+		$barberId = $this->User->getLastInsertID();
+		foreach($services as $service){
+			$this->Duration->create();
+			if(empty($_POST['inputService_'.$service['Service']['id']])){
+				$data['Duration']['duration'] = 0;
+			}else{
+				$data['Duration']['duration'] = $_POST['inputService_'.$service['Service']['id']];
+			}
+			
+			$data['Duration']['barber'] = $barberId;
+			$data['Duration']['service_id'] = $service['Service']['id'];
+			$this->Duration->save($data);
+		}
+
 	sleep(3);
 	$this->redirect(array('action' => '../users'));
 	}
@@ -1013,7 +1066,7 @@ if ($this->request->is('post')) {
 	$data['User']['status'] = $_POST['statusEdit'];
 	$data['User']['type'] = $_POST['typeEdit'];
 	$data['User']['color'] = $_POST['colorEdit'];
-
+	$barberId = $_POST['idEdit'];
 	if(empty($_POST['passwordEdit'])){
 		$data['User']['password'] = $_POST['passwordEditEncrypt'];
 	}else{
@@ -1022,6 +1075,23 @@ if ($this->request->is('post')) {
 	}
 
 	if($this->User->save($data)){
+		$services = $this->Service->find('all',array(
+			'fields' => array('Service.id')
+			));	
+			$this->Duration->query('delete from durations where barber='.$barberId);
+			foreach($services as $service){	
+				$this->Duration->create();
+				if(empty($_POST['inputEditService_'.$service['Service']['id']])){
+					$dataD['Duration']['duration'] = 0;
+				}else{
+					$dataD['Duration']['duration'] = $_POST['inputEditService_'.$service['Service']['id']];
+				}
+				
+				$dataD['Duration']['barber'] = $barberId;
+			
+				$dataD['Duration']['service_id'] = $service['Service']['id'];
+				$this->Duration->save($dataD);
+			}
 		sleep(3);
 		$this->redirect(array('action' => '../users'));
 		}

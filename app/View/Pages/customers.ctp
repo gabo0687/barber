@@ -44,11 +44,11 @@
             </div>
             <div class="form-group">
               <label for="accountInputEmail">Telefono</label>
-              <input type="number" class="form-control" id="phone" name="phone" onblur="checkPhone(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
+              <input type="number" class="form-control" id="phone" name="phone" onblur="checkPhoneCostumers(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Contraseña</label>
-              <input type="text" class="form-control" id="password" name="password" aria-describedby="emailHelp" placeholder="Contraseña">
+              <input type="password" class="form-control" id="password" name="password" aria-describedby="emailHelp" placeholder="Contraseña">
             </div>
             <div class="form-group">
               <label for="accountInputEmail">ultima cita</label>
@@ -104,11 +104,11 @@
             </div>
             <div class="form-group" style="display:none;">
               <label for="accountInputUser">Contraseña</label>
-              <input type="text" class="form-control" id="passwordEditEncrypt" name="passwordEditEncrypt" aria-describedby="emailHelp" placeholder="Estado">
+              <input type="password" class="form-control" id="passwordEditEncrypt" name="passwordEditEncrypt" aria-describedby="emailHelp" placeholder="Estado">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Contraseña</label>
-              <input type="text" class="form-control" id="passwordEdit" name="passwordEdit" aria-describedby="emailHelp" placeholder="Contraseña">
+              <input type="password" class="form-control" id="passwordEdit" name="passwordEdit" aria-describedby="emailHelp" placeholder="Contraseña">
             </div>
             <div class="form-group">
               <label for="accountInputEmail">ultima cita</label>
@@ -139,7 +139,7 @@
       search();
     });
 
-    var checkNumber = false;
+    var checkNumberCustomers = false;
     var NumberEditExist = false;
 
     window.scrollTo(0, document.body.scrollHeight);
@@ -177,8 +177,7 @@ function showEditForm(){
   
 }
 
-    function checkPhone(userPhone){
-
+function checkPhoneCostumers(userPhone){
 $.ajax({
               type: 'POST', 
               url: 'Pages/getPhone', 
@@ -193,11 +192,11 @@ $.ajax({
               success: function(existPhone) {
                 if(existPhone == 1 ){
                   event.preventDefault();
-                  checkNumber = true;
+                  checkNumberCustomers = true;
                   $('#error-phone').show();
                   $('#phone').css('border','2px solid red');
                 } else{
-                  checkNumber = false;
+                  checkNumberCustomers = false;
                   $('#error-phone').hide();
                   $('#phone').css('border','');
                 }
@@ -238,9 +237,7 @@ $( "#createCustomer" ).on( "submit", function( event ) {
   var nombre = $('#name').val();
   var celular = $('#phone').val();
   var pass = $('#password').val();
-  alert(nombre);
- 
-  checkPhone(celular);
+  checkPhoneCostumers(celular);
 
   var updatePassError = false;
   if(pass !== ''){
@@ -252,7 +249,7 @@ $( "#createCustomer" ).on( "submit", function( event ) {
   }
 
   
-  if( nombre == '' || celular == '' ||checkNumber == true || pass == '' || updatePassError == true ){
+  if( nombre == '' || celular == '' ||checkNumberCustomers == true || pass == '' || updatePassError == true ){
     event.preventDefault();
     $showError = false;
     if( nombre == '' ){
@@ -267,7 +264,7 @@ $( "#createCustomer" ).on( "submit", function( event ) {
     }else{
        $('#phone').css('border','');
     }
-    if( checkNumber == true ){
+    if( checkNumberCustomers == true ){
       $('#error-phone').show();
       $('#phone').css('border','2px solid red');
     }else{
