@@ -106,6 +106,10 @@
 	Router::connect('/schedule/*', array('controller' => 'pages', 'action' => 'schedule'));
 	Router::connect('/confirm/*', array('controller' => 'pages', 'action' => 'confirm'));
 	Router::connect('/cancel/*', array('controller' => 'pages', 'action' => 'cancel'));
+	Router::connect('/products', array('controller' => 'pages', 'action' =>  'products'));
+
+
+
 	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.

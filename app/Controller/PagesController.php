@@ -2283,5 +2283,8 @@ if ($this->request->is('post')) {
    * var_dump($log);
    * die;		
    */
+	public function products(){
+		
+	}
 
 }
