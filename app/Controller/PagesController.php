@@ -217,10 +217,10 @@ public function services(){
 		);
 	
 	$this->set('barbers',$barbers);
-	if(isset($_SESSION['user'])){
-		$user = $_SESSION['user'];
-	}
-	$this->set('user',$user);
+
+		
+	
+	
 }
 function loginUser(){
 
@@ -392,6 +392,29 @@ function saveUser(){
 			echo 1;
 		}
 	}
+
+	public function getColorEdit(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$storedCol = $this->User->find('first',array('conditions'=>array('User.color'=> $_POST['color'],'User.id !='=> $_POST['user_id'])));
+    	if(empty($storedCol)){
+			echo 0;
+		} else {
+			echo 1;
+		}
+	}
+
+	public function getColor(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$storedColor = $this->User->find('first',array('conditions'=>array('User.color'=>$_POST['color'])));
+    	if(empty($storedColor)){
+			echo 0;
+		} else {
+			echo 1;
+		}
+	}
+
 
 	public function load_reservations(){
 		$this->layout = 'ajax';
@@ -1137,6 +1160,8 @@ public function add_customer(){
 		$this->User->create();
 		$data['User']['name'] = $_POST['name'];
 		$data['User']['phone'] = $_POST['phone'];
+		$pass = $this->Encrypt->encrypt($_POST['password']);
+		$data['User']['password'] = $pass;
 		$data['User']['type'] = 3;
 		$data['User']['status'] = 1;
 		$data['User']['creation_date'] = date('Y-m-d');
@@ -1181,6 +1206,177 @@ public function update_customer(){
 		
 	}
 }
+
+public function users(){
+}
+
+
+public function load_user(){
+$this->autoRender = false;
+$this->layout = 'ajax';
+$iduser = $_POST['iduser'];
+//seria bueno agregar el barbero en customers, para saber quien fue el ultimo barbero que atendio a un cliente
+$user = $this->User->find('all',array(
+'fields' => array('Customer.user_id','Customer.last_appointment','User.user_id','User.name','User.phone','User.status'),
+'conditions'=>array('.id'=>$iduser),
+'joins' =>
+	array(
+		array(
+			'table' => 'users',
+			'alias' => 'User',
+			'type' => 'inner',
+			'foreignKey' => false,
+			'conditions'=> array('User.id = Customer.user_id')
+		)          
+		),
+'recursive' => 2	
+));
+
+echo json_encode($customer);
+}
+
+public function search_user(){
+$this->autoRender = false;
+$this->layout = 'ajax';
+$searchUser = $_POST['searchUser'];
+$user = $this->User->find('all',array(
+'fields' => array('User.id','User.name','User.phone','User.type'),
+'conditions'=>array('User.type !='=> 3,'OR'=> array(
+	array('User.name LIKE'=> "%$searchUser%" ),
+	array('User.phone'=>$searchUser)
+	)),
+'recursive' => 2	
+));
+echo json_encode($user);
+}
+
+public function edit_user(){
+$this->autoRender = false;
+$this->layout = 'ajax';
+$searchUser = $_POST['idUser'];
+$user = $this->User->find('first',array(
+'fields' => array('User.id','User.name','User.phone','User.status','User.password','User.type','User.color'),
+'conditions'=>array('User.id'=>$searchUser),
+'recursive' => 2	
+));
+echo json_encode($user);
+
+
+
+}
+
+public function search_Services(){
+	$this->autoRender = false;
+	$this->layout = 'ajax';
+	$service = $this->Service->find('all',array(
+	'fields' => array('Service.id','Service.service_name')));
+	echo json_encode($service);
+	}
+
+public function search_duration(){
+		$this->autoRender = false;
+		$this->layout = 'ajax';
+		$searchUser = $_POST['searchDuration'];
+		$duration = $this->Duration->find('all',array(
+			'fields' => array('Duration.id','Duration.duration','Duration.barber','Duration.service_id','Service.id','Service.service_name'),
+			'conditions'=>array('Duration.barber'=>$searchUser),
+			'joins' =>
+				array(
+					array(
+						'table' => 'services',
+						'alias' => 'Service',
+						'type' => 'inner',
+						'foreignKey' => false,
+						'conditions'=> array('Duration.service_id = Service.id')
+					)          
+					),
+			'recursive' => 2	
+			));
+		echo json_encode($duration);
+		
+		
+		
+		
+}
+
+public function add_user(){
+$this->layout = 'ajax';
+if ($this->request->is('post')) {
+	$this->User->create();
+	$data['User']['name'] = $_POST['nameAdd'];
+	$data['User']['phone'] = $_POST['phoneAdd'];
+	$data['User']['color'] = $_POST['colorAdd'];
+	$data['User']['type'] = $_POST['typeAdd'];
+	$pass = $this->Encrypt->encrypt($_POST['passwordAdd']);
+	$data['User']['password'] = $pass;
+	$data['User']['status'] = 1;
+	$data['User']['creation_date'] = date('Y-m-d');
+	if($this->User->save($data)){
+	$services = $this->Service->find('all',array(
+		'fields' => array('Service.id')
+		));	
+		$barberId = $this->User->getLastInsertID();
+		foreach($services as $service){
+			$this->Duration->create();
+			if(empty($_POST['inputService_'.$service['Service']['id']])){
+				$data['Duration']['duration'] = 0;
+			}else{
+				$data['Duration']['duration'] = $_POST['inputService_'.$service['Service']['id']];
+			}
+			
+			$data['Duration']['barber'] = $barberId;
+			$data['Duration']['service_id'] = $service['Service']['id'];
+			$this->Duration->save($data);
+		}
+
+	sleep(3);
+	$this->redirect(array('action' => '../users'));
+	}
+}
+}
+
+public function update_user(){
+$this->layout = 'ajax';
+if ($this->request->is('post')) {
+	$this->User->id = $_POST['idEdit'];
+	$data['User']['name'] = $_POST['nameEdit'];
+	$data['User']['phone'] = $_POST['phoneEdit'];
+	$data['User']['status'] = $_POST['statusEdit'];
+	$data['User']['type'] = $_POST['typeEdit'];
+	$data['User']['color'] = $_POST['colorEdit'];
+	$barberId = $_POST['idEdit'];
+	if(empty($_POST['passwordEdit'])){
+		$data['User']['password'] = $_POST['passwordEditEncrypt'];
+	}else{
+		$pass = $this->Encrypt->encrypt($_POST['passwordEdit']);
+		$data['User']['password'] = $pass;
+	}
+
+	if($this->User->save($data)){
+		$services = $this->Service->find('all',array(
+			'fields' => array('Service.id')
+			));	
+			$this->Duration->query('delete from durations where barber='.$barberId);
+			foreach($services as $service){	
+				$this->Duration->create();
+				if(empty($_POST['inputEditService_'.$service['Service']['id']])){
+					$dataD['Duration']['duration'] = 0;
+				}else{
+					$dataD['Duration']['duration'] = $_POST['inputEditService_'.$service['Service']['id']];
+				}
+				
+				$dataD['Duration']['barber'] = $barberId;
+			
+				$dataD['Duration']['service_id'] = $service['Service']['id'];
+				$this->Duration->save($dataD);
+			}
+		sleep(3);
+		$this->redirect(array('action' => '../users'));
+		}
+	}
+	
+}
+
 
 	function validateReservations($reservationUser){
 		
