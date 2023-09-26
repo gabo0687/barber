@@ -1215,16 +1215,18 @@ class PagesController extends AppController
 				$userId = $this->User->getLastInsertID();
 				$last_appointment = $_POST['last_appointment'];
 
-		if($this->User->save($data)){
-			$this->Customer->create();
-			$datac['Customer']['user_id'] = $_POST['idEdit'];
-			$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
-			$datac['Customer']['user_id'] = $_POST['idEdit'];
-			$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
-			if($this->Customer->save($datac)){
-				Cache::clear();
-			sleep(3);
-			$this->redirect(array('action' => '../customers'));
+				if($this->User->save($data)){
+					$this->Customer->create();
+					$datac['Customer']['user_id'] = $_POST['idEdit'];
+					$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
+					$datac['Customer']['user_id'] = $_POST['idEdit'];
+					$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
+					if($this->Customer->save($datac)){
+						Cache::clear();
+					sleep(3);
+					$this->redirect(array('action' => '../customers'));
+					}
+				}
 			}
 		}
 	}
@@ -1869,13 +1871,12 @@ class PagesController extends AppController
 	 * everytime cancel reservation every 1 min
 	 * cachecron
 	 */
-	public function notification_cancel()
-	{
+	public function notification_cancel(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
 		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -1884,6 +1885,8 @@ class PagesController extends AppController
 		$reservations = array();
 		$currentDate = date('Y-m-d');
 		$reservations = Cache::read('notification_cancel');
+		
+		if( !$reservations ){
 
 		$reservations = $this->Remove->find('all',array('fields'=>array('Remove.id','Remove.id_reservation','Remove.reservation_time','Remove.reservation_date','Notification.user_id','Notification.reservation_date','User.id','User.name','User.phone'),
 														'conditions'=>array(
@@ -1910,49 +1913,24 @@ class PagesController extends AppController
 														));
 	
 
-			$reservations = $this->Remove->find('all', array(
-				'fields' => array('Remove.id', 'Remove.id_reservation', 'Remove.reservation_time', 'Remove.reservation_date', 'Notification.user_id', 'Notification.reservation_date', 'User.name', 'User.phone'),
-				'conditions' => array(
-					'Remove.reservation_date >=' => $currentDate,
-					'Remove.reservation_date = Notification.reservation_date'
-				),
-				'joins' =>
-				array(
-					array(
-						'table' => 'notifications',
-						'alias' => 'Notification',
-						'type' => 'inner',
-						'foreignKey' => false,
-						'conditions' => array('Notification.reservation_time >= Remove.time_from', 'Notification.reservation_time <= Remove.time_to'),
-					),
-					array(
-						'table' => 'users',
-						'alias' => 'User',
-						'type' => 'inner',
-						'foreignKey' => false,
-						'conditions' => array('Notification.user_id = User.id'),
-					)
-				)
-			));
+			Cache::write('notification_cancel', $reservations);															
+						
+		}												
 
+		foreach( $reservations as $reservation ){
 
-			Cache::write('notification_cancel', $reservations);
-		}
-
-		foreach ($reservations as $reservation) {
-
-
+			
 			$removeId = $reservation['Remove']['id'];
 			$date = $reservation['Remove']['reservation_date'];
 			$day  = date('w', strtotime($date));
-			$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado');
+			$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
 			$year = date('Y', strtotime($date));
 			$month = date('m', strtotime($date));
-			$months = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+			$months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
 			$currentDay = date('d', strtotime($date));
 			$dayOfTheWeek = $days[$day];
-			$dateFormat = $dayOfTheWeek . ' ' . $currentDay . ' de ' . $months[(int)$month - 1] . ' del ' . $year;
-
+			$dateFormat = $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;
+			
 			$data = array();
 			$nombre = $reservation['User']['name'];
 			//$phone = $reservation['User']['phone'];
@@ -1962,61 +1940,63 @@ class PagesController extends AppController
 			
 			$data = array(
 				'messaging_product' => 'whatsapp',
-				'to' => '+506' . $phone,
+				'to' => '+506'.$phone,
 				'type' => 'template',
 				'template' => array(
-					'name' => 'reagendar',
-					'language' => array('code' => 'es_MX'),
-					'components' => array(
-						array(
-							'type' => 'header',
-							'parameters' => array(
-								array(
-									'type' => 'image',
-									'image' => array(
-										'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
-									)
-								)
-							)
-						),
-						array(
-							'type' => 'body',
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $nombre
-								),
-								array(
-									'type' => 'text',
-									'text' => $hora
-								)
-							),
-
-						),
-						array(
-							'type' => 'button',
-							"index" => "0",
-							"sub_type" => "url",
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $info
-								)
-							)
-						),
-					)
-				)
+						'name' => 'reagendar',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														),
+														array(
+															'type'=>'text',
+															'text'=> $hora
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+											)
+						)
 			);
 
 			$payload = json_encode($data);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			$server_output = curl_exec($ch);
 			var_dump($server_output);
 			curl_close($ch);
-			$this->Remove->query('delete from removes where id=' . $removeId);
+			$this->Remove->query('delete from removes where id='.$removeId);
 			Cache::clear();
 		}
+		
+
 	}
 
 	public function testWhatsapp()

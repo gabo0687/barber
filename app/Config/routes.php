@@ -132,6 +132,9 @@
 
 	
 
+	
+	Router::connect('/products', array('controller' => 'pages', 'action' =>  'products'));
+
 
 
 	
