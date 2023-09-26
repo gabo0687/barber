@@ -281,6 +281,8 @@ function reservar(reservationNumber){
   var reservationBarber  = $("#barbero_"+reservationNumber+":checked").val();
   var reservationService = $('#service_'+reservationNumber).val();
   var reservationTime    = $('#time_'+reservationNumber).val();
+  var reservationPrice    = $('#price_'+reservationNumber).val();
+  
   var user_type = $('#user_type').val();
   var client = 0;
   var clientEmpty = true;
@@ -302,7 +304,7 @@ function reservar(reservationNumber){
     $.ajax({
                   type: 'POST', 
                   url: 'save_reservation', 
-                  data: 'reservation_date='+reservationDate+'&client='+client+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
+                  data: 'reservation_date='+reservationDate+'&client='+client+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber+'&reservationPrice='+reservationPrice,
                   beforeSend:function() {  
                     $('#loadingReservation'+reservationNumber).addClass('spinner-border');
                   },
@@ -462,6 +464,7 @@ function filterReservations(){
                               
                             responseHtml += '<span class="price">Tiempo: '+reservationDuration+' minutos</span>';
                             responseHtml += '<span class="price">Precio: ₡'+reservationPrice+'</span>';
+                            responseHtml += '<input type="hidden" name="price_'+reservationNumber+'" id="price_'+reservationNumber+'" value="'+reservationPrice+'">';
                             responseHtml += '<span class="price">Barberos disponibles:</span></br>';
                             responseHtml += '<span class="price">';
                             Object.entries(reservationBarbers).forEach((barber) => {

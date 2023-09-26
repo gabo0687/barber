@@ -35,7 +35,7 @@ class PagesController extends AppController {
  *
  * @var array
  */
-	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove','Activereservation','Workhour');
+	public $uses = array('Service','Duration','User','Reservation','Notification','Customer','Remove','Activereservation','Workhour','Saleproduct','Sale','Expense');
 	public $components = array('Encrypt');
 /**
  * Displays a view
@@ -858,6 +858,7 @@ function saveUser(){
 			$data['Reservation']['reservation_user'] = $reservationUser;
 			$data['Reservation']['reservation_service'] = $_POST['reservation_service'];
 			$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
+			$data['Reservation']['reservation_price'] = $_POST['reservationPrice'];
 			$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
 			if($this->Reservation->save($data)){
 				$lastReservationId = $this->Reservation->getLastInsertID();
@@ -914,12 +915,15 @@ function saveUser(){
 		 */
 		$reservationTaken = $this->reservationTaken($_POST['reservation_barber'],$_POST['reservation_time'],$reservationDate);
 		if( $reservationTaken ){
+		$serviceId = $_POST['reservation_service'];	
+		$reservationPrice = $this->getServicePrice( $serviceId );	
 		$this->Reservation->create();
 		$data['Reservation']['reservation_date'] = $reservationDate;
 		$data['Reservation']['reservation_time'] = $_POST['reservation_time'];
 		$data['Reservation']['reservation_user'] = $_POST['reservation_client'];
 		$data['Reservation']['reservation_service'] = $_POST['reservation_service'];
 		$data['Reservation']['reservation_barber'] = $_POST['reservation_barber'];
+		$data['Reservation']['reservation_price'] = $reservationPrice;
 		$data['Reservation']['creation_date'] = date('Y-m-d H:i:s');
 		if($this->Reservation->save($data)){
 			$lastReservationId = $this->Reservation->getLastInsertID();
@@ -950,6 +954,10 @@ function saveUser(){
 		}
 	}
     
+	public function getServicePrice( $serviceId ){
+		$servicePrice = $this->Service->find('first',array('fields'=>array('Service.price'),'conditions'=>array('Service.id'=>$serviceId)));
+		return $servicePrice['Service']['price'];
+	}
 
 	 public function events(){
 		$this->layout = 'ajax';
@@ -1194,11 +1202,13 @@ public function update_customer(){
 		}
 
 		if($this->User->save($data)){
-			$this->Customer->user_id = $_POST['idEdit'];
+			$this->Customer->create();
+			$datac['Customer']['user_id'] = $_POST['idEdit'];
 			$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
 			$datac['Customer']['user_id'] = $_POST['idEdit'];
 			$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
 			if($this->Customer->save($datac)){
+				Cache::clear();
 			sleep(3);
 			$this->redirect(array('action' => '../customers'));
 			}
@@ -1370,6 +1380,7 @@ if ($this->request->is('post')) {
 				$dataD['Duration']['service_id'] = $service['Service']['id'];
 				$this->Duration->save($dataD);
 			}
+		Cache::clear();
 		sleep(3);
 		$this->redirect(array('action' => '../users'));
 		}
@@ -2080,6 +2091,130 @@ if ($this->request->is('post')) {
 			$response = 'no';
 		}
 		return $response;
+	}
+
+	public function product_sales(){
+		$this->checksession();
+	    $dateFrom = '';
+		$dateTo = '';
+		if ($this->request->is('post')) {
+			$dateFrom = $_POST['desde_reporte'];
+			if( $_POST['desde_reporte'] == ''){
+				$dateFrom = date('Y-m-d');
+			}
+
+			$dateTo = $_POST['hasta_reporte'];
+			if( $_POST['hasta_reporte'] == ''){
+				$dateTo = date('Y-m-d');
+			}
+			
+		}else{
+			$dateFrom = date('Y-m-01');
+			$dateTo = date("Y-m-t");
+		}	
+		
+			/**
+			 * Services
+			 */
+			$resevationsTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.reservation_status'=>1)));
+			$bankTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.payment_type'=>1)));
+			$cashTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.payment_type'=>2)));
+			/**
+			 * Products
+			 */
+			$productsTotal = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.date_creation >='=>$dateFrom,'Saleproduct.date_creation <='=>$dateTo)));
+			$bankProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.date_creation >='=>$dateFrom,'Saleproduct.date_creation <='=>$dateTo,'Saleproduct.payment_type'=>1)));
+			$cashProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.date_creation >='=>$dateFrom,'Saleproduct.date_creation <='=>$dateTo,'Saleproduct.payment_type'=>2)));
+			
+			/**
+			 * Expenses
+			 */
+			$expensesTotal = $this->Expense->find('all',array('fields' => array('sum(Expense.expense_price)   AS ctotal'),'conditions'=>array('Expense.date_creation >='=>$dateFrom,'Expense.date_creation <='=>$dateTo)));
+			$bankExpenses = $this->Expense->find('all',array('fields' => array('sum(Expense.expense_price)   AS ctotal'),'conditions'=>array('Expense.date_creation >='=>$dateFrom,'Expense.date_creation <='=>$dateTo,'Expense.payment_type'=>1)));
+			$cashExpenses = $this->Expense->find('all',array('fields' => array('sum(Expense.expense_price)   AS ctotal'),'conditions'=>array('Expense.date_creation >='=>$dateFrom,'Expense.date_creation <='=>$dateTo,'Expense.payment_type'=>2)));
+			
+		$totalReservation = 0;	
+		if($resevationsTotal[0][0]['ctotal'] != null){
+			$totalReservation = $resevationsTotal[0][0]['ctotal'];
+		}
+		$this->set('resevationsTotal',$resevationsTotal);
+
+		$totalReservationBank = 0;	
+		if($bankTotal[0][0]['ctotal'] != null){
+			$totalReservationBank = $bankTotal[0][0]['ctotal'];
+		}
+		$this->set('bankTotal',$bankTotal);
+
+		$totalReservationCash = 0;	
+		if($cashTotal[0][0]['ctotal'] != null){
+			$totalReservationCash = $cashTotal[0][0]['ctotal'];
+		}
+		$this->set('cashTotal',$cashTotal);
+
+
+		$totalProducts = 0;	
+		if($productsTotal[0][0]['ctotal'] != null){
+			$totalProducts = $productsTotal[0][0]['ctotal'];
+		}
+		$this->set('productsTotal',$productsTotal);
+
+		$totalProductBank = 0;	
+		if($bankProduct[0][0]['ctotal'] != null){
+			$totalProductBank = $bankProduct[0][0]['ctotal'];
+		}
+		$this->set('bankProduct',$bankProduct);
+
+		$totalProductCash = 0;	
+		if($cashProduct[0][0]['ctotal'] != null){
+			$totalProductCash = $cashProduct[0][0]['ctotal'];
+		}
+		$this->set('cashProduct',$cashProduct);
+
+
+		$totalExpenses = 0;	
+		if($expensesTotal[0][0]['ctotal'] != null){
+			$totalExpenses = $expensesTotal[0][0]['ctotal'];
+		}
+		$this->set('expensesTotal',$expensesTotal);
+
+		$totalBankExpenses = 0;	
+		if($bankExpenses[0][0]['ctotal'] != null){
+			$totalBankExpenses = $bankExpenses[0][0]['ctotal'];
+		}
+		$this->set('bankExpenses',$bankExpenses);
+
+		$totalCashExpenses = 0;	
+		if($cashExpenses[0][0]['ctotal'] != null){
+			$totalCashExpenses = $cashExpenses[0][0]['ctotal'];
+		}
+		$this->set('cashExpenses',$cashExpenses);
+		
+		$generaTotal = ( $totalReservation + $totalProducts ) - $totalExpenses;
+		$this->set('generaTotal',$generaTotal);
+		$cashGeneral = ( $totalReservationCash + $totalProductCash ) - $totalCashExpenses;
+		$this->set('cashGeneral',$cashGeneral);
+
+		$bankGeneral = ( $totalReservationBank	 + $totalProductBank ) - $totalBankExpenses;
+		
+		$this->set('bankGeneral',$bankGeneral);
+
+		$dateFromFormat = $this->dateFormat($dateFrom);
+		$this->set('dateFromFormat',$dateFromFormat);
+
+		$dateToFormat = $this->dateFormat($dateTo);
+		$this->set('dateToFormat',$dateToFormat);
+	}
+
+	public function dateFormat($date){
+		$day  = date('w', strtotime($date));
+		$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+		$year = date('Y', strtotime($date));
+		$month = date('m', strtotime($date));
+		$months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+		$currentDay = date('d', strtotime($date));
+		$dayOfTheWeek = $days[$day];
+		$dayFormat = $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;
+		return $dayFormat;
 	}
   /**
    * $log = $this->Model->getDataSource()->getLog(false, false);
