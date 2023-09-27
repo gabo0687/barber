@@ -80,13 +80,14 @@ public function home(){
 		$user = $_SESSION['User'];
 		if( $user['User']['type'] == 3 ){
 			$conditions['Reservation.reservation_user'] = $user['User']['id'];
+			$conditions['Reservation.reservation_status <>'] = 2;
 		}else{
 			if( $user['User']['type'] == 2 ){
 				$conditions['Reservation.reservation_barber'] = $user['User']['id'];
 			}		
 		}
 		$conditions['Reservation.reservation_date >='] = date('Y-m-d');
-		$conditions['Reservation.reservation_status <>'] = 2;
+		
 		$reservations = $this->Reservation->find('all',array('fields'=>
 																	array('Reservation.id','Reservation.reservation_bill','Reservation.payment_type','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
 																		  'Service.id','Service.service_name','Service.price',
@@ -131,7 +132,7 @@ public function home(){
 	
 	
 	$this->set('reservations',$reservationResponse);
-	$this->set('user',$user);
+	//$this->set('user',$user);
 	
 
 }
@@ -1391,7 +1392,7 @@ if ($this->request->is('post')) {
 
 	function validateReservations($reservationUser){
 		
-		$activeReservations = $this->Reservation->find('all',array('conditions'=>array('Reservation.reservation_user'=>$reservationUser,'Reservation.reservation_status <>'=>2,'Reservation.reservation_date >= '=>date('Y-m-d'))));
+		$activeReservations = $this->Reservation->find('all',array('conditions'=>array('Reservation.reservation_user'=>$reservationUser,'Reservation.reservation_status <>'=>2,'Reservation.payment_type '=>0,'Reservation.reservation_date >= '=>date('Y-m-d'))));
 		
 		if( count($activeReservations) < 2 ){
 			return true;
@@ -1743,8 +1744,8 @@ if ($this->request->is('post')) {
 			$nombre = $reservation['User']['name'];
 			//$phone = $reservation['User']['phone'];
 			$phone = '83481182';
-			$info = base64_encode($reservation['Activereservation']['id_reservation']);
 			$hora = $reservation['Activereservation']['reservation_time'];
+			$info = base64_encode($reservation['Activereservation']['id_reservation'].'|'.$hora.'|'.$reservation['Activereservation']['reservation_date']);
 			$data = array(
 				'messaging_product' => 'whatsapp',
 				'to' => '506'.$phone,
@@ -1835,7 +1836,7 @@ if ($this->request->is('post')) {
 		
 		if( !$reservations ){
 
-		$reservations = $this->Remove->find('all',array('fields'=>array('Remove.id','Remove.id_reservation','Remove.reservation_time','Remove.reservation_date','Notification.user_id','Notification.reservation_date','User.name','User.phone'),
+		$reservations = $this->Remove->find('all',array('fields'=>array('Remove.id','Remove.id_reservation','Remove.reservation_time','Remove.reservation_date','Notification.user_id','Notification.reservation_date','User.id','User.name','User.phone'),
 														'conditions'=>array(
 																			'Remove.reservation_date >='=>$currentDate,
 																			'Remove.reservation_date = Notification.reservation_date'
@@ -1882,7 +1883,7 @@ if ($this->request->is('post')) {
 			$nombre = $reservation['User']['name'];
 			//$phone = $reservation['User']['phone'];
 			$phone = '72795112';
-			$info = base64_encode($phone);
+			$info = base64_encode($reservation['User']['id']);
 			$hora = $dateFormat.' a las '.$reservation['Remove']['reservation_time'];
 			
 			$data = array(
@@ -2215,6 +2216,66 @@ if ($this->request->is('post')) {
 		$dayOfTheWeek = $days[$day];
 		$dayFormat = $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;
 		return $dayFormat;
+	}
+
+	public function download() {
+		$this->layout = 'ajax';
+	}
+
+	public function schedule($info){
+		$this->layout = 'cron';
+		$user = base64_decode($info);
+		$infoUser = $user.'-'.'user';
+		$this->set('client_id',$infoUser);
+		$services = $this->Service->find('all');
+		$this->set('services',$services);
+		$users = $this->User->find('all',array('conditions'=>array(
+			'OR'=> array(
+						array('User.type'=>1),
+						array('User.type'=>2)
+						)
+					)
+				)
+			);
+		$this->set('users',$users);
+		
+	}
+
+	public function cancel($info){
+		$this->layout = 'cron_cancel';
+		$appointmentInfo = base64_decode($info);
+		$appointment = explode('|',$appointmentInfo);
+		
+		
+		$reservation_time = $appointment[1];
+		$reservation_date = $appointment[2]; 
+		$this->Reservation->id = $appointment[0];
+		$data['Reservation']['reservation_status'] = 2;
+		if($this->Reservation->save($data)){
+			$activeReservationid = $this->getActiveReservationId($appointmentId);
+			$this->Activereservation->id = $activeReservationid;
+			$data['Activereservation']['reservation_status'] = 2;
+			$this->Activereservation->save($data);
+			//Guardar Notification
+			$this->validate_cancel($appointmentId,$reservation_time,$reservation_date);
+			Cache::clear();
+		}
+	}
+
+	public function confirm($info){
+		$this->layout = 'cron_confirm';
+		$appointmentInfo = base64_decode($info);
+		$appointment = explode('|',$appointmentInfo);
+		$appointmentId = $appointment[0];
+		$this->Reservation->id = $appointmentId;
+		$data['Reservation']['reservation_status'] = 1;
+		if($this->Reservation->save($data)){
+			$activeReservationid = $this->getActiveReservationId($appointmentId);
+			$this->Activereservation->id = $activeReservationid;
+			$data['Activereservation']['reservation_status'] = 1;
+			$this->Activereservation->save($data);
+			Cache::clear();
+		}
 	}
   /**
    * $log = $this->Model->getDataSource()->getLog(false, false);

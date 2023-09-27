@@ -25,8 +25,8 @@ if( $user['User']['type'] == 1 ){ ?>
 <label style="color:white">Filtrar por Barbero</label>
 <select class="form-control" onchange="filterBarber()" name="barbero_admin" id="barbero_admin">
     <option value="0">Todos</option>
-    <?php foreach( $users as $user ){ ?>
-        <option value="<?php echo $user['User']['id'];?>"><?php echo $user['User']['name'];?></option>
+    <?php foreach( $users as $users_barbero ){ ?>
+        <option value="<?php echo $users_barbero['User']['id'];?>"><?php echo $users_barbero['User']['name'];?></option>
     <?php }?>
 </select>  
 <?php 
@@ -73,18 +73,20 @@ if( isset($user['User']) ){ ?>
 
 💈 Tienes cita para corte a las <?php echo $reservation['Reservation']['reservation_time'];?> , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width='30px' src="img/layout/whatsapp.png" alt=""></a></p>
                         <p>Tiempo : <?php echo $reservation[0]['Duration']['duration'];?> minutos</p>
-                        <p>Estatus de la cita : <?php if( $reservation['Reservation']['reservation_status'] == 0 ){ echo 'Sin Confirmar'; }if( $reservation['Reservation']['reservation_status'] == 1 ){ echo 'Confirmada'; }?></p>
+                        <p>Estatus de la cita : <?php if( $reservation['Reservation']['reservation_status'] == 0 ){ echo 'Sin Confirmar'; }if( $reservation['Reservation']['reservation_status'] == 1 ){ echo 'Confirmada'; }if( $reservation['Reservation']['reservation_status'] == 2 ){ echo '<b class="blink_me">CANCELADA</b>'; }?></p>
                         <p>Precio : ₡<?php echo number_format($reservation['Service']['price']);?></p>
 
-                    <?php if( $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  ){?>    
+                    <?php if( $reservation['Reservation']['reservation_status'] == 1 && $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  && $reservation['Reservation']['reservation_status'] != 2 ){?>    
                     <p>Selecciona el tipo de pago:</p>  
-                    <select class="form-control" name="tipoPago<?php echo $reservation['Reservation']['id'];?>" id="tipoPago<?php echo $reservation['Reservation']['id'];?>">
+                    <select onchange="tipopago(this.value)" class="form-control" name="tipoPago<?php echo $reservation['Reservation']['id'];?>" id="tipoPago<?php echo $reservation['Reservation']['id'];?>">
                     <option value="1">SINPE Movil</option>
                     <option value="2">Efectivo</option>
                     </select>    
                     </br> 
+                    <span id="comprobanteSubir">
                     <p>Subir comprobante de pago:</p>    
                     <input type="file"  class="form-control" name="comprobante<?php echo $reservation['Reservation']['id'];?>" id="comprobante<?php echo $reservation['Reservation']['id'];?>">
+                    </span>
                     <input type="hidden" name="idReservation" id="idReservation" value="<?php echo $reservation['Reservation']['id'];?>">
                     </br>  
                    <?php 
@@ -92,7 +94,7 @@ if( isset($user['User']) ){ ?>
                     <button type="button" class="btn btn-secondary" onclick="confirmAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Confirmar Cita</a></button>
                     <?php
                          }else{?>
-                    <button type="submit" class="btn btn-success"><a>Subir Comprobante</a></button>
+                    <button type="submit" class="btn btn-success"><a>Guardar</a></button>
                     <?php
                          }
                          $reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
@@ -101,7 +103,32 @@ if( isset($user['User']) ){ ?>
                     <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>,<?php echo $reservatioTime;?>,<?php echo $reservatioDate;?>)"><a>Eliminar</a></button>
                     </div>
                     </span>
-                    <?php } ?>
+                    <?php }else{ 
+                        if( $reservation['Reservation']['reservation_status'] == 0 ){
+                            ?>
+                            <button type="button" class="btn btn-secondary" onclick="confirmAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Confirmar Cita</a></button>
+                            <?php
+                            $reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
+                            $reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
+                            ?>
+                            <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>,<?php echo $reservatioTime;?>,<?php echo $reservatioDate;?>)"><a>Eliminar</a></button>
+                            </div>
+                            </span>
+                            <?php
+                        }else{
+                        if( $user['User']['type'] == 1 ){
+                        ?>
+                            <p>Forma de pago : <?php if($reservation['Reservation']['payment_type'] == 2){ echo 'Efectivo'; }else{ if($reservation['Reservation']['payment_type'] == 1){ echo 'SINPE'; }else{ echo 'N/A'; } }?></p>  
+                            <?php 
+                            if( $reservation['Reservation']['payment_type'] == 1 && $reservation['Reservation']['reservation_bill'] != '' ){ ?>
+                            <img id='comprobante_imagen' src="bills/<?php echo $reservation['Reservation']['id'].'_'.$reservation['Reservation']['reservation_bill'];?>" width='40px' data-bs-toggle="modal" data-bs-target="#modalAmpliarImagen">
+                            <?php
+                            }
+                          }
+                        } 
+                    }
+                        
+                    ?>
                 </li>
                 </form>
                 <?php }
@@ -112,7 +139,49 @@ if( isset($user['User']) ){ ?>
 
         </section>
 <?php } ?>
+<div class="modal fade" id="modalAmpliarImagen" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <form role="form" method="post" enctype="multipart/form-data">
+         <!--=====================================
+                       CABEZA DEL MODAL
+         ======================================-->
+            <div class="modal-header" style="background:#3c8dbc; color:white">
+            <h4 class="modal-title">Comprobante</h4>
+            </div>
+            <div class="modal-body">
+               <img src="" id="modal_image" style="width: auto; height: auto;" ></br></br>
+               <a href="" id="modal_image_download" target="_blank" style="color:black"><h3><u>Descargar Comprobante</u></h3></a>
+            </div>
+            
+                            
+            <div class="modal-footer">
+               <button type="button" class="btn btn-default" onclick="closeComprobante()" data-dismiss="modal">Cerrar</button>
+            </div>
+         </div>
+      </div>
+   </div>
+</form>
 <script>
+
+$('#comprobante_imagen').click(function(){
+    var comprobante_imagen = $('#comprobante_imagen').attr('src');
+    $('#modal_image').attr('src',comprobante_imagen);
+    $('#modal_image_download').attr('href','download?path='+comprobante_imagen);
+
+});
+
+
+    function tipopago(tipoPago){
+        if( tipoPago == 2 ){
+            $('#comprobanteSubir').hide();
+        }else{
+            $('#comprobanteSubir').show();
+        }
+    }
+    function closeComprobante(){
+        $('#modalAmpliarImagen').modal("hide");
+    }
    // window.scrollTo(0, document.body.scrollHeight);
    function confirmAppointment(appointmentId){
             $.ajax({
