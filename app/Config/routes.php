@@ -96,9 +96,16 @@
 	Router::connect('/work', array('controller' => 'pages', 'action' => 'work'));
 	Router::connect('/block_check', array('controller' => 'pages', 'action' => 'block_check'));
 	Router::connect('/product_sales', array('controller' => 'pages', 'action' => 'product_sales'));
+
 	
-
-
+	Router::connect('/download/*', array('controller' => 'pages', 'action' => 'download'));
+	
+	/**
+	 * Response cronjob
+	 */
+	Router::connect('/schedule/*', array('controller' => 'pages', 'action' => 'schedule'));
+	Router::connect('/confirm/*', array('controller' => 'pages', 'action' => 'confirm'));
+	Router::connect('/cancel/*', array('controller' => 'pages', 'action' => 'cancel'));
 	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
