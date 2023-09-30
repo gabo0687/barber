@@ -2309,13 +2309,7 @@ class PagesController extends AppController
 				}
 				$quantitySelected = $_POST['countAdd'];
 
-				$quantityStock = $this->Product->find('first', array(
-					'fields' => array('Product.id', 'Product.quantity'),
-					'conditions' => array('Product.id' => $productId),
-					'recursive' => 2
-				));/* $_POST['countAddAvaiable'];*/
-
-				$stock = ($quantityStock['Product']['quantity'] - $quantitySelected);
+				$stock = ($_POST['countAddAvaiableProduct']-$quantitySelected);
 
 				$datac['SaleProduct']['product_id'] = $productId;
 				$datac['SaleProduct']['price'] = $_POST['priceAdd'];
