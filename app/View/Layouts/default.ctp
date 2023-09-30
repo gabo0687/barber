@@ -195,7 +195,7 @@ date_default_timezone_set('America/Costa_Rica');
 
         <datalist id="clients">
           <?php foreach( $clients as $client ){?>
-          <option value="<?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?>" />
+          <option value="<?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?>">
           <?php } ?>
         </datalist>
       </span>
