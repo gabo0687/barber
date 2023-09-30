@@ -37,7 +37,7 @@ class PagesController extends AppController
 	 *
 	 * @var array
 	 */
-	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'SaleProduct', 'Expense');
+	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense');
 	public $components = array('Encrypt');
 	/**
 	 * Displays a view
@@ -56,89 +56,90 @@ class PagesController extends AppController
 	
 	
 
-	public function home()
-	{
+	public function home(){
 
 
 		if ($this->request->is('post')) {
-
+			
 			$reservaId = $_POST['idReservation'];
 			$dataBill = array();
 			$this->Reservation->id = $reservaId;
-			if ($_FILES['comprobante' . $reservaId]['name'] != "") {
-				$pathImage = WWW_ROOT . 'bills' . DIRECTORY_SEPARATOR;
-				$imageName = $reservaId . '_' . $_FILES['comprobante' . $reservaId]['name'];
-				if (move_uploaded_file($_FILES['comprobante' . $reservaId]['tmp_name'], $pathImage . $imageName)) {
-					$dataBill['Reservation']['reservation_bill'] = $_FILES['comprobante' . $reservaId]['name'];
+			if ( $_FILES['comprobante'.$reservaId]['name'] != "" ){
+				$pathImage = WWW_ROOT . 'bills' . DIRECTORY_SEPARATOR ;
+				$imageName = $reservaId.'_'.$_FILES['comprobante'.$reservaId]['name'];
+				if (move_uploaded_file($_FILES['comprobante'.$reservaId]['tmp_name'], $pathImage . $imageName)) {
+					$dataBill['Reservation']['reservation_bill'] = $_FILES['comprobante'.$reservaId]['name'];
 				}
 			}
-
-
-			$dataBill['Reservation']['payment_type'] = $_POST['tipoPago' . $reservaId];
+			
+			
+			$dataBill['Reservation']['payment_type'] = $_POST['tipoPago'.$reservaId];
 			$this->Reservation->save($dataBill);
 		}
-
+	
 		$user = array();
-	$reservations = array();
-	$reservationResponse=array();
-	if(isset($_SESSION['User'])){
-		$conditions = array();
-		$user = $_SESSION['User'];
-		if( $user['User']['type'] == 3 ){
-			$conditions['Reservation.reservation_user'] = $user['User']['id'];
-			$conditions['Reservation.reservation_status <>'] = 2;
-		}else{
-			if( $user['User']['type'] == 2 ){
-				$conditions['Reservation.reservation_barber'] = $user['User']['id'];
-			}		
+		$reservations = array();
+		$reservationResponse=array();
+		if(isset($_SESSION['User'])){
+			$conditions = array();
+			$user = $_SESSION['User'];
+			if( $user['User']['type'] == 3 ){
+				$conditions['Reservation.reservation_user'] = $user['User']['id'];
+				$conditions['Reservation.reservation_status <>'] = 2;
+			}else{
+				if( $user['User']['type'] == 2 ){
+					$conditions['Reservation.reservation_barber'] = $user['User']['id'];
+				}		
+			}
+			$conditions['Reservation.reservation_date >='] = date('Y-m-d');
+			
+			$reservations = $this->Reservation->find('all',array('fields'=>
+																		array('Reservation.id','Reservation.reservation_bill','Reservation.payment_type','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
+																			  'Service.id','Service.service_name','Service.price',
+																			  'Barber.id','Barber.name','Barber.color',
+																			  'User.id','User.name','User.phone',
+																			  ),
+																 'conditions'=>
+																		array($conditions),
+																 'joins' =>
+																 array(
+																	 array(
+																		 'table' => 'services',
+																		 'alias' => 'Service',
+																		 'type' => 'inner',
+																		 'foreignKey' => false,
+																		 'conditions'=> array('Service.id = Reservation.reservation_service'),
+																	 ),
+																	 array(
+																		'table' => 'users',
+																		'alias' => 'Barber',
+																		'type' => 'inner',
+																		'foreignKey' => false,
+																		'conditions'=> array('Barber.id = Reservation.reservation_barber')
+																	),
+																	array(
+																	   'table' => 'users',
+																	   'alias' => 'User',
+																	   'type' => 'inner',
+																	   'foreignKey' => false,
+																	   'conditions'=> array('User.id = Reservation.reservation_user')
+																   )          
+																	),
+																 'order'=>array('Reservation.reservation_date'=>'ASC','Reservation.reservation_time'=>'ASC')
+																));
+		foreach( $reservations as $reservation ){
+			$duration = $this->Duration->find('first',array('fields'=>array('Duration.id','Duration.duration'),'conditions'=>array('Duration.barber'=>$reservation['Barber']['id'],'Duration.service_id'=>$reservation['Service']['id'])));
+			array_push($reservation,$duration);
+			array_push($reservationResponse,$reservation);
 		}
-		$conditions['Reservation.reservation_date >='] = date('Y-m-d');
+	
+		}
 		
-		$reservations = $this->Reservation->find('all',array('fields'=>
-																	array('Reservation.id','Reservation.reservation_bill','Reservation.payment_type','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
-																		  'Service.id','Service.service_name','Service.price',
-																		  'Barber.id','Barber.name','Barber.color',
-																		  'User.id','User.name','User.phone',
-																		  ),
-															 'conditions'=>
-																	array($conditions),
-															 'joins' =>
-															 array(
-																 array(
-																	 'table' => 'services',
-																	 'alias' => 'Service',
-																	 'type' => 'inner',
-																	 'foreignKey' => false,
-																	 'conditions'=> array('Service.id = Reservation.reservation_service'),
-																 ),
-																 array(
-																	'table' => 'users',
-																	'alias' => 'Barber',
-																	'type' => 'inner',
-																	'foreignKey' => false,
-																	'conditions'=> array('Barber.id = Reservation.reservation_barber')
-																),
-																array(
-																   'table' => 'users',
-																   'alias' => 'User',
-																   'type' => 'inner',
-																   'foreignKey' => false,
-																   'conditions'=> array('User.id = Reservation.reservation_user')
-															   )          
-																),
-															 'order'=>array('Reservation.reservation_date'=>'ASC','Reservation.reservation_time'=>'ASC')
-															));
-	foreach( $reservations as $reservation ){
-		$duration = $this->Duration->find('first',array('fields'=>array('Duration.id','Duration.duration'),'conditions'=>array('Duration.barber'=>$reservation['Barber']['id'],'Duration.service_id'=>$reservation['Service']['id'])));
-		array_push($reservation,$duration);
-		array_push($reservationResponse,$reservation);
-	}
-
-	}
-	
-	
+		
 		$this->set('reservations',$reservationResponse);
 		//$this->set('user',$user);
+		
+	
 	}
 
 	public function account()
@@ -239,6 +240,7 @@ class PagesController extends AppController
 		$pass = $_POST['loginPass'];
 		$pass = $this->Encrypt->encrypt($pass);
 
+		
 
 		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user, 'User.password' => $pass, 'User.status' => 1)));
 
@@ -2508,30 +2510,30 @@ class PagesController extends AppController
 			$data['Sale']['seller_id'] = $sellerId;
 			$data['Sale']['creation_date'] = date('Y-m-d');
 			if ($this->Sale->save($data)) {
-				$this->SaleProduct->create();
+				$this->Saleproduct->create();
 				$saleId = $this->Sale->getLastInsertID();
-				$datac['SaleProduct']['sales_id'] = $saleId;
+				$datac['Saleproduct']['sales_id'] = $saleId;
 				if (empty($_POST['dateAdd'])) {
-					$datac['SaleProduct']['sale_date'] = date('Y-m-d');
+					$datac['Saleproduct']['sale_date'] = date('Y-m-d');
 				} else {
-					$datac['SaleProduct']['sale_date'] = $_POST['dateAdd'];
+					$datac['Saleproduct']['sale_date'] = $_POST['dateAdd'];
 				}
 				$quantitySelected = $_POST['countAdd'];
 
 				$stock = ($_POST['countAddAvaiableProduct']-$quantitySelected);
 
-				$datac['SaleProduct']['product_id'] = $productId;
-				$datac['SaleProduct']['price'] = $_POST['priceAdd'];
-				$datac['SaleProduct']['notes'] = $_POST['notesAdd'];
-				$datac['SaleProduct']['quantity'] = $quantitySelected;
-				$datac['SaleProduct']['payment_type'] = $_POST['payAdd'];
-				$datac['SaleProduct']['date_creation'] = date('Y-m-d');
+				$datac['Saleproduct']['product_id'] = $productId;
+				$datac['Saleproduct']['price'] = $_POST['priceAdd'];
+				$datac['Saleproduct']['notes'] = $_POST['notesAdd'];
+				$datac['Saleproduct']['quantity'] = $quantitySelected;
+				$datac['Saleproduct']['payment_type'] = $_POST['payAdd'];
+				$datac['Saleproduct']['date_creation'] = date('Y-m-d');
 
 				$this->Product->id = $this->Product->field('id', array('id' => $productId));
 				if ($this->Product->id) {
 					$this->Product->saveField('quantity', $stock);
 				}
-				$this->SaleProduct->save($datac);
+				$this->Saleproduct->save($datac);
 				sleep(3);
 				$this->redirect(array('action' => '../sales'));
 			}
