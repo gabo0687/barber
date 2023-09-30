@@ -2,22 +2,7 @@
   <article id="profile">
     <h2>Inventario</h2>
     <ul class="nav nav-pills text-end">
-<<<<<<< HEAD
     <?php  echo $this->element('menu');?>
-=======
-      <?php if ($user['User']['type'] == '1') { ?>
-        <li class="nav-item"><a class="nav-link fa fa-calendar" aria-hidden="true" id="calendar" href="calendar" type="button"> Calendario</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-scissors" aria-hidden="true" id="calendar" href="services" type="button"> Servicios</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-id-card" aria-hidden="true" id="calendar" href="users" type="button"> Usuarios</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-users" aria-hidden="true" id="calendar" href="customers" type="button"> Clientes</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-product-hunt" aria-hidden="true" id="calendar" href="products" type="button"> Productos</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-clock-o" aria-hidden="true" id="calendar" href="work" type="button"> Horas de trabajo</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-book" aria-hidden="true" id="calendar" href="expenses" type="button"> Gastos</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-line-chart" aria-hidden="true" id="calendar" href="sales" type="button"> Ventas</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-usd" aria-hidden="true" id="calendar" href="product_sales" type="button"> Reporte Productos</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-money" aria-hidden="true" id="calendar" href="expenses_sales" type="button"> Reporte Gastos</a></li>
-      <?php } ?>
->>>>>>> 90b773f (ticket_10_13_35)
     </ul>
     </br>
     <div class="form-group text-left">
@@ -76,11 +61,17 @@
             <label for="accountInputEmail">Cantidad disponible</label>
             <input type="number" class="form-control" id="countAddAvailable" name="countAddAvailable" aria-describedby="emailHelp" placeholder="Cantidad en stock" disabled>
 <<<<<<< HEAD
+<<<<<<< HEAD
             <input type="hidden" id="countAddAvaiableProduct" name="countAddAvaiableProduct" value="0">
             
             
 =======
 >>>>>>> 90b773f (ticket_10_13_35)
+=======
+            <input type="hidden" id="countAddAvaiableProduct" name="countAddAvaiableProduct" value="0">
+            
+            
+>>>>>>> ad44c76 (fixdb)
           </div>
           <div class="form-group">
             <label for="accountInputEmail">Cantidad</label>
@@ -500,9 +491,13 @@
             price = res['Product']['price'];
             $('#countAddAvailable').val(cantProductos);
 <<<<<<< HEAD
+<<<<<<< HEAD
             $('#countAddAvaiableProduct').val(cantProductos);
 =======
 >>>>>>> 90b773f (ticket_10_13_35)
+=======
+            $('#countAddAvaiableProduct').val(cantProductos);
+>>>>>>> ad44c76 (fixdb)
             $('#priceAdd').val(price);
             productPrice = price;
           }
