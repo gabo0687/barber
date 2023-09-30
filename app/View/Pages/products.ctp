@@ -2,22 +2,7 @@
   <article id="profile">
     <h2>Inventario</h2>
     <ul class="nav nav-pills text-end">
-<<<<<<< HEAD
       <?php  echo $this->element('menu');?>
-=======
-      <?php if ($user['User']['type'] == '1') { ?>
-        <li class="nav-item"><a class="nav-link fa fa-calendar" aria-hidden="true" id="calendar" href="calendar" type="button"> Calendario</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-scissors" aria-hidden="true" id="calendar" href="services" type="button"> Servicios</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-id-card" aria-hidden="true" id="calendar" href="users" type="button"> Usuarios</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-users" aria-hidden="true" id="calendar" href="customers" type="button"> Clientes</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-product-hunt" aria-hidden="true" id="calendar" href="products" type="button"> Productos</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-clock-o" aria-hidden="true" id="calendar" href="work" type="button"> Horas de trabajo</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-book" aria-hidden="true" id="calendar" href="expenses" type="button"> Gastos</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-line-chart" aria-hidden="true" id="calendar" href="sales" type="button"> Ventas</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-usd" aria-hidden="true" id="calendar" href="product_sales" type="button"> Reporte Productos</a></li>
-        <li class="nav-item"><a class="nav-link fa fa-money" aria-hidden="true" id="calendar" href="expenses_sales" type="button"> Reporte Gastos</a></li>
-      <?php } ?>
->>>>>>> 90b773f (ticket_10_13_35)
     </ul>
     </br>
     <div class="form-group text-left">
@@ -31,8 +16,8 @@
     </div>
     <form method="post" id="searchProductEdit" style="display:none;" class="col-sm-6 offset-sm-3">
       <div class="form-group text-left">
-        <label for="accountInputUser">Buscar Usuario</label>
-        <input type="text" class="form-control" id="searchProduct" name="searchProduct" aria-describedby="emailHelp" placeholder="Nombre/telefono">
+        <label for="accountInputUser">Buscar Producto</label>
+        <input type="text" class="form-control" id="searchProduct" name="searchProduct" aria-describedby="emailHelp" placeholder="Nombre">
       </div>
       <div class="form-group text-left">
         <button type="button" onclick="search()" class="btn btn-primary">Buscar</button>
@@ -55,8 +40,8 @@
             <input type="number" class="form-control" id="countAdd" name="countAdd" aria-describedby="emailHelp" placeholder="Cantidad">
           </div>
           <div class="form-group">
-            <label for="accountInputUser">proovedor</label>
-            <input type="text" class="form-control" id="sellerAdd" name="sellerAdd" aria-describedby="emailHelp" placeholder="Proovedor">
+            <label for="accountInputUser">Provedor</label>
+            <input type="text" class="form-control" id="sellerAdd" name="sellerAdd" aria-describedby="emailHelp" placeholder="Provedor">
           </div>
           <div class="form-group" id="error-color" style="display:none;">
             <label for="signupName"><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este Color ya esta siendo utilizado por otro usuario.</b></span></label>
@@ -83,7 +68,7 @@
     <div class="tab-content" id="pills-tabContent">
       <div class="tab-pane fade show active" id="home_edit" style="display:none;" role="tabpanel" aria-labelledby="nav-profile-tab">
         <form action="update_product" method="post" id="editProduct" class="col-sm-6 offset-sm-3">
-          <h4 class="offset-sm-3">Editar cliente</h4>
+          <h4 class="offset-sm-3">Editar Producto</h4>
           <div class="form-group" style="display:none;">
             <label for="accountInputUser">id</label>
             <input type="text" class="form-control" id="idEdit" name="idEdit" aria-describedby="emailHelp" placeholder="Nombre">
@@ -101,8 +86,8 @@
             <input type="number" class="form-control" id="countEdit" name="countEdit" aria-describedby="emailHelp" placeholder="Cantidad">
           </div>
           <div class="form-group">
-            <label for="accountInputUser">proovedor</label>
-            <input type="text" class="form-control" id="sellerEdit" name="sellerEdit" aria-describedby="emailHelp" placeholder="Proovedor">
+            <label for="accountInputUser">Provedor</label>
+            <input type="text" class="form-control" id="sellerEdit" name="sellerEdit" aria-describedby="emailHelp" placeholder="Provedor">
           </div>
           <div class="form-group" id="error-emptyEdit" style="display:none;">
             <label for="signupName"><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
@@ -323,8 +308,4 @@
       }
     });
   }
-<<<<<<< HEAD
 </script>
-=======
-</script>
->>>>>>> 90b773f (ticket_10_13_35)

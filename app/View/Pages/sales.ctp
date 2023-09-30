@@ -6,8 +6,8 @@
     </ul>
     </br>
     <div class="form-group text-left">
-      <button type="button" onclick="showAddForm()" class="btn btn-primary">Agregar Producto</button>
-      <button type="button" onclick="showEditForm()" class="btn btn-primary">Editar Producto</button>
+      <button type="button" onclick="showAddForm()" class="btn btn-primary">Agregar Venta</button>
+      <button type="button" onclick="showEditForm()" class="btn btn-primary">Editar Venta</button>
     </div>
     <div style="display:none;" id="userUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
       <h4 class="alert-heading">Usuario actualizado! </h4>
@@ -16,8 +16,8 @@
     </div>
     <form method="post" id="searchProductEdit" style="display:none;" class="col-sm-6 offset-sm-3">
       <div class="form-group text-left">
-        <label for="accountInputUser">Buscar Usuario</label>
-        <input type="text" class="form-control" id="searchProduct" name="searchProduct" aria-describedby="emailHelp" placeholder="Nombre/telefono">
+        <label for="accountInputUser">Buscar Venta</label>
+        <input type="text" class="form-control" id="searchProduct" name="searchProduct" aria-describedby="emailHelp" placeholder="Nombre">
       </div>
       <div class="form-group text-left">
         <button type="button" onclick="search()" class="btn btn-primary">Buscar</button>
@@ -60,18 +60,9 @@
           <div class="form-group">
             <label for="accountInputEmail">Cantidad disponible</label>
             <input type="number" class="form-control" id="countAddAvailable" name="countAddAvailable" aria-describedby="emailHelp" placeholder="Cantidad en stock" disabled>
-<<<<<<< HEAD
-<<<<<<< HEAD
+
             <input type="hidden" id="countAddAvaiableProduct" name="countAddAvaiableProduct" value="0">
-            
-            
-=======
->>>>>>> 90b773f (ticket_10_13_35)
-=======
-            <input type="hidden" id="countAddAvaiableProduct" name="countAddAvaiableProduct" value="0">
-            
-            
->>>>>>> ad44c76 (fixdb)
+         
           </div>
           <div class="form-group">
             <label for="accountInputEmail">Cantidad</label>
@@ -490,14 +481,9 @@
             var price = "";
             price = res['Product']['price'];
             $('#countAddAvailable').val(cantProductos);
-<<<<<<< HEAD
-<<<<<<< HEAD
+
             $('#countAddAvaiableProduct').val(cantProductos);
-=======
->>>>>>> 90b773f (ticket_10_13_35)
-=======
-            $('#countAddAvaiableProduct').val(cantProductos);
->>>>>>> ad44c76 (fixdb)
+
             $('#priceAdd').val(price);
             productPrice = price;
           }

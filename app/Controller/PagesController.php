@@ -1569,7 +1569,7 @@ class PagesController extends AppController
 		$reservations = $this->Reservation->find('all', array(
 			'fields' =>
 			array(
-				'Reservation.id', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
+				'Reservation.id','Reservation.payment_type','Reservation.reservation_bill', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
 				'Service.id', 'Service.service_name', 'Service.price',
 				'Barber.id', 'Barber.name', 'Barber.color',
 				'User.id', 'User.name', 'User.phone',
@@ -1628,46 +1628,77 @@ class PagesController extends AppController
 				$dayOfTheWeek = $days[$day];
 
 
-				$response .= '<form name="subirArchivo' . $reservation['Reservation']['id'] . '" action="" method="post" enctype="multipart/formdata" >';
-				$response .= '<li><span class="event-list-item-content">
-								<div class="event-list-info">
-								<h3>' . $reservation['Service']['service_name'] . '</h3>
-								<p>Fecha : ' . $dayOfTheWeek . ' ' . $currentDay . ' de ' . $months[(int)$month - 1] . ' del ' . $year . '</p>
-								<p>Hora : ' . $reservation['Reservation']['reservation_time'] . '</p>
-								<p>Barbero : ' . $reservation['Barber']['name'] . '</p>
-								<p>Cliente : ' . $reservation['User']['name'] . ' <a taget="_blank" href="https://api.whatsapp.com/send?phone=506' . $reservation['User']['phone'] . '&text=Hola ' . $reservation['User']['name'] . '!
-
-								💈 Tienes cita para corte a las ' . $reservation['Reservation']['reservation_time'] . ' , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
-								<p>Tiempo : ' . $reservation[0]['Duration']['duration'] . ' minutos</p>';
-				$response .=    '<p>Estatus de la cita :';
-				if ($reservation['Reservation']['reservation_status'] == 0) {
-					$response .= 'Sin Confirmar';
-				}
-				if ($reservation['Reservation']['reservation_status'] == 1) {
-					$response .= 'Confirmada';
-				}
-				$response .=    '</p>';
-				$response .=    '<p>Precio : ₡' . number_format($reservation['Service']['price']) . '</p>';
-				$response .=    '<p>Selecciona el tipo de pago:</p>  
-								<select class="form-control" name="tipoPago" id="tipoPago">
-								<option value="0">SINPE Movil</option>
-								<option value="1">Efectivo</option>
-								</select>    
-								</br> 
-								<p>Subir comprobante de pago:</p>    
-								<input type="file"  class="form-control" name="comprobante" id="comprobante">
-								</br>';
-				if ($reservation['Reservation']['reservation_status'] == 0) {
-					$response .=   '<button type="button" class="btn btn-secondary" onclick="confirmAppointment(' . $reservation['Reservation']['id'] . ')"><a>Confirmar Cita</a></button>';
-				} else {
-					$response .=    '<button type="submit" class="btn btn-success"><a>Subir Comprobante</a></button>';
-				}
-
-				$response .=    '<button type="button" class="btn btn-danger" onclick="cancelAppointment(' . $reservation['Reservation']['id'] . ')"><a>Eliminar</a></button>
-								</div>
-								</span>
-								</li>
-								</form>';
+				$response .= '<form name="subirArchivo" action="" method="post" enctype="multipart/form-data">
+                			  <li>
+                    		  <span class="event-list-item-content">
+                    		  <div class="event-list-info">
+                        	  <h3>'.$reservation['Service']['service_name'].'</h3>
+                        	  <p>Fecha : '.$dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year.'</p>
+                        	  <p>Hora : '.$reservation['Reservation']['reservation_time'].'</p>
+                        	  <p>Barbero : '.$reservation['Barber']['name'].'</p>
+                        	  <p>Cliente : '.$reservation['User']['name'].'<a taget="_blank" href="https://api.whatsapp.com/send?phone=506'.$reservation['User']['phone'].'&text=Hola '.$reservation['User']['name'].'!
+							   💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
+                        	  <p>Tiempo : '.$reservation[0]['Duration']['duration'].' minutos</p>
+                        	  <p>Estatus de la cita :';
+							  if( $reservation['Reservation']['reservation_status'] == 0 ){ $response .= 'Sin Confirmar'; }
+							  if( $reservation['Reservation']['reservation_status'] == 1 ){ $response .= 'Confirmada'; }
+							  if( $reservation['Reservation']['reservation_status'] == 2 ){ $response .= '<b class="blink_me">CANCELADA</b>'; }
+							  $response .= '</p>
+                        	  <p>Precio : ₡'.number_format($reservation['Service']['price']).'</p>';
+							 if( $reservation['Reservation']['reservation_status'] == 1 && $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  && $reservation['Reservation']['reservation_status'] != 2 ){    
+							  $response .= '<p>Selecciona el tipo de pago:</p>  
+                    		  <select onchange="tipopago(this.value)" class="form-control" name="tipoPago'.$reservation['Reservation']['id'].'" id="tipoPago'.$reservation['Reservation']['id'].'">
+                    		  <option value="1">SINPE Movil</option>
+                    		  <option value="2">Efectivo</option>
+                    		  </select>    
+						      </br> 
+							  <span id="comprobanteSubir">
+							  <p>Subir comprobante de pago:</p>    
+							  <input type="file"  class="form-control" name="comprobante'.$reservation['Reservation']['id'].'" id="comprobante'.$reservation['Reservation']['id'].'">
+							  </span>
+							  <input type="hidden" name="idReservation" id="idReservation" value="'.$reservation['Reservation']['id'].'">
+							  </br>';  
+                   
+							if( $reservation['Reservation']['reservation_status'] == 0 ){
+							$response .= '<button type="button" class="btn btn-secondary" onclick="confirmAppointment('.$reservation['Reservation']['id'].')"><a>Confirmar Cita</a></button>';
+						    }else{
+							$response .= '<button type="submit" class="btn btn-success"><a>Guardar</a></button>';
+							}
+							$reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
+							$reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
+						
+							$response .= '<button type="button" class="btn btn-danger" onclick="cancelAppointment('.$reservation['Reservation']['id'].','.$reservatioTime.','.$reservatioDate.')"><a>Eliminar</a></button>
+										  </div>
+										  </span>';
+						   }else{ 
+								if( $reservation['Reservation']['reservation_status'] == 0 ){
+								
+									$response .= '<button type="button" class="btn btn-secondary" onclick="confirmAppointment('.$reservation['Reservation']['id'].')"><a>Confirmar Cita</a></button>';
+									$reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
+									$reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
+									$response .= '<button type="button" class="btn btn-danger" onclick="cancelAppointment('.$reservation['Reservation']['id'].','.$reservatioTime.','.$reservatioDate.')"><a>Eliminar</a></button>
+									</div>
+									</span>';
+									
+								}else{
+									if( $user['User']['type'] == 1 ){
+									
+										$response .= '<p>Forma de pago :';
+										if($reservation['Reservation']['payment_type'] == 2){ $response .= 'Efectivo'; }else{ 
+											if($reservation['Reservation']['payment_type'] == 1){ $response .= 'SINPE'; }else{ $response .= 'N/A'; } 
+										}
+										$response .= '</p>';  
+										if( $reservation['Reservation']['payment_type'] == 1 && $reservation['Reservation']['reservation_bill'] != '' ){
+											$comprobante = 'bills/'.$reservation['Reservation']['id'].'_'.$reservation['Reservation']['reservation_bill'];
+                            				$comprobante = "'".$comprobante."'";
+											$response .= '<img id="comprobante_imagen" onclick="comprobanteShow('.$comprobante.');" src="bills/'.$reservation['Reservation']['id'].'_'.$reservation['Reservation']['reservation_bill'].'" width="40px" data-bs-toggle="modal" data-bs-target="#modalAmpliarImagen">';
+										
+										}
+									}
+								} 
+							}
+				$response .= '</li>
+                			  </form>';
 			}
 		} else {
 			$response .=    '<span style="color:white">No hay Citas programadas</span>';

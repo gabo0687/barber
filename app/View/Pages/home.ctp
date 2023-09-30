@@ -120,8 +120,12 @@ if( isset($user['User']) ){ ?>
                         ?>
                             <p>Forma de pago : <?php if($reservation['Reservation']['payment_type'] == 2){ echo 'Efectivo'; }else{ if($reservation['Reservation']['payment_type'] == 1){ echo 'SINPE'; }else{ echo 'N/A'; } }?></p>  
                             <?php 
-                            if( $reservation['Reservation']['payment_type'] == 1 && $reservation['Reservation']['reservation_bill'] != '' ){ ?>
-                            <img id='comprobante_imagen' src="bills/<?php echo $reservation['Reservation']['id'].'_'.$reservation['Reservation']['reservation_bill'];?>" width='40px' data-bs-toggle="modal" data-bs-target="#modalAmpliarImagen">
+                            if( $reservation['Reservation']['payment_type'] == 1 && $reservation['Reservation']['reservation_bill'] != '' ){
+                            $comprobante = 'bills/'.$reservation['Reservation']['id'].'_'.$reservation['Reservation']['reservation_bill'];
+                            $comprobante = "'".$comprobante."'";
+                             ?>
+
+                            <img id='comprobante_imagen' onclick="comprobanteShow(<?php echo $comprobante;?>);" src="bills/<?php echo $reservation['Reservation']['id'].'_'.$reservation['Reservation']['reservation_bill'];?>" width='40px' data-bs-toggle="modal" data-bs-target="#modalAmpliarImagen">
                             <?php
                             }
                           }
@@ -164,12 +168,17 @@ if( isset($user['User']) ){ ?>
 </form>
 <script>
 
-$('#comprobante_imagen').click(function(){
+/*$('#comprobante_imagen').click(function(){
+    alert($('#comprobante_imagen').attr('src'));
     var comprobante_imagen = $('#comprobante_imagen').attr('src');
     $('#modal_image').attr('src',comprobante_imagen);
     $('#modal_image_download').attr('href','download?path='+comprobante_imagen);
 
-});
+});*/
+function comprobanteShow(comprobante_imagen){
+    $('#modal_image').attr('src',comprobante_imagen);
+    $('#modal_image_download').attr('href','download?path='+comprobante_imagen);
+}
 
 
     function tipopago(tipoPago){
