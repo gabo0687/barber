@@ -71,6 +71,9 @@
           <div class="form-group">
             <label for="accountInputEmail">Cantidad disponible</label>
             <input type="number" class="form-control" id="countAddAvailable" name="countAddAvailable" aria-describedby="emailHelp" placeholder="Cantidad en stock" disabled>
+            <input type="hidden" id="countAddAvaiableProduct" name="countAddAvaiableProduct" value="0">
+            
+            
           </div>
           <div class="form-group">
             <label for="accountInputEmail">Cantidad</label>
@@ -489,6 +492,7 @@
             var price = "";
             price = res['Product']['price'];
             $('#countAddAvailable').val(cantProductos);
+            $('#countAddAvaiableProduct').val(cantProductos);
             $('#priceAdd').val(price);
             productPrice = price;
           }
