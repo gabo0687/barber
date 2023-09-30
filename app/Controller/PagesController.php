@@ -37,7 +37,7 @@ class PagesController extends AppController
 	 *
 	 * @var array
 	 */
-	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'SaleProduct', 'Expense');
+	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense');
 	public $components = array('Encrypt');
 	/**
 	 * Displays a view
@@ -230,7 +230,7 @@ class PagesController extends AppController
 
 		$this->set('barbers', $barbers);
 	}
-	function loginUser()
+	public function loginUser()
 	{
 
 		$this->layout = 'ajax';
@@ -239,7 +239,7 @@ class PagesController extends AppController
 		$pass = $_POST['loginPass'];
 		$pass = $this->Encrypt->encrypt($pass);
 
-			foreach ($barbers as $barber) {
+			
 
 		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user, 'User.password' => $pass, 'User.status' => 1)));
 
@@ -250,10 +250,11 @@ class PagesController extends AppController
 		} else {
 			echo 0;
 		}
+			
 	}
 
 
-	function logout()
+	public function logout()
 	{
 		$this->autoRender = false;
 		$this->Session->destroy();
@@ -1216,16 +1217,18 @@ class PagesController extends AppController
 				$userId = $this->User->getLastInsertID();
 				$last_appointment = $_POST['last_appointment'];
 
-		if($this->User->save($data)){
-			$this->Customer->create();
-			$datac['Customer']['user_id'] = $_POST['idEdit'];
-			$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
-			$datac['Customer']['user_id'] = $_POST['idEdit'];
-			$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
-			if($this->Customer->save($datac)){
-				Cache::clear();
-			sleep(3);
-			$this->redirect(array('action' => '../customers'));
+				if($this->User->save($data)){
+					$this->Customer->create();
+					$datac['Customer']['user_id'] = $_POST['idEdit'];
+					$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
+					$datac['Customer']['user_id'] = $_POST['idEdit'];
+					$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
+					if($this->Customer->save($datac)){
+						Cache::clear();
+					sleep(3);
+					$this->redirect(array('action' => '../customers'));
+					}
+				}
 			}
 		}
 	}
@@ -1675,13 +1678,12 @@ class PagesController extends AppController
 	 * Run onces a day
 	 */
 
-	public function notification_biweekly()
-	{
+	 public function notification_biweekly(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
 		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -1689,7 +1691,7 @@ class PagesController extends AppController
 		curl_setopt($ch, CURLOPT_POST, 1);
 
 		$customers = $this->Customer->query('SELECT DATEDIFF(CURDATE(),clientes.last_appointment) as dias_transcurridos,clientes.user_id,usuarios.name,usuarios.phone from customers as clientes INNER JOIN users as usuarios ON clientes.user_id=usuarios.id where DATEDIFF(CURDATE(),clientes.last_appointment) = 15');
-		foreach ($customers as $customer) {
+		foreach( $customers as $customer ){
 			$nombre = $customer["usuarios"]["name"];
 			//$phone = $customer["usuarios"]["phone"];
 			$info = base64_encode($customer["clientes"]["user_id"]);
@@ -1697,53 +1699,54 @@ class PagesController extends AppController
 			$data = array();
 			$data = array(
 				'messaging_product' => 'whatsapp',
-				'to' => '506' . $phone,
+				'to' => '506'.$phone,
 				'type' => 'template',
 				'template' => array(
-					'name' => 'quince',
-					'language' => array('code' => 'es_MX'),
-					'components' => array(
-						array(
-							'type' => 'header',
-							'parameters' => array(
-								array(
-									'type' => 'image',
-									'image' => array(
-										'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
-									)
-								)
-							)
-						),
-						array(
-							'type' => 'body',
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $nombre
-								)
-							),
-
-						),
-						array(
-							'type' => 'button',
-							"index" => "0",
-							"sub_type" => "url",
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $info
-								)
-							)
-						),
-					)
-				)
+						'name' => 'quince',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+											)
+						)
 			);
 			$payload = json_encode($data);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			$server_output = curl_exec($ch);
 			var_dump($server_output);
 			curl_close($ch);
+			
 		}
 	}
 
@@ -1751,13 +1754,12 @@ class PagesController extends AppController
 	 * Run every minute
 	 * cachecron
 	 */
-	public function notification_confirm()
-	{
+	public function notification_confirm(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
 		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -1765,34 +1767,33 @@ class PagesController extends AppController
 		curl_setopt($ch, CURLOPT_POST, 1);
 
 		$currentDate = date('Y-m-d');
-		$currentTime = date('H:i:s');
-		$newTime = strtotime('+3 hour', strtotime($currentTime));
-		$newTime = date('H:i', $newTime);
-		$newTime = $newTime . ':00';
-
+		$currentTime= date('H:i:s'); 
+		$newTime = strtotime ( '+3 hour' , strtotime ($currentTime) ) ; 
+		$newTime = date ( 'H:i' , $newTime);
+		$newTime = $newTime.':00';
+		
 		$reservations = Cache::read('notification_confirm');
+		
+		if( !$reservations ){
 
-		if (!$reservations) {
-
-			$reservations = $this->Activereservation->find('all', array(
-				'fields' => array('Activereservation.id_reservation,Activereservation.reservation_date,Activereservation.reservation_time,User.id,User.name,User.phone'),
-				'conditions' => array(
-					'Activereservation.reservation_time' => $newTime, 'Activereservation.reservation_date' => $currentDate, 'Activereservation.reservation_status <>' => 2
-				),
-				'joins' =>																			array(
-					array(
-						'table' => 'users',
-						'alias' => 'User',
-						'type' => 'inner',
-						'foreignKey' => false,
-						'conditions' => array('User.id = Activereservation.reservation_user'),
-					)
-				)
-			));
-			Cache::write('notification_confirm', $reservations);
+		$reservations = $this->Activereservation->find('all',array('fields'=>array('Activereservation.id_reservation,Activereservation.reservation_date,Activereservation.reservation_time,User.id,User.name,User.phone'),
+															 'conditions'=>array(
+																				'Activereservation.reservation_time'=>$newTime,'Activereservation.reservation_date'=>$currentDate,'Activereservation.reservation_status <>'=>2
+																				),
+															 'joins' =>																			array(
+																		array(
+																			'table' => 'users',
+																			'alias' => 'User',
+																			'type' => 'inner',
+																			'foreignKey' => false,
+																			'conditions'=> array('User.id = Activereservation.reservation_user'),
+																		)
+																	)));
+		Cache::write('notification_confirm', $reservations);															
+																	
 		}
 
-		foreach ($reservations as $reservation) {
+		foreach( $reservations as $reservation ){
 			$data = array();
 			$nombre = $reservation['User']['name'];
 			//$phone = $reservation['User']['phone'];
@@ -1801,82 +1802,83 @@ class PagesController extends AppController
 			$info = base64_encode($reservation['Activereservation']['id_reservation'].'|'.$hora.'|'.$reservation['Activereservation']['reservation_date']);
 			$data = array(
 				'messaging_product' => 'whatsapp',
-				'to' => '506' . $phone,
+				'to' => '506'.$phone,
 				'type' => 'template',
 				'template' => array(
-					'name' => 'recordar_cita',
-					'language' => array('code' => 'es_MX'),
-					'components' => array(
-						array(
-							'type' => 'header',
-							'parameters' => array(
-								array(
-									'type' => 'image',
-									'image' => array(
-										'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
-									)
-								)
-							)
-						),
-						array(
-							'type' => 'body',
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $nombre
-								),
-								array(
-									'type' => 'text',
-									'text' => $hora
-								)
-							),
-
-						),
-						array(
-							'type' => 'button',
-							"index" => "0",
-							"sub_type" => "url",
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $info
-								)
-							)
-						),
-						array(
-							'type' => 'button',
-							"index" => "1",
-							"sub_type" => "url",
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $info
-								)
-							)
+						'name' => 'recordar_cita',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														),
+														array(
+															'type'=>'text',
+															'text'=> $hora
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+													array(
+														'type'=>'button',
+														"index"=> "1",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													)
+											)
 						)
-					)
-				)
 			);
 			$payload = json_encode($data);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			$server_output = curl_exec($ch);
 			var_dump($server_output);
 			curl_close($ch);
 		}
+		
+		
 	}
 
 	/**
 	 * everytime cancel reservation every 1 min
 	 * cachecron
 	 */
-	public function notification_cancel()
-	{
+	public function notification_cancel(){
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
 		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -1885,6 +1887,8 @@ class PagesController extends AppController
 		$reservations = array();
 		$currentDate = date('Y-m-d');
 		$reservations = Cache::read('notification_cancel');
+		
+		if( !$reservations ){
 
 		$reservations = $this->Remove->find('all',array('fields'=>array('Remove.id','Remove.id_reservation','Remove.reservation_time','Remove.reservation_date','Notification.user_id','Notification.reservation_date','User.id','User.name','User.phone'),
 														'conditions'=>array(
@@ -1911,49 +1915,24 @@ class PagesController extends AppController
 														));
 	
 
-			$reservations = $this->Remove->find('all', array(
-				'fields' => array('Remove.id', 'Remove.id_reservation', 'Remove.reservation_time', 'Remove.reservation_date', 'Notification.user_id', 'Notification.reservation_date', 'User.name', 'User.phone'),
-				'conditions' => array(
-					'Remove.reservation_date >=' => $currentDate,
-					'Remove.reservation_date = Notification.reservation_date'
-				),
-				'joins' =>
-				array(
-					array(
-						'table' => 'notifications',
-						'alias' => 'Notification',
-						'type' => 'inner',
-						'foreignKey' => false,
-						'conditions' => array('Notification.reservation_time >= Remove.time_from', 'Notification.reservation_time <= Remove.time_to'),
-					),
-					array(
-						'table' => 'users',
-						'alias' => 'User',
-						'type' => 'inner',
-						'foreignKey' => false,
-						'conditions' => array('Notification.user_id = User.id'),
-					)
-				)
-			));
+			Cache::write('notification_cancel', $reservations);															
+						
+		}												
 
+		foreach( $reservations as $reservation ){
 
-			Cache::write('notification_cancel', $reservations);
-		}
-
-		foreach ($reservations as $reservation) {
-
-
+			
 			$removeId = $reservation['Remove']['id'];
 			$date = $reservation['Remove']['reservation_date'];
 			$day  = date('w', strtotime($date));
-			$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado');
+			$days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
 			$year = date('Y', strtotime($date));
 			$month = date('m', strtotime($date));
-			$months = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+			$months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
 			$currentDay = date('d', strtotime($date));
 			$dayOfTheWeek = $days[$day];
-			$dateFormat = $dayOfTheWeek . ' ' . $currentDay . ' de ' . $months[(int)$month - 1] . ' del ' . $year;
-
+			$dateFormat = $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;
+			
 			$data = array();
 			$nombre = $reservation['User']['name'];
 			//$phone = $reservation['User']['phone'];
@@ -1963,61 +1942,63 @@ class PagesController extends AppController
 			
 			$data = array(
 				'messaging_product' => 'whatsapp',
-				'to' => '+506' . $phone,
+				'to' => '+506'.$phone,
 				'type' => 'template',
 				'template' => array(
-					'name' => 'reagendar',
-					'language' => array('code' => 'es_MX'),
-					'components' => array(
-						array(
-							'type' => 'header',
-							'parameters' => array(
-								array(
-									'type' => 'image',
-									'image' => array(
-										'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
-									)
-								)
-							)
-						),
-						array(
-							'type' => 'body',
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $nombre
-								),
-								array(
-									'type' => 'text',
-									'text' => $hora
-								)
-							),
-
-						),
-						array(
-							'type' => 'button',
-							"index" => "0",
-							"sub_type" => "url",
-							'parameters' => array(
-								array(
-									'type' => 'text',
-									'text' => $info
-								)
-							)
-						),
-					)
-				)
+						'name' => 'reagendar',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													'parameters'=> array(
+														array(
+																'type'=>'text',
+																'text'=> $nombre
+														),
+														array(
+															'type'=>'text',
+															'text'=> $hora
+														)
+														),
+														
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													),
+											)
+						)
 			);
 
 			$payload = json_encode($data);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			$server_output = curl_exec($ch);
 			var_dump($server_output);
 			curl_close($ch);
-			$this->Remove->query('delete from removes where id=' . $removeId);
+			$this->Remove->query('delete from removes where id='.$removeId);
 			Cache::clear();
 		}
+		
+
 	}
 
 	public function testWhatsapp()
@@ -2199,9 +2180,11 @@ class PagesController extends AppController
 			/**
 			 * Products
 			 */
-			$productsTotal = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.date_creation >='=>$dateFrom,'Saleproduct.date_creation <='=>$dateTo)));
-			$bankProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.date_creation >='=>$dateFrom,'Saleproduct.date_creation <='=>$dateTo,'Saleproduct.payment_type'=>1)));
-			$cashProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.date_creation >='=>$dateFrom,'Saleproduct.date_creation <='=>$dateTo,'Saleproduct.payment_type'=>2)));
+			
+			$productsTotal = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo)));
+			
+			$bankProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo,'Saleproduct.payment_type'=>1)));
+			$cashProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo,'Saleproduct.payment_type'=>2)));
 			
 			/**
 			 * Expenses
@@ -2281,6 +2264,7 @@ class PagesController extends AppController
 		$dateToFormat = $this->dateFormat($dateTo);
 		$this->set('dateToFormat',$dateToFormat);
 	}
+
 
 	public function dateFormat($date){
 		$day  = date('w', strtotime($date));
@@ -2529,30 +2513,30 @@ class PagesController extends AppController
 			$data['Sale']['seller_id'] = $sellerId;
 			$data['Sale']['creation_date'] = date('Y-m-d');
 			if ($this->Sale->save($data)) {
-				$this->SaleProduct->create();
+				$this->Saleproduct->create();
 				$saleId = $this->Sale->getLastInsertID();
-				$datac['SaleProduct']['sales_id'] = $saleId;
+				$datac['Saleproduct']['sales_id'] = $saleId;
 				if (empty($_POST['dateAdd'])) {
-					$datac['SaleProduct']['sale_date'] = date('Y-m-d');
+					$datac['Saleproduct']['sale_date'] = date('Y-m-d');
 				} else {
-					$datac['SaleProduct']['sale_date'] = $_POST['dateAdd'];
+					$datac['Saleproduct']['sale_date'] = $_POST['dateAdd'];
 				}
 				$quantitySelected = $_POST['countAdd'];
 
 				$stock = ($_POST['countAddAvaiableProduct']-$quantitySelected);
 
-				$datac['SaleProduct']['product_id'] = $productId;
-				$datac['SaleProduct']['price'] = $_POST['priceAdd'];
-				$datac['SaleProduct']['notes'] = $_POST['notesAdd'];
-				$datac['SaleProduct']['quantity'] = $quantitySelected;
-				$datac['SaleProduct']['payment_type'] = $_POST['payAdd'];
-				$datac['SaleProduct']['date_creation'] = date('Y-m-d');
+				$datac['Saleproduct']['product_id'] = $productId;
+				$datac['Saleproduct']['price'] = $_POST['priceAdd'];
+				$datac['Saleproduct']['notes'] = $_POST['notesAdd'];
+				$datac['Saleproduct']['quantity'] = $quantitySelected;
+				$datac['Saleproduct']['payment_type'] = $_POST['payAdd'];
+				$datac['Saleproduct']['date_creation'] = date('Y-m-d');
 
 				$this->Product->id = $this->Product->field('id', array('id' => $productId));
 				if ($this->Product->id) {
 					$this->Product->saveField('quantity', $stock);
 				}
-				$this->SaleProduct->save($datac);
+				$this->Saleproduct->save($datac);
 				sleep(3);
 				$this->redirect(array('action' => '../sales'));
 			}
