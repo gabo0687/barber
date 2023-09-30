@@ -239,6 +239,7 @@ class PagesController extends AppController
 		$pass = $_POST['loginPass'];
 		$pass = $this->Encrypt->encrypt($pass);
 
+			foreach ($barbers as $barber) {
 
 		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user, 'User.password' => $pass, 'User.status' => 1)));
 

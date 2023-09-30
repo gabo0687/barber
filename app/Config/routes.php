@@ -132,6 +132,33 @@
 
 	
 
+	
+	Router::connect('/products', array('controller' => 'pages', 'action' =>  'products'));
+	Router::connect('/add_product', array('controller' => 'pages', 'action' =>  'add_product'));
+	Router::connect('/update_product', array('controller' => 'pages', 'action' =>  'update_product'));
+	Router::connect('/search_product', array('controller' => 'pages', 'action' =>  'search_product'));
+	Router::connect('/edit_product', array('controller' => 'pages', 'action' =>  'edit_product'));
+
+	Router::connect('/sales', array('controller' => 'pages', 'action' =>  'sales'));
+	Router::connect('/add_sales', array('controller' => 'pages', 'action' =>  'add_sales'));
+	Router::connect('/search_quantity', array('controller' => 'pages', 'action' =>  'search_quantity'));
+
+	Router::connect('/update_sales', array('controller' => 'pages', 'action' =>  'update_sales'));
+	Router::connect('/search_sales', array('controller' => 'pages', 'action' =>  'search_sales'));
+	Router::connect('/edit_sales', array('controller' => 'pages', 'action' =>  'edit_sales'));
+	Router::connect('/saleproducts', array('controller' => 'pages', 'action' =>  'saleproducts'));
+	Router::connect('/expenses', array('controller' => 'pages', 'action' =>  'expenses'));
+	Router::connect('/add_expenses', array('controller' => 'pages', 'action' =>  'add_expenses'));
+	Router::connect('/search_expenses', array('controller' => 'pages', 'action' =>  'search_expenses'));
+	Router::connect('/edit_expenses', array('controller' => 'pages', 'action' =>  'edit_expenses'));
+	Router::connect('/update_expenses', array('controller' => 'pages', 'action' =>  'update_expenses'));
+	
+
+	
+	
+
+	
+
 
 
 	
