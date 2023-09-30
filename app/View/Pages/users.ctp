@@ -56,6 +56,7 @@
               <option value="2">Barber</option>
               <option value="1">Admin</option>
               </select>
+              </div>
             <div class="form-group">
               <label for="accountInputEmail">Color</label>
               <input type="color" class="form-control" id="colorAdd" name="colorAdd" onblur="checkColor(this.value)" aria-describedby="emailHelp" placeholder="color">
