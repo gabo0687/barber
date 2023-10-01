@@ -2378,19 +2378,25 @@ class PagesController extends AppController
 	public function products(){
 		
 	}
-
+	public function products_edit(){
+		
+	}
 	public function add_product()
 	{
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
+			
+		
 			$this->Product->create();
 			$data['Product']['name'] = $_POST['nameAdd'];
 			$data['Product']['price'] = $_POST['priceAdd'];
 			$data['Product']['provider'] = $_POST['sellerAdd'];
 			$data['Product']['quantity'] = $_POST['countAdd'];
+			$data['Product']['codigo_barra'] = $_POST['codigo_barra'];
 			$data['Product']['creation_date'] = date('Y-m-d');
 			if ($this->Product->save($data)) {
-				sleep(3);
+				
+				sleep(2);
 				$this->redirect(array('action' => '../products'));
 			}
 		}
@@ -2401,11 +2407,20 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		$this->layout = 'ajax';
 		$searchUser = $_POST['searchProduct'];
-		$user = $this->Product->find('all', array(
-			'fields' => array('Product.id', 'Product.name', 'Product.provider'),
-			'conditions' => array('Product.name LIKE' => "%$searchUser%"),
-			'recursive' => 2
-		));
+		if( $_POST['search_producto'] == 1 ){
+			$user = $this->Product->find('all', array(
+				'fields' => array('Product.id', 'Product.name', 'Product.provider'),
+				'conditions' => array('Product.name LIKE' => "%$searchUser%"),
+				'recursive' => 2
+			));
+		}
+		if( $_POST['search_producto'] == 2 ){
+			$user = $this->Product->find('all', array(
+				'fields' => array('Product.id', 'Product.name', 'Product.provider'),
+				'conditions' => array('Product.codigo_barra ' => trim($searchUser)),
+				'recursive' => 2
+			));
+		}
 		echo json_encode($user);
 	}
 
@@ -2428,19 +2443,16 @@ class PagesController extends AppController
 		if ($this->request->is('post')) {
 			$this->Product->id = $_POST['idEdit'];
 			$data['Product']['name'] = $_POST['nameEdit'];
-
+			
 			$data['Product']['price'] = $_POST['priceEdit'];
 			$data['Product']['provider'] = $_POST['sellerEdit'];
 
-			if (empty($_POST['countEdit'])) {
-				$data['Product']['quantity'] = 0;
-			} else {
-				$data['Product']['quantity'] = $_POST['countEdit'];
-			}
+			$data['Product']['quantity'] = $_POST['countEdit'] + $_POST['NewcountEdit'];
+			
 
 			if ($this->Product->save($data)) {
 				sleep(3);
-				$this->redirect(array('action' => '../products'));
+				$this->redirect(array('action' => '../products_edit'));
 			}
 		}
 	}
@@ -2639,5 +2651,18 @@ class PagesController extends AppController
 
 	public function saleproducts()
 	{
+	}
+
+	public function check_barcode()
+	{
+		$this->autoRender = false;
+		$this->layout = 'ajax';
+		$barCode = $_POST['barcode'];
+		$barCodes = $this->Product->find('first',array('conditions'=>array('Product.codigo_barra'=>$barCode)));
+		if(empty($barCodes)){
+			return false;
+		}
+		return true;
+		
 	}
 }
