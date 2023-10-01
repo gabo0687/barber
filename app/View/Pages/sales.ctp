@@ -47,11 +47,12 @@
           <span class="description">Producto:</span>
           <span class="tax">
 
-            <input type="search" list="products" class="form-control" id="product" name="product" placeholder="Escribe el nombre del producto">
-
-            <datalist id="products">
-              <?php foreach ($products as $product) { ?>
-                <option id="productOption" name="productOption" value="<?php echo $product['Product']['id']; ?>-<?php echo $product['Product']['name']; ?> / <?php echo $product['Product']['provider']; ?> | ₡<?php echo $product['Product']['price']; ?>">
+            <input type="search" list="products-sales" onchange="searchQuantity()" class="form-control" id="productSales" name="productSales" placeholder="Escribe el nombre del producto">
+          
+            <datalist id="products-sales">
+              
+             <?php foreach ($products as $product) { ?>
+                <option id="productOptionSales" name="productOptionSales" value="<?php echo $product['Product']['id']; ?>-<?php echo $product['Product']['name']; ?> / <?php echo $product['Product']['provider']; ?> | ₡<?php echo $product['Product']['price']; ?>">
                 <?php } ?>
             </datalist>
           </span>
@@ -425,31 +426,7 @@
     });
   }
 
-  setInterval(validateQuantity, 1000);
-
-  function validateQuantity() {
-    var prod = "";
-    prod = $('#product').val();
-    var splitProd = prod.split('-');
-    if (prod == "") {
-      productChange = "";
-      $('#countAddAvailable').val('');
-      $('#priceAdd').val('');
-      productPrice = 0;
-    } else {
-      if (productChange == "") {
-        searchQuantity();
-        productChange = splitProd[0];
-      } else {
-        if (productChange != splitProd[0]) {
-          searchQuantity();
-          productChange = splitProd[0];
-        }
-      }
-    }
-
-  }
-
+ 
   function calculatePrice() {
     var cant = $('#countAdd').val();
     productPrice = productPrice * cant;
@@ -459,14 +436,14 @@
   function searchQuantity() {
 
     var prod = 0;
-    prod = $('#product').val();
+    prod = $('#productSales').val();
     if (prod != "") {
       var splitProd = prod.split('-');
 
       $.ajax({
         type: 'POST',
         url: 'search_quantity',
-        data: 'idProduct=' + splitProd,
+        data: 'idProduct=' + splitProd[0],
         beforeSend: function() {
 
         },

@@ -2212,11 +2212,42 @@ class PagesController extends AppController
 			 * Products
 			 */
 			
-			$productsTotal = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo)));
+			$productsTotalResponse = $this->Saleproduct->find('all',array('fields' => array('Saleproduct.price,Saleproduct.quantity,Saleproduct.discount'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo)));
+			$productsTotal = 0;
+			foreach( $productsTotalResponse as $productTotalResponse ){
+				
+				$priceNoDiscount = $productTotalResponse['Saleproduct']['price'] * $productTotalResponse['Saleproduct']['quantity'];
+				$Discount = 0;
+				if( $productTotalResponse['Saleproduct']['discount'] != 0 ){
+					$Discount = ($productTotalResponse['Saleproduct']['price'] * $productTotalResponse['Saleproduct']['quantity']) * $productTotalResponse['Saleproduct']['discount'];
+				}
+				$productsTotal += $priceNoDiscount - $Discount;
+			}
 			
-			$bankProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo,'Saleproduct.payment_type'=>1)));
-			$cashProduct = $this->Saleproduct->find('all',array('fields' => array('sum(Saleproduct.price * Saleproduct.quantity)   AS ctotal'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo,'Saleproduct.payment_type'=>2)));
-			
+			$bankProductsResponse = $this->Saleproduct->find('all',array('fields' => array('Saleproduct.price,Saleproduct.quantity,Saleproduct.discount'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo,'Saleproduct.payment_type'=>1)));
+			$bankProduct = 0;
+			foreach( $bankProductsResponse as $bankProductResponse ){
+				
+				$priceNoDiscount = $bankProductResponse['Saleproduct']['price'] * $bankProductResponse['Saleproduct']['quantity'];
+				$Discount = 0;
+				if( $bankProductResponse['Saleproduct']['discount'] != 0 ){
+					$Discount = ($bankProductResponse['Saleproduct']['price'] * $bankProductResponse['Saleproduct']['quantity']) * $bankProductResponse['Saleproduct']['discount'];
+				}
+				$bankProduct += $priceNoDiscount - $Discount;
+			}
+
+
+			$cashProductsResponse = $this->Saleproduct->find('all',array('fields' => array('Saleproduct.price,Saleproduct.quantity,Saleproduct.discount'),'conditions'=>array('Saleproduct.sale_date >='=>$dateFrom,'Saleproduct.sale_date <='=>$dateTo,'Saleproduct.payment_type'=>2)));
+			$cashProduct = 0;
+			foreach( $cashProductsResponse as $cashProductResponse ){
+				
+				$priceNoDiscount = $cashProductResponse['Saleproduct']['price'] * $cashProductResponse['Saleproduct']['quantity'];
+				$Discount = 0;
+				if( $cashProductResponse['Saleproduct']['discount'] != 0 ){
+					$Discount = ($cashProductResponse['Saleproduct']['price'] * $cashProductResponse['Saleproduct']['quantity']) * $cashProductResponse['Saleproduct']['discount'];
+				}
+				$cashProduct += $priceNoDiscount - $Discount;
+			}
 			/**
 			 * Expenses
 			 */
@@ -2243,22 +2274,16 @@ class PagesController extends AppController
 		$this->set('cashTotal',$cashTotal);
 
 
-		$totalProducts = 0;	
-		if($productsTotal[0][0]['ctotal'] != null){
-			$totalProducts = $productsTotal[0][0]['ctotal'];
-		}
+		
 		$this->set('productsTotal',$productsTotal);
 
-		$totalProductBank = 0;	
-		if($bankProduct[0][0]['ctotal'] != null){
-			$totalProductBank = $bankProduct[0][0]['ctotal'];
-		}
+		
+		$totalProductBank = $bankProduct;
+		
 		$this->set('bankProduct',$bankProduct);
 
-		$totalProductCash = 0;	
-		if($cashProduct[0][0]['ctotal'] != null){
-			$totalProductCash = $cashProduct[0][0]['ctotal'];
-		}
+		$totalProductCash = $cashProduct;
+		
 		$this->set('cashProduct',$cashProduct);
 
 
@@ -2280,7 +2305,7 @@ class PagesController extends AppController
 		}
 		$this->set('cashExpenses',$cashExpenses);
 		
-		$generaTotal = ( $totalReservation + $totalProducts ) - $totalExpenses;
+		$generaTotal = ( $totalReservation + $productsTotal ) - $totalExpenses;
 		$this->set('generaTotal',$generaTotal);
 		$cashGeneral = ( $totalReservationCash + $totalProductCash ) - $totalCashExpenses;
 		$this->set('cashGeneral',$cashGeneral);
@@ -2546,7 +2571,7 @@ class PagesController extends AppController
 
 			$client = explode('-', $_POST['client']);
 			$clientId = $client[0];
-			$product = explode('-', $_POST['product']);
+			$product = explode('-', $_POST['productSales']);
 			$productId = $product[0];
 			$seller = explode('-', $_POST['seller']);
 			$sellerId = $seller[0];
