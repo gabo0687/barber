@@ -905,7 +905,7 @@ class PagesController extends AppController
 				$this->Customer->create();
 				$data['Customer']['last_appointment'] = $reservationDate;
 				$data['Customer']['user_id'] = $reservationUser;
-				$data['Customer']['fecha_creacion'] = date('Y-m-d H:i:s');
+				$data['Customer']['date_creation'] = date('Y-m-d H:i:s');
 				$this->Customer->save($data);
 				Cache::clear();
 				echo 1;
@@ -971,7 +971,7 @@ class PagesController extends AppController
 				$this->Customer->create();
 				$data['Customer']['last_appointment'] = $reservationDate;
 				$data['Customer']['user_id'] = $_POST['reservation_client'];
-				$data['Customer']['fecha_creacion'] = date('Y-m-d H:i:s');
+				$data['Customer']['date_creation'] = date('Y-m-d H:i:s');
 				$this->Customer->save($data);
 				Cache::clear();
 				echo 1;
@@ -1184,7 +1184,7 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$searchCustomer = $_POST['idCustomer'];
 		$customer = $this->User->find('first', array(
-			'fields' => array('Customer.user_id', 'Customer.last_appointment', 'User.id', 'User.name', 'User.phone', 'User.status', 'User.password'),
+			'fields' => array('Customer.id','Customer.user_id','Customer.date_creation', 'Customer.last_appointment', 'User.id', 'User.name', 'User.phone', 'User.status', 'User.password'),
 			'conditions' => array('User.id' => $searchCustomer),
 			'joins' =>
 			array(
@@ -1207,29 +1207,26 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
 			$this->User->create();
-			$data['User']['name'] = $_POST['name'];
-			$data['User']['phone'] = $_POST['phone'];
-			$pass = $this->Encrypt->encrypt($_POST['password']);
+			$data['User']['name'] = $_POST['nameCustomer'];
+			$data['User']['phone'] = $_POST['phoneCustomer'];
+			$pass = $this->Encrypt->encrypt($_POST['passwordCustomer']);
 			$data['User']['password'] = $pass;
 			$data['User']['type'] = 3;
 			$data['User']['status'] = 1;
-			$data['User']['creation_date'] = date('Y-m-d');
+			$data['User']['creation_date'] = date('Y-m-d H:i:s');
 			if ($this->User->save($data)) {
 				$userId = $this->User->getLastInsertID();
 				$last_appointment = $_POST['last_appointment'];
-
-				if($this->User->save($data)){
-					$this->Customer->create();
-					$datac['Customer']['user_id'] = $_POST['idEdit'];
-					$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
-					$datac['Customer']['user_id'] = $_POST['idEdit'];
-					$this->Customer->query('delete from customers where user_id='.$_POST['idEdit']);
-					if($this->Customer->save($datac)){
-						Cache::clear();
+				$this->Customer->create();
+				$datac['Customer']['user_id'] = $userId;
+				$datac['Customer']['last_appointment'] = $last_appointment;
+				$datac['Customer']['date_creation'] = date('Y-m-d H:i:s');
+				if($this->Customer->save($datac)){
+					Cache::clear();
 					sleep(3);
 					$this->redirect(array('action' => '../customers'));
 					}
-				}
+				
 			}
 		}
 	}
@@ -1238,22 +1235,24 @@ class PagesController extends AppController
 	{
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
-			$this->User->id = $_POST['idEdit'];
-			$data['User']['name'] = $_POST['nameEdit'];
-			$data['User']['phone'] = $_POST['phoneEdit'];
-			$data['User']['status'] = $_POST['statusEdit'];
-			if (empty($_POST['passwordEdit'])) {
-				$data['User']['password'] = $_POST['passwordEditEncrypt'];
+			$this->User->id = $_POST['idEditCustomer'];
+			$data['User']['name'] = $_POST['nameEditCustomer'];
+			$data['User']['phone'] = $_POST['phoneEditCustomer'];
+			$data['User']['status'] = $_POST['statusEditCustomer'];
+			if (empty($_POST['passwordEditCustomer'])) {
+				$data['User']['password'] = $_POST['passwordEditEncryptCustomer'];
 			} else {
-				$pass = $this->Encrypt->encrypt($_POST['passwordEdit']);
+				$pass = $this->Encrypt->encrypt($_POST['passwordEditCustomer']);
 				$data['User']['password'] = $pass;
 			}
 
 			if ($this->User->save($data)) {
-				$this->Customer->user_id = $_POST['idEdit'];
+				$this->Customer->user_id = $_POST['idEditCustomer'];
+				$idRegister = $_POST['idEditCustomerId'];
+				$this->Customer->id =$idRegister;
 				$datac['Customer']['last_appointment'] = $_POST['lastAppointmentEdit'];
-				$datac['Customer']['user_id'] = $_POST['idEdit'];
-				$this->Customer->query('delete from customers where user_id=' . $_POST['idEdit']);
+				$datac['Customer']['user_id'] = $_POST['idEditCustomer'];
+				$datac['Customer']['date_creation'] = $_POST['EditCustomerCreationDate'];
 				if ($this->Customer->save($datac)) {
 					sleep(3);
 					$this->redirect(array('action' => '../customers'));
@@ -2338,7 +2337,7 @@ class PagesController extends AppController
 		$appointmentInfo = base64_decode($info);
 		$appointment = explode('|',$appointmentInfo);
 		
-		
+		$appointmentId = $appointment[0];
 		$reservation_time = $appointment[1];
 		$reservation_date = $appointment[2]; 
 		$this->Reservation->id = $appointment[0];
@@ -2468,10 +2467,10 @@ class PagesController extends AppController
 		if ($this->request->is('post')) {
 			$user = $_SESSION['User'];
 			$this->Expense->create();
-			$data['Expense']['expense_title'] = $_POST['nameAdd'];
-			$data['Expense']['expense_price'] = $_POST['priceAdd'];
+			$data['Expense']['expense_title'] = $_POST['nameAddExpense'];
+			$data['Expense']['expense_price'] = $_POST['priceAddExpense'];
 			$data['Expense']['user_id'] = $user['User']['id'];
-			$data['Expense']['payment_type'] = $_POST['payAdd'];
+			$data['Expense']['payment_type'] = $_POST['payAddExpense'];
 			$data['Expense']['date_creation'] = date('Y-m-d');
 			if ($this->Expense->save($data)) {
 				sleep(3);
@@ -2511,11 +2510,11 @@ class PagesController extends AppController
 	{
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
-			$this->Expense->id = $_POST['idEdit'];
-			$data['Expense']['expense_title'] = $_POST['nameEdit'];
-			$data['Expense']['expense_price'] = $_POST['priceEdit'];
-			$data['Expense']['payment_type'] = $_POST['payEdit'];
-			$data['Expense']['date_creation'] = $_POST['dateEdit'];
+			$this->Expense->id = $_POST['idEditExpense'];
+			$data['Expense']['expense_title'] = $_POST['nameEditExpense'];
+			$data['Expense']['expense_price'] = $_POST['priceEditExpense'];
+			$data['Expense']['payment_type'] = $_POST['payEditExpense'];
+			$data['Expense']['date_creation'] = $_POST['dateEditExpense'];
 
 
 			if ($this->Expense->save($data)) {
