@@ -43,13 +43,13 @@
           <form class="col-sm-6 offset-sm-3">
             <h4 class="offset-sm-2">Ventas de Productos</h4>
             <div class="form-group">
-              <label for="accountInputPassword">Total: ₡<?php if($productsTotal[0][0]['ctotal'] != null){ echo number_format($productsTotal[0][0]['ctotal']); }else{ echo 0;}?></label>
+              <label for="accountInputPassword">Total: ₡<?php echo number_format($productsTotal);?></label>
             </div>
             <div class="form-group">
-              <label for="accountInputPassword2">Efectivo: ₡<?php if($cashProduct[0][0]['ctotal'] != null){ echo number_format($cashProduct[0][0]['ctotal']); }else{ echo 0;}?></label>
+              <label for="accountInputPassword2">Efectivo: ₡<?php echo number_format($cashProduct);?></label>
             </div>
             <div class="form-group">
-              <label for="accountInputPassword2">Banco: ₡<?php if($bankProduct[0][0]['ctotal'] != null){ echo number_format($bankProduct[0][0]['ctotal']); }else{ echo 0;}?></label>
+              <label for="accountInputPassword2">Banco: ₡<?php echo number_format($bankProduct);?></label>
             </div>
           </form>
         </div>
