@@ -152,8 +152,10 @@
 	Router::connect('/search_expenses', array('controller' => 'pages', 'action' =>  'search_expenses'));
 	Router::connect('/edit_expenses', array('controller' => 'pages', 'action' =>  'edit_expenses'));
 	Router::connect('/update_expenses', array('controller' => 'pages', 'action' =>  'update_expenses'));
-	
 
+	
+	Router::connect('/products_edit', array('controller' => 'pages', 'action' =>  'products_edit'));
+	Router::connect('/check_barcode', array('controller' => 'pages', 'action' =>  'check_barcode'));
 	
 	
 
