@@ -37,6 +37,22 @@ date_default_timezone_set('America/Costa_Rica');
 
 <body>
     <header>
+    <div style="display:none;" id="expenseCreated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Gasto creado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+    </div>
+    <div style="display:none;" id="expenseUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Gasto actualizado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+    </div>
+    <div style="display:none;" id="customerCreated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Cliente creado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+      </div>
+      <div style="display:none;" id="customerUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Cliente actualizado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+      </div>
         <div class="slider">
         
             <div class="sliderbox" id="sliderbox">
