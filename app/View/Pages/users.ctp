@@ -1,6 +1,10 @@
 <section class="event-detail">
     <article id="profile">
     <h2>Usuarios</h2>
+    <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Cliente creado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+      </div>
       <ul class="nav nav-pills text-end">
       <?php  echo $this->element('menu');?>
       </ul>
@@ -66,11 +70,6 @@
             <div class="form-group" id="error-passChar" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>La contraseña debe ser mayor a 7 caracteres y tener al menos 1 letra en Mayúscula.</b></span></label>
             </div>
-            <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
-        <h4 class="alert-heading">Cliente creado! </h4>
-        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
-        <hr>
-      </div>
             <div class="form-group text-right">
               <button type="submit" class="btn btn-primary">Guardar Barbero</button>
             </div>
