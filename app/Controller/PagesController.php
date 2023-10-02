@@ -37,7 +37,7 @@ class PagesController extends AppController
 	 *
 	 * @var array
 	 */
-	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense');
+	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense', 'Role');
 	public $components = array('Encrypt');
 	/**
 	 * Displays a view
@@ -145,7 +145,7 @@ class PagesController extends AppController
 	public function account()
 	{
 
-		$this->checksession();
+		$this->checksession(1);
 		if ($this->request->is('post')) {
 
 			$blockDate = $_POST['date_block'];
@@ -213,7 +213,7 @@ class PagesController extends AppController
 	}
 	public function services()
 	{
-		$this->checksession();
+		$this->checksession(3);
 		$user = '';
 		$services = $this->Service->find('all');
 		$this->set('services', $services);
@@ -243,10 +243,11 @@ class PagesController extends AppController
 		
 
 		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user, 'User.password' => $pass, 'User.status' => 1)));
-
+		
 		if (isset($register['User']['id'])) {
-
+			$roles = $this->Role->find('all',array('conditions'=>array('Role.id_user'=>$register['User']['id'])));
 			$_SESSION['User'] = $register;
+			$_SESSION['Role'] = $roles;
 			echo 1;
 		} else {
 			echo 0;
@@ -309,7 +310,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
-
+		$servicio = mb_convert_encoding($servicio, 'UTF-8', 'UTF-8');
 		echo json_encode($servicio);
 	}
 
@@ -462,7 +463,7 @@ class PagesController extends AppController
 		));
 
 		$reservationsAvailable = $this->load_reservation_available($reservations, $reservationServices, $reservationBarber, $reservationTime, $reservationDate);
-
+		$reservationsAvailable = mb_convert_encoding($reservationsAvailable, 'UTF-8', 'UTF-8');
 		echo json_encode($reservationsAvailable);
 	}
 
@@ -996,11 +997,14 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		$events = array();
 		$reservations = Cache::read('reservationResponse' . $_SESSION['User']['User']['id']);
+
 		if (!$reservations) {
 
 			$this->reservations();
 			$reservations = Cache::read('reservationResponse' . $_SESSION['User']['User']['id']);
 		}
+		
+		
 		foreach ($reservations as $reservation) {
 			$reservationId = $reservation['Reservation']['id'];
 			$reservationdate = $reservation['Reservation']['reservation_date'];
@@ -1021,14 +1025,18 @@ class PagesController extends AppController
 			$event = array('groupId' => $reservationId, 'id' => $service, 'title' => $userName, 'start' => $reservationdate . 'T' . $reservationtimeStart, 'end' => $reservationdate . 'T' . $reservationtimeEnd, 'color' => $barbercolor);
 			array_push($events, $event);
 		}
+		$events = mb_convert_encoding($events, 'UTF-8', 'UTF-8');
 		echo json_encode($events);
+		
+		
 	}
+	
 	public function calendar()
 	{
 
 		$this->layout = 'ajax';
 		$events = array();
-		$this->checksession();
+		$this->checksession(2);
 		$reservations = Cache::read('reservationResponse' . $_SESSION['User']['User']['id']);
 		if (!$reservations) {
 
@@ -1118,12 +1126,12 @@ class PagesController extends AppController
 			array_push($reservation, $duration);
 			array_push($reservationResponse, $reservation);
 		}
-
+		
 		Cache::write('reservationResponse' . $_SESSION['User']['User']['id'], $reservationResponse);
 	}
 	public function customers()
 	{
-		$this->checksession();
+		$this->checksession(4);
 	}
 
 
@@ -1148,7 +1156,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
-
+		$customer = mb_convert_encoding($customer, 'UTF-8', 'UTF-8');
 		echo json_encode($customer);
 	}
 
@@ -1175,6 +1183,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
+		$customer = mb_convert_encoding($customer, 'UTF-8', 'UTF-8');
 		echo json_encode($customer);
 	}
 
@@ -1198,6 +1207,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
+		$customer = mb_convert_encoding($customer, 'UTF-8', 'UTF-8');
 		echo json_encode($customer);
 	}
 
@@ -1263,6 +1273,7 @@ class PagesController extends AppController
 
 	public function users()
 	{
+		$this->checksession(10);
 	}
 
 
@@ -1304,11 +1315,12 @@ class PagesController extends AppController
 			)),
 			'recursive' => 2
 		));
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
 	public function edit_user()
-	{
+	{  
 		$this->autoRender = false;
 		$this->layout = 'ajax';
 		$searchUser = $_POST['idUser'];
@@ -1317,6 +1329,9 @@ class PagesController extends AppController
 			'conditions' => array('User.id' => $searchUser),
 			'recursive' => 2
 		));
+		$roles = $this->Role->find('all',array('fields' => array('Role.id_module'),'conditions'=>array('Role.id_user'=>$searchUser)));
+		array_push($user,$roles);
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -1327,6 +1342,7 @@ class PagesController extends AppController
 		$service = $this->Service->find('all', array(
 			'fields' => array('Service.id', 'Service.service_name')
 		));
+		$service = mb_convert_encoding($service, 'UTF-8', 'UTF-8');
 		echo json_encode($service);
 	}
 
@@ -1350,6 +1366,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
+		$duration = mb_convert_encoding($duration, 'UTF-8', 'UTF-8');
 		echo json_encode($duration);
 	}
 
@@ -1371,6 +1388,16 @@ class PagesController extends AppController
 					'fields' => array('Service.id')
 				));
 				$barberId = $this->User->getLastInsertID();
+				for( $i=1; $i<=9; $i++){
+					if( isset($_POST['role'.$i]) ){
+						$this->Role->create();
+						$dataRole['Role']['id_user'] = $barberId;
+						$dataRole['Role']['id_module'] = $i;
+						$dataRole['Role']['creation_date'] = date('Y-m-d');
+						$this->Role->save($dataRole);
+					}
+				}
+
 				foreach ($services as $service) {
 					$this->Duration->create();
 					if (empty($_POST['inputService_' . $service['Service']['id']])) {
@@ -1409,6 +1436,19 @@ class PagesController extends AppController
 			}
 
 			if ($this->User->save($data)) {
+				$barberId = $_POST['idEdit'];
+				$this->Role->query('delete from roles where id_user='.$barberId);
+				for( $i=1; $i<=9; $i++){
+					if( isset($_POST['roleEdit'.$i]) ){
+						
+						$this->Role->create();
+						$dataRole['Role']['id_user'] = $barberId;
+						$dataRole['Role']['id_module'] = $i;
+						$dataRole['Role']['creation_date'] = date('Y-m-d');
+						$this->Role->save($dataRole);
+					}
+				}
+
 				$services = $this->Service->find('all', array(
 					'fields' => array('Service.id')
 				));
@@ -1543,6 +1583,7 @@ class PagesController extends AppController
 				)
 			)
 		));
+		$reservation = mb_convert_encoding($reservation, 'UTF-8', 'UTF-8');
 		echo json_encode($reservation);
 	}
 
@@ -1771,6 +1812,7 @@ class PagesController extends AppController
 											)
 						)
 			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 			$payload = json_encode($data);
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1889,6 +1931,7 @@ class PagesController extends AppController
 											)
 						)
 			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 			$payload = json_encode($data);
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2018,7 +2061,7 @@ class PagesController extends AppController
 											)
 						)
 			);
-
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 			$payload = json_encode($data);
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2056,7 +2099,7 @@ class PagesController extends AppController
 		);
 
 
-
+		$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 		$payload = json_encode($data);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2108,16 +2151,34 @@ class PagesController extends AppController
 		Cache::clear();
 	}
 
-	public function checksession()
+	public function checksession($moduleId)
 	{
 		if (!isset($_SESSION['User'])) {
 			$this->redirect(array('action' => 'home'));
+		}else{
+			if( $moduleId != 1 && $_SESSION['User']['User']['type'] != 1){
+				$permission = $this->checkRole( $moduleId );
+				if( !$permission ){
+					$this->redirect(array('action' => 'home'));
+				}
+			}
+			
 		}
+	}
+
+	public function checkRole( $moduleId ){
+		$roles = $_SESSION['Role'];
+		foreach( $roles as $role ){
+			if( $moduleId == $role['Role']['id_module'] ){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function work()
 	{
-		$this->checksession();
+		$this->checksession(6);
 		if ($this->request->is('post')) {
 			$this->Workhour->query('delete from workhours');
 			$days = array('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun');
@@ -2183,7 +2244,7 @@ class PagesController extends AppController
 	}
 
 	public function product_sales(){
-		$this->checksession();
+		$this->checksession(8);
 	    $dateFrom = '';
 		$dateTo = '';
 		if ($this->request->is('post')) {
@@ -2400,10 +2461,10 @@ class PagesController extends AppController
    * die;		
    */
 	public function products(){
-		
+		$this->checksession(5);
 	}
 	public function products_edit(){
-		
+		$this->checksession(5);
 	}
 	public function add_product()
 	{
@@ -2445,6 +2506,7 @@ class PagesController extends AppController
 				'recursive' => 2
 			));
 		}
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -2458,6 +2520,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
 		echo json_encode($product);
 	}
 
@@ -2515,6 +2578,7 @@ class PagesController extends AppController
 			'conditions' => array('Expense.expense_title LIKE' => "%$expenseName%"),
 			'recursive' => 2
 		));
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -2528,6 +2592,7 @@ class PagesController extends AppController
 			'conditions' => array('Expense.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
 		echo json_encode($product);
 	}
 
@@ -2621,6 +2686,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$cantidad = mb_convert_encoding($cantidad, 'UTF-8', 'UTF-8');
 		echo json_encode($cantidad);
 	}
 
@@ -2634,6 +2700,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.name LIKE' => "%$searchUser%"),
 			'recursive' => 2
 		));
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -2647,6 +2714,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
 		echo json_encode($product);
 	}
 

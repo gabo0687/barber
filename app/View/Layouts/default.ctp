@@ -37,7 +37,11 @@ date_default_timezone_set('America/Costa_Rica');
 
 <body>
     <header>
-
+    <div style="display:none;" id="userUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Usuario actualizado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+        <hr>
+      </div>
     <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
         <h4 class="alert-heading">Usuario creado! </h4>
         <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
@@ -89,7 +93,15 @@ date_default_timezone_set('America/Costa_Rica');
          <div class="event-info-buttons"> 
            <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
            <?php 
-           if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '2' ){ ?> 
+            $hasPermission = false;
+            $menuRoles = $_SESSION['Role'];
+            foreach( $menuRoles as $menuRole ){
+              $moduleId = $menuRole['Role']['id_module'];
+              if( $moduleId == 2 ){
+                $hasPermission = true;
+              }
+            }
+           if( $_SESSION['User']['User']['type'] == '1' || $hasPermission ){ ?> 
            <a class="ticket-btn" id="calendar" href="calendario" type="button" >💈Vista del Calendario</a>
            </div>
           </form>

@@ -31,7 +31,16 @@
           </form>
         </div>
       </div>
-  <?php if( $type == 1 ){ ?>
+  <?php 
+  $hasBlockPermission = false;
+  $menuRoles = $_SESSION['Role'];
+  foreach( $menuRoles as $menuRole ){
+    $moduleId = $menuRole['Role']['id_module'];
+    if( $moduleId == 1 ){
+      $hasBlockPermission = true;
+    }
+  }
+  if( $type == 1 || $hasBlockPermission ){ ?>
 
     
 
