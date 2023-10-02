@@ -89,8 +89,12 @@ date_default_timezone_set('America/Costa_Rica');
       <span class="description">Servicio:</span>
       <span class="tax">
                       <select class="form-control" onchange="filterReservations()" name="services" id="services">
-                        <?php foreach( $services as $service ){ ?>
-                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                        <?php foreach( $services as $service ){
+                          $serviceType = '';
+                          if( $service['Service']['gender'] == 1 ){ $serviceType = 'Hombre'; }
+                          if( $service['Service']['gender'] == 2 ){ $serviceType = 'Mujer'; }
+                          if( $service['Service']['gender'] == 3 ){ $serviceType = 'Unisex'; } ?>
+                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'].' / '.$serviceType;?></option>
                         <?php } ?>
                       </select>
       </span>   

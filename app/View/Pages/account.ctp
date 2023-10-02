@@ -8,14 +8,14 @@
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
           <h4 class="offset-sm-3">Datos de cuenta</h4>
-          <form class="col-sm-6 offset-sm-3">
+          <form action="profile_save" method="post" id="saveProfile" class="col-sm-6 offset-sm-3">
             <div class="form-group">
               <label for="accountInputUser">Usuario</label>
-              <input type="text" name="usuario_perfil" class="form-control" id="usuario_perfil" aria-describedby="emailHelp" placeholder="Usuario">
+              <input type="text" name="usuario_perfil" value="<?php echo $currentUser['User']['name'];?>" class="form-control" id="usuario_perfil" aria-describedby="emailHelp" placeholder="Usuario">
             </div>
             <div class="form-group">
-              <label for="accountInputEmail">Email</label>
-              <input type="email" name="email_perfil" class="form-control" id="email_perfil" aria-describedby="emailHelp" placeholder="Correo Electrónico">
+              <label for="accountInputEmail">Teléfono</label>
+              <input type="text" name="telefono_perfil" value="<?php echo $currentUser['User']['phone'];?>" class="form-control" id="telefono_perfil" aria-describedby="emailHelp" placeholder="Teléfono">
             </div>
             <div class="form-group">
               <label for="accountInputPassword">Contraseña</label>
@@ -25,8 +25,19 @@
               <label for="accountInputPassword2">Confirmar Contraseña</label>
               <input type="password" class="form-control" id="contrasena_confirmar" placeholder="Password">
             </div>
+            <div class="form-group" id="error-number-profile" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Este numero ya esta siendo utilizado por otro usuario.</b></span></label>
+            </div>
+            <div class="form-group" id="error-empty-profile" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
+            </div>
+            <div class="form-group" id="error-password" style="display:none;">
+              <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Contraseñas no coinciden.</b></span></label>
+            </div>
+            
             <div class="form-group text-right">
-              <button type="button" class="btn btn-primary">Guardar Cambios</button>
+             <input type="hidden" name="id_perfil" value="<?php echo $currentUser['User']['id'];?>" id="id_perfil">
+             <button type="button" id="saveChanges" class="btn btn-primary">Guardar Cambios</button>
             </div>
           </form>
         </div>
@@ -152,5 +163,79 @@
             });
           }
     }
+
+
+    $( "#saveChanges" ).on( "click", function( event ) {
+  
+  var nombre = $('#usuario_perfil').val();
+  var celular = $('#telefono_perfil').val();
+  var contrasena_perfil = $('#contrasena_perfil').val();
+  var contrasena_confirmar = $('#contrasena_confirmar').val();
+  var userId = $('#id_perfil').val();
+
+  if( contrasena_perfil != '' && contrasena_perfil != contrasena_confirmar){
+    $('#error-password').show();
+  }else{
+    $('#error-password').hide();
+      $.ajax({
+                  type: 'POST', 
+                  url: 'Pages/getPhoneEdit', 
+                  data: 'user_id='+userId+'&phone='+celular,
+                  beforeSend:function() {  
+
+                  },
+                  error: function(){
+                      
+                  alert('No hay internet');    
+                  },
+                  success: function(existPhone) {
+                    if(existPhone == 1 ){
+                      checkNumberCustomers = true;
+                      $('#error-number-profile').show();
+                      $('#telefono_perfil').css('border','2px solid red');
+                    } else{
+                      checkNumberCustomers = false;
+                      $('#error-number-profile').hide();
+                      $('#telefono_perfil').css('border','');
+                    }
+                    if( nombre == '' || celular == '' || checkNumberCustomers == true  ){
+                    
+                    $showError = false;
+                    if( nombre == '' ){
+                      $('#usuario_perfil').css('border','2px solid red');
+                      $showError = true;
+                    }else{
+                      $('#usuario_perfil').css('border','');
+                    }
+                    if( celular == '' ){
+                      $showError = true;
+                      $('#phoneCustomer').css('border','2px solid red');
+                    }else{
+                      $('#phoneCustomer').css('border','');
+                    }
+                  
+
+                    
+                    if ($showError){
+                      $('#error-empty-profile').show();
+                    }else{
+                      $('#error-empty-profile').hide();
+                    }
+                  }else{
+                    $('#createCustomer').submit();
+                    $('#error-empty-profile').hide();
+                    $('#error-number-profile').hide();
+                    window.scrollTo(0, 0);
+                    $('#profileUpdated').show();
+                        setInterval(function() {
+                            $('#profileUpdated').hide('2000');
+                          }, 2000);
+                    }
+                  }
+    });
+  }
+});
+
+
     window.scrollTo(0, document.body.scrollHeight);
   </script>

@@ -173,8 +173,15 @@ class PagesController extends AppController
 		);
 		$this->set('barbers', $barbers);
 
+
+
 		$user = $_SESSION['User'];
+		
+		$currentUser = $this->User->find('first',array('conditions'=>array('User.id'=>$user['User']['id'])));
+
+		$this->set('currentUser', $currentUser);
 		$this->set('type', $user['User']['type']);
+		
 		$current_date = date('Y-m-d');
 		$blockReservations = $this->Block->find('all', array('conditions' => array('Block.block_date >= ' => $current_date)));
 		$blockResult = array();
@@ -2774,4 +2781,31 @@ class PagesController extends AppController
 		return true;
 		
 	}
+
+	function profile_save()
+	{
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		if ($this->request->is('post')) {
+			//Initialize
+			$nombreUsuario = $_POST['usuario_perfil'];
+			$celular = $_POST['telefono_perfil'];
+			$userId = $_POST['id_perfil'];
+			$userContrasena = $_POST['contrasena_perfil'];
+			//Save user
+			$this->User->id = $userId;
+			$data['User']['name'] = $nombreUsuario;
+			$data['User']['phone'] = $celular;
+			if ($userContrasena != '') {
+				$pass = $this->Encrypt->encrypt($userContrasena);
+				$data['User']['password'] = $pass;
+			}
+
+			if ($this->User->save($data)) {
+				sleep(5);
+				$this->redirect(array('action' => '../'));
+			} 
+		}
+	}
+	
 }
