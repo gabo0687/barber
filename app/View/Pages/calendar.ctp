@@ -98,7 +98,44 @@
 /* Show the dropdown menu (use JS to add this class to the .dropdown-content container when the user clicks on the dropdown button) */
 .show {display:block;}
 
-</style>
+/* Add your custom styles here */
+
+.searchable-dropdown {
+        position: relative;
+        width: 200px;
+    }
+
+    #reservation_client {
+        width: 100%;
+        padding: 10px;
+    }
+
+    #dropdown-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #dropdown-list li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #dropdown-list li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+</style>  
 </head>
 <body>
 <div class="container">
@@ -150,29 +187,29 @@
                     <h4 class="modal-title" id="modal-title-date"></h4>
                 </div>
                 <div id="modalBody" class="modal-body">
-                <span class="tax">
+               
                 <div class="dropdown">
-                  <button onclick="myFunction()" class="dropbtn">Clientes</button></br>
+                  
                   <span style="color:red; display:none;" id="errorCliente">Debes seleccionar a un cliente de la lista</span>
                   <span style="color:red; display:none;" id="errorClienteFormat">Debes seleccionar a un cliente de la lista</span>
                   <span style="color:red; display:none;" id="alreadytaken">Este horario ya fue reservado por alguien más, por favor cambie su elección</span>
                   
-                    
-                  <div id="myDropdown" class="dropdown-content">
-                  <input autofocus class="form-control" type="text" name="reservation_client_text" id="reservation_client_text" placeholder="Buscar.." value="" onkeyup="filterFunction()">
-                  
-                    <input type="hidden"  name="reservation_client" id="reservation_client" value="">
-                    <?php foreach( $clients as $client ){ 
-                      $user_name = "'".$client['User']['name'].' | '.$client['User']['phone']."'";
-                      ?>
-                    <a onclick="reservationClient(<?php echo $client['User']['id'];?>,<?php echo $user_name;?>)"><?php echo $client['User']['name'].' | '.$client['User']['phone'];?></a>
-                    <?php } ?>
-                  </div>
                 </div>
-                </span></br>
-                </br>
-                <span class="tax" id="clienteUser"></span>
-                </br>
+               
+               
+                <span class="description">Cliente:</span>        
+                <span class="tax">
+                <input type="text" id="reservation_client" name="reservation_client" class="form-control" placeholder="Escribe el nombre del cliente">
+                <ul id="dropdown-list" class="hidden">
+                <?php foreach( $clients as $client ){
+                  $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
+                  ?>
+                    <li onclick="selectClient(<?php echo $clientSelected;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
+                    <?php } ?>
+                </ul>
+                </span>
+
+
                 <span class="description"><b>Servicio:</b></span>
                 <span class="tax">
                   <select class="form-control" name="services" id="services">
@@ -239,41 +276,48 @@
 </html>
 <script>
 
+
+function selectClient(client){
+          $('#reservation_client').val(client);
+          $('#dropdown-list').hide();
+        }
+        
+        const searchInput = document.getElementById("reservation_client");
+        const dropdownList = document.getElementById("dropdown-list");
+
+        searchInput.addEventListener("input", function () {
+            const filter = searchInput.value.toLowerCase();
+            const options = dropdownList.getElementsByTagName("li");
+
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option.textContent.toLowerCase().includes(filter)) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+
+            if (filter === "") {
+                dropdownList.classList.add("hidden");
+            } else {
+                dropdownList.classList.remove("hidden");
+            }
+        });
+
+
 setInterval(function () { loadReservations(); }, 10000);
 
 function cleanUsers(){
-  $('#reservation_client_text').val('');
+  
   $('#reservation_client').val('');
-  $('#clienteUser').html('');
   
 }
 function reservationClient(user_id,user_text){
-  $('#reservation_client_text').val(user_text);
   $('#reservation_client').val(user_id);
-  $('#clienteUser').html('<b>Cliente: '+user_text+'</b>');
   myFunction();
 }
 
-function myFunction() {
-  document.getElementById("myDropdown").classList.toggle("show");
- // $('#reservation_client_text').show();
-}
-
-function filterFunction() {
-  var input, filter, ul, li, a, i;
-  input = document.getElementById("reservation_client_text");
-  filter = input.value.toUpperCase();
-  div = document.getElementById("myDropdown");
-  a = div.getElementsByTagName("a");
-  for (i = 0; i < a.length; i++) {
-    txtValue = a[i].textContent || a[i].innerText;
-    if (txtValue.toUpperCase().indexOf(filter) > -1) {
-      a[i].style.display = "";
-    } else {
-      a[i].style.display = "none";
-    }
-  }
-}
 var calendar = '';
 
   document.addEventListener('DOMContentLoaded', function() {
@@ -498,15 +542,15 @@ function saveAppointment(){
  var reservation_client = $('#reservation_client').val();
 
  if( reservation_client != '' ){
-  var client = $('#reservation_client_text').val();
-  var splitClient = client.split('|');
+  var client = $('#reservation_client').val();
+  var splitClient = client.split('-');
   if( splitClient.length < 2 ){
     $('#errorClienteFormat').hide();
   }else{
     $.ajax({
                   type: 'POST', 
                   url: 'save_reservation_calendar', 
-                  data: 'reservation_date='+reservationDate+'&reservation_client='+reservation_client+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
+                  data: 'reservation_date='+reservationDate+'&reservation_client='+splitClient[0]+'&reservation_time='+reservationTime+'&reservation_service='+reservationService+'&reservation_barber='+reservationBarber,
                   beforeSend:function() {  
                     $('#saveAppointmentButton').prop('disabled', true);
                     $('#loadingReservation').addClass('spinner-border');

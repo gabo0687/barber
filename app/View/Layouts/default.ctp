@@ -28,7 +28,45 @@
     opacity: 0;
   }
 }
-</style>
+
+  /* Add your custom styles here */
+
+    .searchable-dropdown {
+        position: relative;
+        width: 200px;
+    }
+
+    #client {
+        width: 100%;
+        padding: 10px;
+    }
+
+    #dropdown-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #dropdown-list li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #dropdown-list li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+</style>  
 <?php
 date_default_timezone_set('America/Costa_Rica');
 
@@ -228,20 +266,26 @@ date_default_timezone_set('America/Costa_Rica');
         <input class="form-control" type="text" onchange="filterReservations()" onfocus="changeReservationDate()" placeholder="<?php echo date('m/d/Y');?>" name="fecha_reserva" id="fecha_reserva" >
         <input type="hidden" name="user_type" id="user_type" value="<?php echo $user['User']['type'];?>">
       
+
+
+
+
+
         <?php 
         if( $user['User']['type'] == 1 || $user['User']['type'] == 2 ){ ?>  
-      <span class="description">Cliente:</span>                
-      <span class="tax">
-
-        <input type="search" list="clients" class="form-control" id="client" name="client" placeholder="Escribe el nombre del cliente">
-
-        <datalist id="clients">
-          <?php foreach( $clients as $client ){?>
-          <option value="<?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?>">
-          <?php } ?>
-        </datalist>
-      </span>
-      <?php } ?>
+          <span class="description">Cliente:</span>        
+         <span class="tax">
+        <input type="text" id="client" name="client" class="form-control" placeholder="Escribe el nombre del cliente">
+        <ul id="dropdown-list" class="hidden">
+        <?php foreach( $clients as $client ){
+          $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
+           ?>
+            <li onclick="selectClient(<?php echo $clientSelected;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
+            <?php } ?>
+        </ul>
+        </span>
+        <?php } ?>
+            
       <span id="clientError" style="display:none; color:red">Selecciona un cliente</br></span>
       <span id="clientFormatError" style="display:none; color:red">Debes seleccionar a un cliente de la lista</br></span>
       
@@ -321,6 +365,36 @@ date_default_timezone_set('America/Costa_Rica');
 </body>
 </html>
 <script>
+        
+        function selectClient(client){
+          $('#client').val(client);
+          $('#dropdown-list').hide();
+        }
+        
+        const searchInput = document.getElementById("client");
+        const dropdownList = document.getElementById("dropdown-list");
+
+        searchInput.addEventListener("input", function () {
+            const filter = searchInput.value.toLowerCase();
+            const options = dropdownList.getElementsByTagName("li");
+
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option.textContent.toLowerCase().includes(filter)) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+
+            if (filter === "") {
+                dropdownList.classList.add("hidden");
+            } else {
+                dropdownList.classList.remove("hidden");
+            }
+        });
+
+
 
 function reservar(reservationNumber){
  
