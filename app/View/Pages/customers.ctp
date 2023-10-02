@@ -12,7 +12,7 @@
       <form method="post" id="searchUser" style="display:none;" class="col-sm-6 offset-sm-3">
       <div class="form-group text-left">
       <label for="accountInputUser">Buscar cliente</label>
-      <input type="text" class="form-control" id="searchCustomer" name="searchCustomer" aria-describedby="emailHelp" placeholder="Nombre/telefono">
+      <input type="text" class="form-control" id="searchCustomer" name="searchCustomer" aria-describedby="emailHelp" placeholder="Nombre/Teléfono">
       </div>
       <div class="form-group text-left">
       <button type="button" onclick="search()" class="btn btn-primary">Buscar</button>
@@ -27,7 +27,7 @@
               <input type="text" class="form-control" id="nameCustomer" name="nameCustomer" aria-describedby="emailHelp" placeholder="Nombre">
             </div>
             <div class="form-group">
-              <label for="accountInputEmail">Telefono</label>
+              <label for="accountInputEmail">Teléfono</label>
               <input type="number" class="form-control" id="phoneCustomer" name="phoneCustomer" onblur="checkPhoneCostumers(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
             </div>
             <div class="form-group">
@@ -48,7 +48,8 @@
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
             </div>
             <div class="form-group text-right">
-              <button type="submit" class="btn btn-primary">Guardar</button>
+              <input name="sendPassword" id="sendPassword" type="checkbox" value=""> Invitar a cambiar contraseña por Whatsapp</br></br>
+              <button type="button" id="creationCustomer" class="btn btn-primary">Guardar</button>
             </div>
           </form>
         </div>
@@ -78,7 +79,7 @@
               <input type="text" class="form-control" id="nameEditCustomer" name="nameEditCustomer" aria-describedby="emailHelp" placeholder="Nombre">
             </div>
             <div class="form-group">
-              <label for="accountInputEmail">Telefono</label>
+              <label for="accountInputEmail">Teléfono</label>
               <input type="number" class="form-control" id="phoneEditCustomer" name="phoneEditCustomer" onblur="checkPhoneEdit(idEditCustomer.value,this.value)" aria-describedby="emailHelp"  placeholder="Telefono">
             </div>
             <div class="form-group">
@@ -88,10 +89,6 @@
               <option value="1">Activo</option>
               </select>
               
-            </div>
-            <div class="form-group" style="display:none;">
-              <label for="accountInputUser">Contraseña</label>
-              <input type="password" class="form-control" id="passwordEditEncryptCustomer" name="passwordEditEncryptCustomer" aria-describedby="emailHelp" placeholder="Estado">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Contraseña</label>
@@ -110,8 +107,9 @@
             <div class="form-group" id="error-passCharEditCustomer" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>La contraseña debe ser mayor a 7 caracteres y tener al menos 1 letra en Mayúscula.</b></span></label>
             </div>
-            <div class="form-group text-center">
-              <button type="submit" class="btn btn-primary">Editar</button>
+            <div class="form-group text-right">
+            <input name="sendEditPassword" id="sendEditPassword" type="checkbox" value=""> Invitar a cambiar contraseña por Whatsapp</br></br>
+              <button type="button" id="editSaveCustomer" class="btn btn-primary">Editar</button>
             </div>  
           </form>
         </div>
@@ -140,7 +138,7 @@ function showAddForm(){
   $('#home_editCustomer').hide();
   $('#customersList').hide();
   $('#searchUser').hide();
-  
+  window.scrollTo(0, document.body.scrollHeight);
 }
 
 function showEditForm(){
@@ -158,15 +156,73 @@ function showEditForm(){
   $('#lastAppointmentEdit').val('');
   $('#statusEditCustomer').val('');
   $('#home_editCustomer').hide();
-  
+  window.scrollTo(0, document.body.scrollHeight);
   
 }
 
 function checkPhoneCostumers(userPhone){
+  $.ajax({
+                type: 'POST', 
+                url: 'Pages/getPhone', 
+                data: 'phone='+userPhone,
+                beforeSend:function() {  
+
+                },
+                error: function(){
+                    
+                alert('No hay internet');    
+                },
+                success: function(existPhone) {
+                  if(existPhone == 1 ){
+                    event.preventDefault();
+                    checkNumberCustomers = true;
+                    $('#error-phone').show();
+                    $('#phoneCustomer').css('border','2px solid red');
+                  } else{
+                    checkNumberCustomers = false;
+                    $('#error-phone').hide();
+                    $('#phoneCustomer').css('border','');
+                  }
+                }
+  });
+}
+
+function checkPhoneEdit(userId,userPhone){
+
 $.ajax({
               type: 'POST', 
+              url: 'Pages/getPhoneEdit', 
+              data: 'user_id='+userId+'&phone='+userPhone,
+              beforeSend:function() {  
+
+              },
+              error: function(){
+                  
+              alert('No hay internet');    
+              },
+              success: function(existPhone) {
+                if(existPhone == 1 ){
+                  NumberEditExist = true;
+                  $('#error-phoneEditCustomer').show();
+                  $('#phoneEditCustomer').css('border','2px solid red');
+                } else{
+                  NumberEditExist = false;
+                  $('#error-phoneEditCustomer').hide();
+                  $('#phoneEditCustomer').css('border','');
+                }
+              }
+});
+}
+
+$( "#creationCustomer" ).on( "click", function( event ) {
+  
+  var nombre = $('#nameCustomer').val();
+  var celular = $('#phoneCustomer').val();
+  
+  $.ajax({
+              type: 'POST', 
               url: 'Pages/getPhone', 
-              data: 'phone='+userPhone,
+              data: 'phone='+celular,
               beforeSend:function() {  
 
               },
@@ -185,16 +241,55 @@ $.ajax({
                   $('#error-phone').hide();
                   $('#phoneCustomer').css('border','');
                 }
+                if( nombre == '' || celular == '' || checkNumberCustomers == true  ){
+                event.preventDefault();
+                $showError = false;
+                if( nombre == '' ){
+                  $('#nameCustomer').css('border','2px solid red');
+                  $showError = true;
+                }else{
+                  $('#nameCustomer').css('border','');
+                }
+                if( celular == '' ){
+                  $showError = true;
+                  $('#phoneCustomer').css('border','2px solid red');
+                }else{
+                  $('#phoneCustomer').css('border','');
+                }
+              
+
+                
+                if ($showError){
+                  $('#error-empty').show();
+                }else{
+                  $('#error-empty').hide();
+                }
+              }else{
+                $('#createCustomer').submit();
+                $('#error-empty').hide();
+                $('#error-phone').hide();
+                window.scrollTo(0, 0);
+                $('.close').click();
+                $('#customerCreated').show();
+                    setInterval(function() {
+                        $('#customerCreated').hide('2000');
+                      }, 2000);
+                }
               }
 });
-}
+   
+});
 
-function checkPhoneEdit(userId,userPhone){
+$( "#editSaveCustomer" ).on( "click", function( event ) {
+  var id = $('#idEditCustomer').val();
+  var nombre = $('#nameEditCustomer').val();
+  var celular = $('#phoneEditCustomer').val();
+  var cita = $('#lastAppointmenEdit').val();
 
-$.ajax({
+  $.ajax({
               type: 'POST', 
               url: 'Pages/getPhoneEdit', 
-              data: 'user_id='+userId+'&phone='+userPhone,
+              data: 'user_id='+id+'&phone='+celular,
               beforeSend:function() {  
 
               },
@@ -204,7 +299,6 @@ $.ajax({
               },
               success: function(existPhone) {
                 if(existPhone == 1 ){
-                  event.preventDefault();
                   NumberEditExist = true;
                   $('#error-phoneEditCustomer').show();
                   $('#phoneEditCustomer').css('border','2px solid red');
@@ -213,141 +307,49 @@ $.ajax({
                   $('#error-phoneEditCustomer').hide();
                   $('#phoneEditCustomer').css('border','');
                 }
+                if( NumberEditExist == true || nombre == '' || celular == '' ){ 
+                    event.preventDefault();
+                    $showError = false;
+                    if( nombre == '' ){
+                      $('#nameEditCustomer').css('border','2px solid red');
+                      $showError = true;
+                    }else{
+                      $('#nameEditCustomer').css('border','');
+                    }
+                    if( celular == '' ){
+                      $showError = true;
+                      $('#phoneEditCustomer').css('border','2px solid red');
+                    }else{
+                      if( NumberEditExist == true ){
+                      $('#error-phoneEditCustomer').show();
+                      $('#phoneEditCustomer').css('border','2px solid red');
+                    }else{
+                      $('#error-phoneEditCustomer').hide();
+                      $('#phoneEditCustomer').css('border','');
+                    }
+                    }
+
+                    
+                    if ($showError){
+                      $('#error-emptyEditCustomer').show();
+                    }else{
+                      $('#error-emptyEditCustomer').hide();
+                    }
+                  }else{
+                    $( "#editCustomer" ).submit();
+                    $('error-passCharEditCustomer').hide();
+                    $('#error-phoneEditCustomer').hide();
+                    window.scrollTo(0, 0);
+                    $('.close').click();
+                    $('#customerUpdated').show();
+                        setInterval(function() {
+                            $('#customerUpdated').hide('2000');
+                          }, 2000);
+                        }  
               }
 });
-}
-
-$( "#createCustomer" ).on( "submit", function( event ) {
-  
-  var nombre = $('#nameCustomer').val();
-  var celular = $('#phoneCustomer').val();
-  var pass = $('#passwordCustomer').val();
-  checkPhoneCostumers(celular);
-
-  var updatePassError = false;
-  if(pass !== ''){
-    if(pass.match(/[A-Z]/) && pass.length > 8){
-       updatePassError = false;
-    }else{
-      updatePassError = true;
-    }
-  }
 
   
-  if( nombre == '' || celular == '' ||checkNumberCustomers == true || pass == '' || updatePassError == true ){
-    event.preventDefault();
-    $showError = false;
-    if( nombre == '' ){
-      $('#nameCustomer').css('border','2px solid red');
-      $showError = true;
-    }else{
-       $('#nameCustomer').css('border','');
-    }
-    if( celular == '' ){
-      $showError = true;
-      $('#phoneCustomer').css('border','2px solid red');
-    }else{
-       $('#phoneCustomer').css('border','');
-    }
-    if( checkNumberCustomers == true ){
-      $('#error-phone').show();
-      $('#phoneCustomer').css('border','2px solid red');
-    }else{
-      $('#error-phone').hide();
-      $('#phoneCustomer').css('border','');
-    }
-    if( pass == '' ){
-      $showError = true;
-      $('#passwordCustomer').css('border','2px solid red');
-    }else{
-       $('#passwordCustomer').css('border','');
-    }
-
-    if( (updatePassError == true) ){
-      $('#passwordCustomer').css('border','2px solid red');
-      $('#error-passCharCustomer').show();
-    }else{
-       $('#passwordCustomer').css('border','');
-       $('#error-passCharCustomer').hide();
-    }
-    if ($showError){
-      $('#error-empty').show();
-    }else{
-      $('#error-empty').hide();
-    }
-  }else{
-    $('#error-empty').hide();
-    $('#error-phone').hide();
-    window.scrollTo(0, 0);
-    $('.close').click();
-    $('#customerCreated').show();
-        setInterval(function() {
-            $('#customerCreated').hide('2000');
-          }, 2000);
-        }  
-});
-
-$( "#editCustomer" ).on( "submit", function( event ) {
-  var id = $('#idEditCustomer').val();
-  var nombre = $('#nameEditCustomer').val();
-  var celular = $('#phoneEditCustomer').val();
-  var pass = $('#passwordEditCustomer').val();
-  var cita = $('#lastAppointmenEdit').val();
-  var updatePassError = false;
-  checkPhoneEdit(id,celular);
-  if(pass !== ''){
-    if(pass.match(/[A-Z]/) && pass.length > 8){
-       updatePassError = false;
-    }else{
-      updatePassError = true;
-    }
-  }
-
-  if( NumberEditExist == true || nombre == '' || celular == '' || updatePassError == true ){ 
-    event.preventDefault();
-    $showError = false;
-    if( nombre == '' ){
-      $('#nameEditCustomer').css('border','2px solid red');
-      $showError = true;
-    }else{
-       $('#nameEditCustomer').css('border','');
-    }
-    if( celular == '' ){
-      $showError = true;
-      $('#phoneEditCustomer').css('border','2px solid red');
-    }else{
-       $('#phoneEditCustomer').css('border','');
-    }
-
-    if( (updatePassError == true) ){
-      $('#passwordEditCustomer').css('border','2px solid red');
-      $('#error-passCharEditCustomer').show();
-    }else{
-       $('#passwordEditCustomer').css('border','');
-       $('#error-passCharEditCustomer').hide();
-    }
-    if( NumberEditExist == true ){
-      $('#error-phoneEditCustomer').show();
-      $('#phoneEditCustomer').css('border','2px solid red');
-    }else{
-      $('#error-phoneEditCustomer').hide();
-      $('#phoneEditCustomer').css('border','');
-    }
-    if ($showError){
-      $('#error-emptyEditCustomer').show();
-    }else{
-      $('#error-emptyEditCustomer').hide();
-    }
-  }else{
-    $('error-passCharEditCustomer').hide();
-    $('#error-phoneEditCustomer').hide();
-    window.scrollTo(0, 0);
-    $('.close').click();
-    $('#customerUpdated').show();
-        setInterval(function() {
-            $('#customerUpdated').hide('2000');
-          }, 2000);
-        }  
 });
 
 
@@ -377,6 +379,7 @@ $( "#editCustomer" ).on( "submit", function( event ) {
                     $('#statusEditCustomer').val(res["User"]["status"]);
                     $('#passwordEditEncryptCustomer').val(res["User"]["password"]);
                     $('#lastAppointmentEdit').val(res["Customer"]["last_appointment"]);
+                    window.scrollTo(0, document.body.scrollHeight);
                 }
 	});
     }
@@ -420,8 +423,9 @@ $( "#editCustomer" ).on( "submit", function( event ) {
                     boton += ' <a class="list-group-item list-group-item-action" id="edit_empty" data-toggle="list"  role="tab" style="color:black;">No existen clientes</a>'; 
                 }
                   $('#customersList').html(boton);
-                
+                  window.scrollTo(0, document.body.scrollHeight);
                 }
+               
 	});
     }
 

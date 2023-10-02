@@ -85,7 +85,7 @@ date_default_timezone_set('America/Costa_Rica');
                  if(!empty($_SESSION['User'])){ ?>
                  <div class="username"><a class="user-edit" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>|  <a href="logout" class="logout">Logout</a> </div>
                  <?php }else{ ?>
-                 <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
+                 <div class="username"> <!--<a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | --><a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
                  <?php } ?>
              </div>
          <?php if(!empty($_SESSION['User'])){ ?>
@@ -145,7 +145,7 @@ date_default_timezone_set('America/Costa_Rica');
             <input type="password" class="form-control" name="loginPass" id="loginPass"  placeholder="Password">
           </div>
             <div class="form-group text-right">                
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
+             <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>-->
               <button type="button" class="btn btn-primary" id="loginNumbers" onclick="login()">Login</button>
             </div>
             <div class="form-group" id="noerror-mail" style="display:none;">
@@ -154,9 +154,9 @@ date_default_timezone_set('America/Costa_Rica');
             <div class="form-group" id="login-error" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Usuario o contraseña invalidos.</b></span></label>
             </div>
-            <div class="form-group text-right">
+            <!--<div class="form-group text-right">
                 <small><a>¿Olvidó su contraseña?</a></small>
-            </div>
+            </div>-->
         </form>
       </div>
     </div>
@@ -255,8 +255,8 @@ date_default_timezone_set('America/Costa_Rica');
       <span class="tax">
                       <select class="form-control" onchange="filterReservations()" name="barber" id="barber">
                       <option value="0">Todos</option>
-                      <?php foreach( $users as $user ){?>
-                      <option value="<?php echo $user['User']['id'];?>"><?php echo $user['User']['name'];?></option>
+                      <?php foreach( $users as $barberUser ){?>
+                      <option value="<?php echo $barberUser['User']['id'];?>"><?php echo $barberUser['User']['name'];?></option>
                       <?php } ?>
                       </select>
       </span>             

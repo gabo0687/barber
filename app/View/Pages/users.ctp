@@ -33,7 +33,7 @@
             </div>
             <div class="form-group">
               <label for="accountInputEmail">Teléfono</label>
-              <input type="number" class="form-control" id="phoneAdd" name="phoneAdd" onchange="checkPhoneUsers(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
+              <input type="number" class="form-control" id="phoneAdd" name="phoneAdd" onkeyup="checkPhoneUsers(this.value)" aria-describedby="emailHelp" placeholder="Telefono">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Contraseña</label>
@@ -129,7 +129,7 @@
             </div>
             <div class="form-group">
               <label for="accountInputEmail">Telefono</label>
-              <input type="number" class="form-control" id="phoneEdit" name="phoneEdit" onchange="checkPhoneEdit(idEdit.value,this.value)" aria-describedby="emailHelp"  placeholder="Telefono">
+              <input type="number" class="form-control" id="phoneEdit" name="phoneEdit" onkeyup="checkPhoneEdit(idEdit.value,this.value)" aria-describedby="emailHelp"  placeholder="Telefono">
             </div>
             <div class="form-group">
               <label for="accountInputUser">Estado</label>

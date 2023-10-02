@@ -37,7 +37,7 @@ class PagesController extends AppController
 	 *
 	 * @var array
 	 */
-	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense', 'Role');
+	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense', 'Role', 'Sendpassword');
 	public $components = array('Encrypt');
 	/**
 	 * Displays a view
@@ -1226,6 +1226,13 @@ class PagesController extends AppController
 			$data['User']['creation_date'] = date('Y-m-d H:i:s');
 			if ($this->User->save($data)) {
 				$userId = $this->User->getLastInsertID();
+				if( isset($_POST['sendPassword']) ){
+					$this->Sendpassword->create();
+					$data['Sendpassword']['id_user'] = $userId;
+					$data['Sendpassword']['status_password'] = 0;
+					$data['Sendpassword']['creation_date'] = date('Y-m-d H:i:s');
+					$this->Sendpassword->save($data);
+				}
 				$last_appointment = $_POST['last_appointment'];
 				$this->Customer->create();
 				$datac['Customer']['user_id'] = $userId;
@@ -1257,6 +1264,16 @@ class PagesController extends AppController
 			}
 
 			if ($this->User->save($data)) {
+
+				if( isset($_POST['sendEditPassword']) ){
+					$this->Sendpassword->query('delete from sendpasswords where id_user='.$_POST['idEditCustomer']);
+					$this->Sendpassword->create();
+					$data['Sendpassword']['id_user'] = $_POST['idEditCustomer'];
+					$data['Sendpassword']['status_password'] = 0;
+					$data['Sendpassword']['creation_date'] = date('Y-m-d H:i:s');
+					$this->Sendpassword->save($data);
+				}
+
 				$this->Customer->user_id = $_POST['idEditCustomer'];
 				$idRegister = $_POST['idEditCustomerId'];
 				$this->Customer->id =$idRegister;
