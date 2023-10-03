@@ -156,6 +156,8 @@
 	
 	Router::connect('/products_edit', array('controller' => 'pages', 'action' =>  'products_edit'));
 	Router::connect('/check_barcode', array('controller' => 'pages', 'action' =>  'check_barcode'));
+	Router::connect('/searchProduct_barcode', array('controller' => 'pages', 'action' =>  'searchProduct_barcode'));
+	Router::connect('/sales_edit', array('controller' => 'pages', 'action' =>  'sales_edit'));
 	
 	
 
