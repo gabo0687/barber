@@ -853,7 +853,11 @@ class PagesController extends AppController
 		}
 		$data['Notification']['reservation_date'] = $reservationDate;
 		$data['Notification']['reservation_time'] = $_POST['reservationFilterTime'];
-		$data['Notification']['user_id'] = $_SESSION['User']['User']['id'];
+		if( $_POST['clientCurrent'] == '' ){
+			$data['Notification']['user_id'] = $_SESSION['User']['User']['id'];
+		}else{
+			$data['Notification']['user_id'] = $_POST['clientCurrent'];
+		}
 		$data['Notification']['notification_type'] = 2;
 		$data['Notification']['date_creation'] = date('Y-m-d H:i:s');
 		if ($this->Notification->save($data)) {

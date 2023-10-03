@@ -117,6 +117,7 @@ function checkBarCode(barcode){
         $('#error-codigo').show();
         window.scrollTo(0, document.body.scrollHeight);
        }else{
+        $('#error-codigo').hide();
         $('#countAdd').focus();
         html5QrcodeScanner.clear();
         $('#qr-reader').hide();

@@ -135,6 +135,22 @@
         display: none;
     }
 
+    .input-container {
+    position: relative;
+    width: 100%;
+}
+
+
+#clear-button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
 </style>  
 </head>
 <body>
@@ -196,10 +212,13 @@
                   
                 </div>
                
-               
+                  </br>
                 <span class="description">Cliente:</span>        
                 <span class="tax">
+                <div class="input-container">
                 <input type="text" id="reservation_client" name="reservation_client" class="form-control" placeholder="Escribe el nombre del cliente">
+                <span id="clear-button" class="hidden">×</span>
+                </div>
                 <ul id="dropdown-list" class="hidden">
                 <?php foreach( $clients as $client ){
                   $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
@@ -280,10 +299,32 @@
 function selectClient(client){
           $('#reservation_client').val(client);
           $('#dropdown-list').hide();
+          $('#reservation_client').attr('readonly','readonly');
         }
         
         const searchInput = document.getElementById("reservation_client");
         const dropdownList = document.getElementById("dropdown-list");
+
+        const inputField = document.getElementById("reservation_client");
+        const clearButton = document.getElementById("clear-button");
+
+
+        inputField.addEventListener("input", function () {
+            if (inputField.value.trim() !== "") {
+                clearButton.classList.remove("hidden");
+            } else {
+                clearButton.classList.add("hidden");
+            }
+        });
+
+        clearButton.addEventListener("click", function () {
+            inputField.value = "";
+            clearButton.classList.add("hidden");
+            $('#reservation_client').removeAttr('readonly');
+            dropdownList.classList.add("hidden");
+            $('#dropdown-list').removeAttr('style');
+            $('#reservation_client').focus();
+        });
 
         searchInput.addEventListener("input", function () {
             const filter = searchInput.value.toLowerCase();

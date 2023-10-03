@@ -39,6 +39,7 @@
     #client {
         width: 100%;
         padding: 10px;
+        
     }
 
     #dropdown-list {
@@ -65,6 +66,26 @@
     .hidden {
         display: none;
     }
+
+
+
+
+.input-container {
+    position: relative;
+    width: 100%;
+}
+
+
+#clear-button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
 
 </style>  
 <?php
@@ -268,14 +289,19 @@ date_default_timezone_set('America/Costa_Rica');
       
 
 
-
+        
 
 
         <?php 
         if( $user['User']['type'] == 1 || $user['User']['type'] == 2 ){ ?>  
           <span class="description">Cliente:</span>        
          <span class="tax">
-        <input type="text" id="client" name="client" class="form-control" placeholder="Escribe el nombre del cliente">
+
+         <div class="input-container">
+          <input type="text" id="client" name="client" class="form-control" placeholder="Escribe el nombre del cliente">
+          <span id="clear-button" class="hidden">×</span>
+        </div>
+
         <ul id="dropdown-list" class="hidden">
         <?php foreach( $clients as $client ){
           $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
@@ -285,7 +311,7 @@ date_default_timezone_set('America/Costa_Rica');
         </ul>
         </span>
         <?php } ?>
-            
+        
       <span id="clientError" style="display:none; color:red">Selecciona un cliente</br></span>
       <span id="clientFormatError" style="display:none; color:red">Debes seleccionar a un cliente de la lista</br></span>
       
@@ -347,12 +373,14 @@ date_default_timezone_set('America/Costa_Rica');
       <div id="notificaciones_check" style="display:none">
       </br>
       <span class="description" id="notificaciones_text"></span>
-      </br><button type="button" class="btn btn-success" onclick="saveNotification()"><a>Guardar Notificación</a> <span class="spinner-border-sm" id="loadingNotification"></span></button>
+      </br><button type="button" class="btn btn-success" onclick="saveNotification(<?php echo $_SESSION['User']['User']['type'];?>)"><a>Guardar Notificación</a> <span class="spinner-border-sm" id="loadingNotification"></span></button>
       </br>
       
       </br>
       </div>
       <span style="color:green; display:none" id="notificationMessage"><b>Notificación guardada exitosamente!</b></span>
+      <span id="notificationError" style="display:none; color:red">Debes seleccionar a un cliente de la lista para crear la notificación</br></span>
+      
       </br>
       <label id="ServiceText"></label>
           <ul class="ticket-list">  
@@ -366,13 +394,38 @@ date_default_timezone_set('America/Costa_Rica');
 </html>
 <script>
         
+        const inputField = document.getElementById("client");
+        const clearButton = document.getElementById("clear-button");
+
+        const searchInput = document.getElementById("client");
+        const dropdownList = document.getElementById("dropdown-list");
+
+        inputField.addEventListener("input", function () {
+            if (inputField.value.trim() !== "") {
+                clearButton.classList.remove("hidden");
+            } else {
+                clearButton.classList.add("hidden");
+            }
+        });
+
+        clearButton.addEventListener("click", function () {
+            inputField.value = "";
+            clearButton.classList.add("hidden");
+            $('#client').removeAttr('readonly');
+            dropdownList.classList.add("hidden");
+            $('#dropdown-list').removeAttr('style');
+            $('#client').focus();
+        });
+
+
         function selectClient(client){
           $('#client').val(client);
           $('#dropdown-list').hide();
+          $('#client').attr('readonly','readonly');
+          
         }
         
-        const searchInput = document.getElementById("client");
-        const dropdownList = document.getElementById("dropdown-list");
+        
 
         searchInput.addEventListener("input", function () {
             const filter = searchInput.value.toLowerCase();
@@ -488,28 +541,44 @@ function reservar(reservationNumber){
  }
 }
 
-function saveNotification(){
-  var reservationDate = $('#fecha_reserva').val();
-  var reservationFilterTime = $('#reservation_time').val();
-  $.ajax({
-                type: 'POST', 
-                url: 'save_notification', 
-                data: 'reservationDate='+reservationDate+'&reservationFilterTime='+reservationFilterTime,
-                beforeSend:function() {  
-                  $('#loadingNotification').addClass('spinner-border');
-                },
-                error: function(){
-                    
-                alert('No hay internet');    
-                },
-                success: function(notification) {
-                 
-             
-                  $('#loadingNotification').removeClass('spinner-border');
-                  $('#notificaciones_check').hide();
-                  $('#notificationMessage').show();  
-                }
-	});
+function saveNotification(UserType){
+  var clientCurrent = '';
+  var showError = false;
+  if( UserType == 1 || UserType == 2 ){
+    var CurrentUser = $('#client').val();
+    var reservaUser = CurrentUser.split('-');
+    clientCurrent = reservaUser[0]; 
+    if( CurrentUser == '' ){
+      showError = true;
+    }
+  }
+  if( !showError ){
+    $('#notificationError').hide();
+    var reservationDate = $('#fecha_reserva').val();
+    var reservationFilterTime = $('#reservation_time').val();
+    $.ajax({
+                  type: 'POST', 
+                  url: 'save_notification', 
+                  data: 'reservationDate='+reservationDate+'&reservationFilterTime='+reservationFilterTime+'&clientCurrent='+clientCurrent,
+                  beforeSend:function() {  
+                    $('#loadingNotification').addClass('spinner-border');
+                  },
+                  error: function(){
+                      
+                  alert('No hay internet');    
+                  },
+                  success: function(notification) {
+                  
+              
+                    $('#loadingNotification').removeClass('spinner-border');
+                    $('#notificaciones_check').hide();
+                    $('#notificationMessage').show();  
+                  }
+    });
+  }else{
+    $('#notificationError').show();
+  }
+  
 }
 
 function filterReservations(){
