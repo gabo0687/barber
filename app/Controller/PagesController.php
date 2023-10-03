@@ -623,7 +623,7 @@ class PagesController extends AppController
 	{
 
 		$barbers = $this->load_barbers();
-		$service = $this->load_service_reservation($reservationService);
+		$service = $this->load_service_reservation($reservationService,$filterBarber);
 		$reservationAvailable = array();
 		$reservationsResponse = array();
 		$reservationBarbers = array();
@@ -690,8 +690,9 @@ class PagesController extends AppController
 			$checkDayPass = $this->checkBlockDayPass($reservationDate, $timeList);
 			$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 			if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
+				
 				$reservationAvailable = array(
-					'Time' => $timeList, 'Service' => $service['Service']['service_name'], 'ServiceId' => $service['Service']['id'], 'Duration' => $service['Duration']['duration'], 'Price' => $service['Service']['price'],
+					'Time' => $timeList, 'Service' => $service['ServiceName'], 'ServiceId' => $service['ServiceId'], 'Duration' => $service['Duration'], 'Price' => $service['ServicePrice'],
 					'Barbers' => $reservationBarberResponse
 				);
 			}
@@ -716,7 +717,7 @@ class PagesController extends AppController
 				$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 				if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
 					$reservationAvailable = array(
-						'Time' => $timeList, 'Service' => $service['Service']['service_name'], 'ServiceId' => $service['Service']['id'], 'Duration' => $service['Duration']['duration'], 'Price' => $service['Service']['price'],
+						'Time' => $timeList, 'Service' => $service['ServiceName'], 'ServiceId' => $service['ServiceId'], 'Duration' => $service['Duration'], 'Price' => $service['ServicePrice'],
 						'Barbers' => $reservationBarberResponse
 					);
 				}
@@ -738,7 +739,7 @@ class PagesController extends AppController
 				$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 				if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
 					$reservationAvailable = array(
-						'Time' => $timeList, 'Service' => $service['Service']['service_name'], 'ServiceId' => $service['Service']['id'], 'Duration' => $service['Duration']['duration'], 'Price' => $service['Service']['price'],
+						'Time' => $timeList, 'Service' => $service['ServiceName'], 'ServiceId' => $service['ServiceId'], 'Duration' => $service['Duration'], 'Price' => $service['ServicePrice'],
 						'Barbers' => $reservationBarberResponse
 					);
 				}
@@ -746,13 +747,18 @@ class PagesController extends AppController
 		}
 		return $reservationAvailable;
 	}
+
 	public function validateBarberService($service, $barber)
 	{
-		$validateService = $this->Duration->find('first', array('conditions' => array('Duration.service_id' => $service, 'Duration.barber' => $barber)));
-
-		if ($validateService['Duration']['duration'] == '' || $validateService['Duration']['duration'] == '0') {
-			return false;
+		$service = explode(',',$service);
+		$validateServices = $this->Duration->find('all', array('conditions' => array('Duration.service_id' => $service, 'Duration.barber' => $barber),
+		'recursive' => 2));
+		foreach( $validateServices as $validateService ){
+			if ($validateService['Duration']['duration'] == '' || $validateService['Duration']['duration'] == '0') {
+				return false;
+			}
 		}
+		
 		return true;
 	}
 
@@ -821,26 +827,81 @@ class PagesController extends AppController
 		return $users;
 	}
 
-	public function load_service_reservation($idServicio)
+	public function load_service_reservation($idServicio,$filterBarber)
 	{
-		$service = $this->Service->find('first', array(
-			'fields' => array('Duration.id', 'Duration.duration', 'Duration.barber', 'Duration.service_id', 'Service.id', 'Service.service_name', 'Service.price', 'Service.gender'),
-			'conditions' => array('Service.id' => $idServicio),
-			'joins' =>
-			array(
-				array(
-					'table' => 'durations',
-					'alias' => 'Duration',
-					'type' => 'inner',
-					'foreignKey' => false,
-					'conditions' => array('Duration.service_id = Service.id')
-				)
-			),
+		$idServicio = explode(',',$idServicio);
+		$services = $this->Service->find('all', array(
+			'fields' => array( 'Service.id', 'Service.service_name', 'Service.price', 'Service.gender'),
+			'conditions' => array('Service.id ' => $idServicio),
 			'recursive' => 2
 		));
-		return $service;
+		$conditions = array();
+		if( $filterBarber != 0 ){
+			$conditions['Duration.barber'] = $filterBarber;
+		}
+		
+		$durations = $this->Duration->find('all',array(
+							'fields'=>array('Duration.id', 'Duration.duration', 'Duration.barber', 'Duration.service_id'),
+							'conditions'=>array('Duration.service_id'=>$idServicio,$conditions)
+							));
+		$durationResponse = array();
+		foreach( $durations as $duration ){
+			$durationArray = array(
+				'Id' => $duration['Duration']['id'], 'Duration' => $duration['Duration']['duration'], 'Barber' => $duration['Duration']['barber'],
+				'Service' => $duration['Duration']['service_id']
+			);
+			array_push($durationResponse, $durationArray);
+		}
+		$durationUniques = $this->unique_multidim_array($durationResponse,'Service');
+		
+			
+		$resultServicios = array();
+		$price = 0;
+		$serviceName = '';
+		foreach( $services as $service){
+			$price = $price + $service['Service']['price'];
+			$serviceName .= $service['Service']['service_name'].' / ';
+		}
+		$durationTime = 0;
+		foreach( $durationUniques as $durationUnique ){
+			$durationTime = $durationTime + $durationUnique["Duration"]; 
+		}
+
+		$arrayServiceDuration = array(
+			'ServiceId'=>$idServicio,'ServiceName'=>$serviceName,'ServicePrice'=>$price,'Duration'=>$durationTime
+		);
+		
+		return $arrayServiceDuration;
 	}
 
+
+	public function unique_multidim_array($array, $key) {
+
+		$temp_array = array();
+	
+		$i = 0;
+	
+		$key_array = array();
+	
+		
+	
+		foreach($array as $val) {
+	
+			if (!in_array($val[$key], $key_array)) {
+	
+				$key_array[$i] = $val[$key];
+	
+				$temp_array[$i] = $val;
+	
+			}
+	
+			$i++;
+	
+		}
+	
+		return $temp_array;
+	
+	}
 	public function save_notification()
 	{
 		$this->layout = 'ajax';
@@ -997,8 +1058,13 @@ class PagesController extends AppController
 	}
     
 	public function getServicePrice( $serviceId ){
-		$servicePrice = $this->Service->find('first',array('fields'=>array('Service.price'),'conditions'=>array('Service.id'=>$serviceId)));
-		return $servicePrice['Service']['price'];
+		$serviceId = explode(',',$serviceId);
+		$servicePrices = $this->Service->find('all',array('fields'=>array('Service.price'),'conditions'=>array('Service.id'=>$serviceId)));
+		$price = 0;
+		foreach( $servicePrices as $servicePrice ){
+			$price = $price + $servicePrice['Service']['price'];
+		}
+		return $price;
 	}
 
 

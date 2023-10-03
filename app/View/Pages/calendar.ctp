@@ -231,7 +231,7 @@
 
                 <span class="description"><b>Servicio:</b></span>
                 <span class="tax">
-                  <select class="form-control" name="services" id="services">
+                  <select class="form-control" name="services" id="services" multiple>
                     <?php foreach( $services as $service ){ ?>
                     <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
                     <?php } ?>

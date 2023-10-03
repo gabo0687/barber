@@ -319,7 +319,7 @@ date_default_timezone_set('America/Costa_Rica');
 
       <span class="description">Servicio:</span>
       <span class="tax">
-                      <select class="form-control" onchange="filterReservations()" name="services" id="services">
+                      <select class="form-control" onchange="filterReservations()" name="services" id="services" multiple>
                         <?php foreach( $services as $service ){ 
                           $serviceType = '';
                           if( $service['Service']['gender'] == 1 ){ $serviceType = 'Hombre'; }
