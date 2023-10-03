@@ -1,5 +1,5 @@
 <?php 
-    Class Sendpassword extends appModel{
+    Class Sendpassword extends AppModel{
         public $name = "Sendpassword";
     }
 ?>

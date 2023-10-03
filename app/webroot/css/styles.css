@@ -201,7 +201,28 @@ header {
     text-align: right;
 }
 
-
+.header-register{
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    padding: 1em;
+    background-color: var(--white-alpha);
+    box-shadow: var(--shadow);
+    width: 30%;
+}
+.header-register label{
+    display: flex;
+    width: 100%;
+}
+.header-register input{
+    flex-grow: 1;
+    height: 2em;
+    border: none;
+    box-sizing: border-box;
+    padding: 0 0.5em;
+}
 
 
 .home-text{

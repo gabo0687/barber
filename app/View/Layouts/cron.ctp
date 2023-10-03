@@ -353,7 +353,7 @@ function filterReservations(){
                             var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
                             reservationDate = day+' de '+meses[month-1];
                           }
-                          $('.ticket-list').html('<h2>No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h2>');  
+                          $('.ticket-list').html('<h4 style="text-align: center;">No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h4>');  
                         }
                       }
                   

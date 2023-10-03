@@ -1,5 +1,5 @@
 <?php 
-    Class Role extends appModel{
+    Class Role extends AppModel{
         public $name = "Role";
     }
 ?>

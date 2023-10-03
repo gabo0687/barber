@@ -2233,6 +2233,7 @@ class PagesController extends AppController
 		$barber_block = $_POST['barber_block'];
 		if ($_POST['barber_block'] != 0) {
 			$conditions['Reservation.reservation_barber'] = $barber_block;
+		}
 			$schedule_block = $_POST['schedule_block'];
 
 			switch ($schedule_block) {
@@ -2249,14 +2250,16 @@ class PagesController extends AppController
 					$conditions['Reservation.reservation_time >='] = date('H:i:s', strtotime('12:00:00'));
 					$conditions['Reservation.reservation_time <='] = date('H:i:s', strtotime('17:59:59'));
 					break;
-				case 2:
+				case 3:
 					$conditions['Reservation.reservation_time >='] = date('H:i:s', strtotime('18:00:00'));
 					$conditions['Reservation.reservation_time <='] = date('H:i:s', strtotime('23:59:59'));
 					break;
 			}
-		}
+		
 
-
+				
+	
+				
 		$date_block = $_POST['date_block'];
 		if ($date_block == '') {
 			$date_block = date('Y-m-d');
@@ -2264,10 +2267,12 @@ class PagesController extends AppController
 
 
 		$reservation = $this->Reservation->find('first', array('conditions' => array('Reservation.reservation_date' => $date_block, 'Reservation.reservation_status <>' => 2, $conditions)));
-
+		
+		
 		if (!empty($reservation)) {
 			$response = 'no';
 		}
+		
 		return $response;
 	}
 
@@ -2811,5 +2816,113 @@ class PagesController extends AppController
 			} 
 		}
 	}
+
+	/**
+	 * Run onces a day
+	 */
+
+	 public function notification_register(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+
+		$registers = $this->Sendpassword->find('all',array('fields'=>array('User.id,User.phone'),
+												   'conditions'=> array('Sendpassword.status_password'=>0),
+												    'joins' => array(
+																	array(
+																		'table' => 'users',
+																		'alias' => 'User',
+																		'type' => 'inner',
+																		'foreignKey' => false,
+																		'conditions'=> array('User.id = Sendpassword.id_user'),
+																		)
+																	)
+												   ));
+		
+		foreach( $registers as $register ){
+			
+			//$phone = $register["User"]["phone"];
+			$info = base64_encode($register["User"]["id"]);
+			$phone = '83481182';
+			$data = array();
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'change_password',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'button',
+													"index"=> "0",
+													"sub_type"=> "url",
+														'parameters'=> array(
+															array(
+															'type'=>'text',
+															'text'=> $info
+														)
+													)
+												),
+											)
+						)
+			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			var_dump($server_output);
+			curl_close($ch);
+			
+		}
+	}
+
+	public function register($idUser){
+		$this->layout = 'cron_register';
+		//http://localhost/barberia/barber/register/NDY=
+		$userId = base64_encode($idUser);
+		$this->set('userId',$userId);
+	}
 	
+	public function save_password(){
+		$this->layout = 'cron_register';
+		$this->autoRender = false;
+		if ($this->request->is('post')) {
+			//Initialize
+			
+			$userId = base64_decode(base64_decode($_POST['idUser']));
+			$userContrasena = $_POST['passwordregister'];
+			//Save user
+			$this->User->id = $userId;
+			if ($userContrasena != '') {
+				$pass = $this->Encrypt->encrypt($userContrasena);
+				$data['User']['password'] = $pass;
+			}
+
+			if ($this->User->save($data)) {
+				sleep(5);
+				$this->redirect(array('action' => '../'));
+			} 
+		}
+	}
 }
