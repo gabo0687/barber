@@ -94,8 +94,7 @@ class PagesController extends AppController
 			$conditions['Reservation.reservation_date >='] = date('Y-m-d');
 			
 			$reservations = $this->Reservation->find('all',array('fields'=>
-																		array('Reservation.id','Reservation.reservation_bill','Reservation.payment_type','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
-																			  'Service.id','Service.service_name','Service.price',
+																		array('Reservation.id','Reservation.reservation_bill','Reservation.reservation_service','Reservation.reservation_price','Reservation.payment_type','Reservation.reservation_status','Reservation.reservation_date','Reservation.reservation_time',
 																			  'Barber.id','Barber.name','Barber.color',
 																			  'User.id','User.name','User.phone',
 																			  ),
@@ -103,13 +102,6 @@ class PagesController extends AppController
 																		array($conditions),
 																 'joins' =>
 																 array(
-																	 array(
-																		 'table' => 'services',
-																		 'alias' => 'Service',
-																		 'type' => 'inner',
-																		 'foreignKey' => false,
-																		 'conditions'=> array('Service.id = Reservation.reservation_service'),
-																	 ),
 																	 array(
 																		'table' => 'users',
 																		'alias' => 'Barber',
@@ -128,8 +120,21 @@ class PagesController extends AppController
 																 'order'=>array('Reservation.reservation_date'=>'ASC','Reservation.reservation_time'=>'ASC')
 																));
 		foreach( $reservations as $reservation ){
-			$duration = $this->Duration->find('first',array('fields'=>array('Duration.id','Duration.duration'),'conditions'=>array('Duration.barber'=>$reservation['Barber']['id'],'Duration.service_id'=>$reservation['Service']['id'])));
+			$servicesIds = explode(',',$reservation['Reservation']['reservation_service']);
+			$timeDurations = $this->Duration->find('all',array('fields'=>array('Duration.duration'),'conditions'=>array('Duration.barber'=>$reservation['Barber']['id'],'Duration.service_id'=>$servicesIds)));
+			$duration = 0;
+			foreach( $timeDurations as $timeDuration ){
+				$duration = $duration + $timeDuration['Duration']['duration'];
+			}
 			array_push($reservation,$duration);
+			$serviceNames = $this->Service->find('all',array('fields'=>array('Service.service_name'),'conditions'=>array('Service.id'=>$servicesIds)));
+			$nameService = '';
+			foreach( $serviceNames as $serviceName ){
+				$nameService .= $serviceName['Service']['service_name'].'/';
+			}
+
+			array_push($reservation, $nameService);
+
 			array_push($reservationResponse,$reservation);
 		}
 	
@@ -842,7 +847,7 @@ class PagesController extends AppController
 		
 		$durations = $this->Duration->find('all',array(
 							'fields'=>array('Duration.id', 'Duration.duration', 'Duration.barber', 'Duration.service_id'),
-							'conditions'=>array('Duration.service_id'=>$idServicio,$conditions)
+							'conditions'=>array('Duration.service_id'=>$idServicio,'Duration.duration <>'=>0,$conditions)
 							));
 		$durationResponse = array();
 		foreach( $durations as $duration ){
@@ -1083,19 +1088,27 @@ class PagesController extends AppController
 		
 		
 		foreach ($reservations as $reservation) {
+			
 			$reservationId = $reservation['Reservation']['id'];
 			$reservationdate = $reservation['Reservation']['reservation_date'];
 			$reservationtimeStart = $reservation['Reservation']['reservation_time'];
 
 			$time = date('H:i:s', strtotime($reservationtimeStart));
-			$duration = $reservation[0]['Duration']['duration'];
+			$duration = $reservation[0];
 			$duration = strval($duration);
 			$sumarTime = strtotime('+' . $duration . ' minute', strtotime($time));
 			$reservationtimeEnd = date('H:i:s', $sumarTime);
 
 			$userId = $reservation['User']['id'];
 			$userName = $reservation['User']['name'];
-			$service = $reservation['Service']['service_name'];
+			
+			$servicesIds = $reservation['Reservation']['reservation_service'];
+			$serviceNames = $this->Service->find('all',array('fields'=>array('Service.service_name'),'conditions'=>array('Service.id'=>$servicesIds)));
+			$service = '';
+			foreach( $serviceNames as $serviceName ){
+				$service .= $serviceName['Service']['service_name'].'/';
+			}
+			
 			$barberName = $reservation['Barber']['name'];
 			$barbercolor = $reservation['Barber']['color'];
 
@@ -1126,14 +1139,21 @@ class PagesController extends AppController
 			$reservationtimeStart = $reservation['Reservation']['reservation_time'];
 
 			$time = date('H:i:s', strtotime($reservationtimeStart));
-			$duration = $reservation[0]['Duration']['duration'];
+			$duration = $reservation[0];
 			$duration = strval($duration);
 			$sumarTime = strtotime('+' . $duration . ' minute', strtotime($time));
 			$reservationtimeEnd = date('H:i:s', $sumarTime);
 
 			$userId = $reservation['User']['id'];
 			$userName = $reservation['User']['name'];
-			$service = $reservation['Service']['service_name'];
+
+
+			$servicesIds = $reservation['Reservation']['reservation_service'];
+			$serviceNames = $this->Service->find('all',array('fields'=>array('Service.service_name'),'conditions'=>array('Service.id'=>$servicesIds)));
+			$service = '';
+			foreach( $serviceNames as $serviceName ){
+				$service .= $serviceName['Service']['service_name'].'/';
+			}
 			$barberName = $reservation['Barber']['name'];
 			$barbercolor = $reservation['Barber']['color'];
 
@@ -1164,7 +1184,7 @@ class PagesController extends AppController
 		$reservations = $this->Reservation->find('all', array(
 			'fields' =>
 			array(
-				'Reservation.id', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
+				'Reservation.id','Reservation.reservation_service', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
 				'Service.id', 'Service.service_name', 'Service.price',
 				'Barber.id', 'Barber.name', 'Barber.color',
 				'User.id', 'User.name', 'User.phone',
@@ -1199,7 +1219,13 @@ class PagesController extends AppController
 		));
 		$reservationResponse = array();
 		foreach ($reservations as $reservation) {
-			$duration = $this->Duration->find('first', array('fields' => array('Duration.id', 'Duration.duration'), 'conditions' => array('Duration.barber' => $reservation['Barber']['id'], 'Duration.service_id' => $reservation['Service']['id'])));
+			$servicesIds = explode(',',$reservation['Reservation']['reservation_service']);
+			$timeDurations = $this->Duration->find('all', array('fields' => array('Duration.duration'), 'conditions' => array('Duration.barber' => $reservation['Barber']['id'], 'Duration.service_id' => $servicesIds)));
+			$duration = 0;
+			foreach( $timeDurations as $timeDuration ){
+				$duration = $duration + $timeDuration['Duration']['duration'];
+			}
+			
 			array_push($reservation, $duration);
 			array_push($reservationResponse, $reservation);
 		}
@@ -1653,21 +1679,13 @@ class PagesController extends AppController
 		$reservation = $this->Reservation->find('first', array(
 			'fields' =>
 			array(
-				'Reservation.id', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
-				'Service.id', 'Service.service_name', 'Service.price',
+				'Reservation.id', 'Reservation.reservation_status','Reservation.reservation_service', 'Reservation.reservation_price', 'Reservation.reservation_date', 'Reservation.reservation_time',
 				'Barber.id', 'Barber.name', 'Barber.color',
 			),
 			'conditions' =>
 			array($conditions),
 			'joins' =>
 			array(
-				array(
-					'table' => 'services',
-					'alias' => 'Service',
-					'type' => 'inner',
-					'foreignKey' => false,
-					'conditions' => array('Service.id = Reservation.reservation_service'),
-				),
 				array(
 					'table' => 'users',
 					'alias' => 'Barber',
@@ -1677,6 +1695,16 @@ class PagesController extends AppController
 				)
 			)
 		));
+		$reservationLoad = array();
+			$servicesIds = explode(',',$reservation['Reservation']['reservation_service']);
+			$serviceNames = $this->Service->find('all',array('fields'=>array('Service.service_name'),'conditions'=>array('Service.id'=>$servicesIds)));
+			$service = '';
+			foreach( $serviceNames as $serviceName ){
+				$service .= $serviceName['Service']['service_name'].'/';
+			}
+			array_push($reservation,$service);
+		
+
 		$reservation = mb_convert_encoding($reservation, 'UTF-8', 'UTF-8');
 		echo json_encode($reservation);
 	}
@@ -1703,8 +1731,7 @@ class PagesController extends AppController
 		$reservations = $this->Reservation->find('all', array(
 			'fields' =>
 			array(
-				'Reservation.id','Reservation.payment_type','Reservation.reservation_bill', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
-				'Service.id', 'Service.service_name', 'Service.price',
+				'Reservation.id','Reservation.reservation_service','Reservation.reservation_price','Reservation.payment_type','Reservation.reservation_bill', 'Reservation.reservation_status', 'Reservation.reservation_date', 'Reservation.reservation_time',
 				'Barber.id', 'Barber.name', 'Barber.color',
 				'User.id', 'User.name', 'User.phone',
 			),
@@ -1712,13 +1739,6 @@ class PagesController extends AppController
 			array($conditions),
 			'joins' =>
 			array(
-				array(
-					'table' => 'services',
-					'alias' => 'Service',
-					'type' => 'inner',
-					'foreignKey' => false,
-					'conditions' => array('Service.id = Reservation.reservation_service'),
-				),
 				array(
 					'table' => 'users',
 					'alias' => 'Barber',
@@ -1738,10 +1758,22 @@ class PagesController extends AppController
 		));
 		$reservationResponse = array();
 		foreach ($reservations as $reservationFirst) {
-			$duration = $this->Duration->find('first', array('fields' => array('Duration.id', 'Duration.duration'), 'conditions' => array('Duration.barber' => $reservationFirst['Barber']['id'], 'Duration.service_id' => $reservationFirst['Service']['id'])));
-
+			$servicesIds = explode(',',$reservationFirst['Reservation']['reservation_service']);
+			$timeDurations = $this->Duration->find('all', array('fields' => array('Duration.duration'), 'conditions' => array('Duration.barber' => $reservationFirst['Barber']['id'], 'Duration.service_id' => $servicesIds)));
+			$duration = 0;
+			foreach( $timeDurations as $timeDuration ){
+				$duration = $duration + $timeDuration['Duration']['duration'];
+			}
 
 			array_push($reservationFirst, $duration);
+
+			$serviceNames = $this->Service->find('all',array('fields'=>array('Service.service_name'),'conditions'=>array('Service.id'=>$servicesIds)));
+			$nameService = '';
+			foreach( $serviceNames as $serviceName ){
+				$nameService .= $serviceName['Service']['service_name'].'/';
+			}
+
+			array_push($reservationFirst, $nameService);
 
 			array_push($reservationResponse, $reservationFirst);
 		}
@@ -1766,19 +1798,19 @@ class PagesController extends AppController
                 			  <li>
                     		  <span class="event-list-item-content">
                     		  <div class="event-list-info">
-                        	  <h3>'.$reservation['Service']['service_name'].'</h3>
+                        	  <h3>'.$reservation[1].'</h3>
                         	  <p>Fecha : '.$dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year.'</p>
                         	  <p>Hora : '.$reservation['Reservation']['reservation_time'].'</p>
                         	  <p>Barbero : '.$reservation['Barber']['name'].'</p>
                         	  <p>Cliente : '.$reservation['User']['name'].'<a taget="_blank" href="https://api.whatsapp.com/send?phone=506'.$reservation['User']['phone'].'&text=Hola '.$reservation['User']['name'].'!
 							   💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
-                        	  <p>Tiempo : '.$reservation[0]['Duration']['duration'].' minutos</p>
+                        	  <p>Tiempo : '.$reservation[0].' minutos</p>
                         	  <p>Estatus de la cita :';
 							  if( $reservation['Reservation']['reservation_status'] == 0 ){ $response .= 'Sin Confirmar'; }
 							  if( $reservation['Reservation']['reservation_status'] == 1 ){ $response .= 'Confirmada'; }
 							  if( $reservation['Reservation']['reservation_status'] == 2 ){ $response .= '<b class="blink_me">CANCELADA</b>'; }
 							  $response .= '</p>
-                        	  <p>Precio : ₡'.number_format($reservation['Service']['price']).'</p>';
+                        	  <p>Precio : ₡'.number_format($reservation['Reservation']['reservation_price']).'</p>';
 							 if( $reservation['Reservation']['reservation_status'] == 1 && $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  && $reservation['Reservation']['reservation_status'] != 2 ){    
 							  $response .= '<p>Selecciona el tipo de pago:</p>  
                     		  <select onchange="tipopago(this.value)" class="form-control" name="tipoPago'.$reservation['Reservation']['id'].'" id="tipoPago'.$reservation['Reservation']['id'].'">

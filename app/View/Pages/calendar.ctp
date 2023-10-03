@@ -422,10 +422,7 @@ var calendar = '';
           
           
           $('#calendarModal').modal("show");
-          //alert(arg.event.groupId);
-          /*if (confirm('Are you sure you want to delete this event?')) {
-            arg.event.remove()
-          }*/
+         
         },
         editable: false,
         dayMaxEvents: true, // allow "more" link when too many events
@@ -505,10 +502,10 @@ var calendar = '';
             success: function(reservation) {
               const res = JSON.parse(reservation);
               
-              $('#appointmentService').html(res.Service.service_name);
+              $('#appointmentService').html(res[0]);
               $('#barberoAppointment').val(res.Barber.id);
               $('#appointmentTime').html(res.Reservation.reservation_time);
-              $('#appointmentPrice').html(res.Service.price);
+              $('#appointmentPrice').html(res.Reservation.reservation_price);
             }
 	        });
   }
