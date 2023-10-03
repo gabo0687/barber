@@ -100,20 +100,25 @@ date_default_timezone_set('America/Costa_Rica');
         <h4 class="alert-heading">Usuario actualizado! </h4>
         <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
         <hr>
-      </div>
+    </div>
     <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
         <h4 class="alert-heading">Usuario creado! </h4>
         <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
         <hr>
-      </div>
-      <div style="display:none;" id="productCreated" class="alert alert-success alert-dismissible fade show" role="alert">
+    </div>
+    <div style="display:none;" id="saleDone" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Venta realizada con exito! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+        <br>
+    </div>
+    <div style="display:none;" id="productCreated" class="alert alert-success alert-dismissible fade show" role="alert">
             <h4 class="alert-heading">Producto creado! </h4>
             <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
           </div>
           <div style="display:none;" id="productUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
       <h4 class="alert-heading">Producto actualizado! </h4>
       <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
-      <hr>
+      <br>
     </div>
     <div style="display:none;" id="expenseCreated" class="alert alert-success alert-dismissible fade show" role="alert">
         <h4 class="alert-heading">Gasto creado! </h4>
