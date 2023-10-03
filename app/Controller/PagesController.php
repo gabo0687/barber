@@ -37,7 +37,7 @@ class PagesController extends AppController
 	 *
 	 * @var array
 	 */
-	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense');
+	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense', 'Role', 'Sendpassword');
 	public $components = array('Encrypt');
 	/**
 	 * Displays a view
@@ -145,7 +145,7 @@ class PagesController extends AppController
 	public function account()
 	{
 
-		$this->checksession();
+		$this->checksession(1);
 		if ($this->request->is('post')) {
 
 			$blockDate = $_POST['date_block'];
@@ -173,8 +173,15 @@ class PagesController extends AppController
 		);
 		$this->set('barbers', $barbers);
 
+
+
 		$user = $_SESSION['User'];
+		
+		$currentUser = $this->User->find('first',array('conditions'=>array('User.id'=>$user['User']['id'])));
+
+		$this->set('currentUser', $currentUser);
 		$this->set('type', $user['User']['type']);
+		
 		$current_date = date('Y-m-d');
 		$blockReservations = $this->Block->find('all', array('conditions' => array('Block.block_date >= ' => $current_date)));
 		$blockResult = array();
@@ -213,7 +220,7 @@ class PagesController extends AppController
 	}
 	public function services()
 	{
-		$this->checksession();
+		$this->checksession(3);
 		$user = '';
 		$services = $this->Service->find('all');
 		$this->set('services', $services);
@@ -243,10 +250,11 @@ class PagesController extends AppController
 		
 
 		$register = $this->User->find('first', array('conditions' => array('User.phone' => $user, 'User.password' => $pass, 'User.status' => 1)));
-
+		
 		if (isset($register['User']['id'])) {
-
+			$roles = $this->Role->find('all',array('conditions'=>array('Role.id_user'=>$register['User']['id'])));
 			$_SESSION['User'] = $register;
+			$_SESSION['Role'] = $roles;
 			echo 1;
 		} else {
 			echo 0;
@@ -309,7 +317,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
-
+		$servicio = mb_convert_encoding($servicio, 'UTF-8', 'UTF-8');
 		echo json_encode($servicio);
 	}
 
@@ -462,7 +470,7 @@ class PagesController extends AppController
 		));
 
 		$reservationsAvailable = $this->load_reservation_available($reservations, $reservationServices, $reservationBarber, $reservationTime, $reservationDate);
-
+		$reservationsAvailable = mb_convert_encoding($reservationsAvailable, 'UTF-8', 'UTF-8');
 		echo json_encode($reservationsAvailable);
 	}
 
@@ -615,7 +623,7 @@ class PagesController extends AppController
 	{
 
 		$barbers = $this->load_barbers();
-		$service = $this->load_service_reservation($reservationService);
+		$service = $this->load_service_reservation($reservationService,$filterBarber);
 		$reservationAvailable = array();
 		$reservationsResponse = array();
 		$reservationBarbers = array();
@@ -682,8 +690,9 @@ class PagesController extends AppController
 			$checkDayPass = $this->checkBlockDayPass($reservationDate, $timeList);
 			$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 			if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
+				
 				$reservationAvailable = array(
-					'Time' => $timeList, 'Service' => $service['Service']['service_name'], 'ServiceId' => $service['Service']['id'], 'Duration' => $service['Duration']['duration'], 'Price' => $service['Service']['price'],
+					'Time' => $timeList, 'Service' => $service['ServiceName'], 'ServiceId' => $service['ServiceId'], 'Duration' => $service['Duration'], 'Price' => $service['ServicePrice'],
 					'Barbers' => $reservationBarberResponse
 				);
 			}
@@ -708,7 +717,7 @@ class PagesController extends AppController
 				$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 				if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
 					$reservationAvailable = array(
-						'Time' => $timeList, 'Service' => $service['Service']['service_name'], 'ServiceId' => $service['Service']['id'], 'Duration' => $service['Duration']['duration'], 'Price' => $service['Service']['price'],
+						'Time' => $timeList, 'Service' => $service['ServiceName'], 'ServiceId' => $service['ServiceId'], 'Duration' => $service['Duration'], 'Price' => $service['ServicePrice'],
 						'Barbers' => $reservationBarberResponse
 					);
 				}
@@ -730,7 +739,7 @@ class PagesController extends AppController
 				$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 				if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
 					$reservationAvailable = array(
-						'Time' => $timeList, 'Service' => $service['Service']['service_name'], 'ServiceId' => $service['Service']['id'], 'Duration' => $service['Duration']['duration'], 'Price' => $service['Service']['price'],
+						'Time' => $timeList, 'Service' => $service['ServiceName'], 'ServiceId' => $service['ServiceId'], 'Duration' => $service['Duration'], 'Price' => $service['ServicePrice'],
 						'Barbers' => $reservationBarberResponse
 					);
 				}
@@ -738,13 +747,18 @@ class PagesController extends AppController
 		}
 		return $reservationAvailable;
 	}
+
 	public function validateBarberService($service, $barber)
 	{
-		$validateService = $this->Duration->find('first', array('conditions' => array('Duration.service_id' => $service, 'Duration.barber' => $barber)));
-
-		if ($validateService['Duration']['duration'] == '' || $validateService['Duration']['duration'] == '0') {
-			return false;
+		$service = explode(',',$service);
+		$validateServices = $this->Duration->find('all', array('conditions' => array('Duration.service_id' => $service, 'Duration.barber' => $barber),
+		'recursive' => 2));
+		foreach( $validateServices as $validateService ){
+			if ($validateService['Duration']['duration'] == '' || $validateService['Duration']['duration'] == '0') {
+				return false;
+			}
 		}
+		
 		return true;
 	}
 
@@ -813,26 +827,81 @@ class PagesController extends AppController
 		return $users;
 	}
 
-	public function load_service_reservation($idServicio)
+	public function load_service_reservation($idServicio,$filterBarber)
 	{
-		$service = $this->Service->find('first', array(
-			'fields' => array('Duration.id', 'Duration.duration', 'Duration.barber', 'Duration.service_id', 'Service.id', 'Service.service_name', 'Service.price', 'Service.gender'),
-			'conditions' => array('Service.id' => $idServicio),
-			'joins' =>
-			array(
-				array(
-					'table' => 'durations',
-					'alias' => 'Duration',
-					'type' => 'inner',
-					'foreignKey' => false,
-					'conditions' => array('Duration.service_id = Service.id')
-				)
-			),
+		$idServicio = explode(',',$idServicio);
+		$services = $this->Service->find('all', array(
+			'fields' => array( 'Service.id', 'Service.service_name', 'Service.price', 'Service.gender'),
+			'conditions' => array('Service.id ' => $idServicio),
 			'recursive' => 2
 		));
-		return $service;
+		$conditions = array();
+		if( $filterBarber != 0 ){
+			$conditions['Duration.barber'] = $filterBarber;
+		}
+		
+		$durations = $this->Duration->find('all',array(
+							'fields'=>array('Duration.id', 'Duration.duration', 'Duration.barber', 'Duration.service_id'),
+							'conditions'=>array('Duration.service_id'=>$idServicio,$conditions)
+							));
+		$durationResponse = array();
+		foreach( $durations as $duration ){
+			$durationArray = array(
+				'Id' => $duration['Duration']['id'], 'Duration' => $duration['Duration']['duration'], 'Barber' => $duration['Duration']['barber'],
+				'Service' => $duration['Duration']['service_id']
+			);
+			array_push($durationResponse, $durationArray);
+		}
+		$durationUniques = $this->unique_multidim_array($durationResponse,'Service');
+		
+			
+		$resultServicios = array();
+		$price = 0;
+		$serviceName = '';
+		foreach( $services as $service){
+			$price = $price + $service['Service']['price'];
+			$serviceName .= $service['Service']['service_name'].' / ';
+		}
+		$durationTime = 0;
+		foreach( $durationUniques as $durationUnique ){
+			$durationTime = $durationTime + $durationUnique["Duration"]; 
+		}
+
+		$arrayServiceDuration = array(
+			'ServiceId'=>$idServicio,'ServiceName'=>$serviceName,'ServicePrice'=>$price,'Duration'=>$durationTime
+		);
+		
+		return $arrayServiceDuration;
 	}
 
+
+	public function unique_multidim_array($array, $key) {
+
+		$temp_array = array();
+	
+		$i = 0;
+	
+		$key_array = array();
+	
+		
+	
+		foreach($array as $val) {
+	
+			if (!in_array($val[$key], $key_array)) {
+	
+				$key_array[$i] = $val[$key];
+	
+				$temp_array[$i] = $val;
+	
+			}
+	
+			$i++;
+	
+		}
+	
+		return $temp_array;
+	
+	}
 	public function save_notification()
 	{
 		$this->layout = 'ajax';
@@ -845,7 +914,11 @@ class PagesController extends AppController
 		}
 		$data['Notification']['reservation_date'] = $reservationDate;
 		$data['Notification']['reservation_time'] = $_POST['reservationFilterTime'];
-		$data['Notification']['user_id'] = $_SESSION['User']['User']['id'];
+		if( $_POST['clientCurrent'] == '' ){
+			$data['Notification']['user_id'] = $_SESSION['User']['User']['id'];
+		}else{
+			$data['Notification']['user_id'] = $_POST['clientCurrent'];
+		}
 		$data['Notification']['notification_type'] = 2;
 		$data['Notification']['date_creation'] = date('Y-m-d H:i:s');
 		if ($this->Notification->save($data)) {
@@ -985,8 +1058,13 @@ class PagesController extends AppController
 	}
     
 	public function getServicePrice( $serviceId ){
-		$servicePrice = $this->Service->find('first',array('fields'=>array('Service.price'),'conditions'=>array('Service.id'=>$serviceId)));
-		return $servicePrice['Service']['price'];
+		$serviceId = explode(',',$serviceId);
+		$servicePrices = $this->Service->find('all',array('fields'=>array('Service.price'),'conditions'=>array('Service.id'=>$serviceId)));
+		$price = 0;
+		foreach( $servicePrices as $servicePrice ){
+			$price = $price + $servicePrice['Service']['price'];
+		}
+		return $price;
 	}
 
 
@@ -996,11 +1074,14 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		$events = array();
 		$reservations = Cache::read('reservationResponse' . $_SESSION['User']['User']['id']);
+
 		if (!$reservations) {
 
 			$this->reservations();
 			$reservations = Cache::read('reservationResponse' . $_SESSION['User']['User']['id']);
 		}
+		
+		
 		foreach ($reservations as $reservation) {
 			$reservationId = $reservation['Reservation']['id'];
 			$reservationdate = $reservation['Reservation']['reservation_date'];
@@ -1021,14 +1102,18 @@ class PagesController extends AppController
 			$event = array('groupId' => $reservationId, 'id' => $service, 'title' => $userName, 'start' => $reservationdate . 'T' . $reservationtimeStart, 'end' => $reservationdate . 'T' . $reservationtimeEnd, 'color' => $barbercolor);
 			array_push($events, $event);
 		}
+		$events = mb_convert_encoding($events, 'UTF-8', 'UTF-8');
 		echo json_encode($events);
+		
+		
 	}
+	
 	public function calendar()
 	{
 
 		$this->layout = 'ajax';
 		$events = array();
-		$this->checksession();
+		$this->checksession(2);
 		$reservations = Cache::read('reservationResponse' . $_SESSION['User']['User']['id']);
 		if (!$reservations) {
 
@@ -1118,12 +1203,12 @@ class PagesController extends AppController
 			array_push($reservation, $duration);
 			array_push($reservationResponse, $reservation);
 		}
-
+		
 		Cache::write('reservationResponse' . $_SESSION['User']['User']['id'], $reservationResponse);
 	}
 	public function customers()
 	{
-		$this->checksession();
+		$this->checksession(4);
 	}
 
 
@@ -1148,7 +1233,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
-
+		$customer = mb_convert_encoding($customer, 'UTF-8', 'UTF-8');
 		echo json_encode($customer);
 	}
 
@@ -1175,6 +1260,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
+		$customer = mb_convert_encoding($customer, 'UTF-8', 'UTF-8');
 		echo json_encode($customer);
 	}
 
@@ -1198,6 +1284,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
+		$customer = mb_convert_encoding($customer, 'UTF-8', 'UTF-8');
 		echo json_encode($customer);
 	}
 
@@ -1216,6 +1303,13 @@ class PagesController extends AppController
 			$data['User']['creation_date'] = date('Y-m-d H:i:s');
 			if ($this->User->save($data)) {
 				$userId = $this->User->getLastInsertID();
+				if( isset($_POST['sendPassword']) ){
+					$this->Sendpassword->create();
+					$data['Sendpassword']['id_user'] = $userId;
+					$data['Sendpassword']['status_password'] = 0;
+					$data['Sendpassword']['creation_date'] = date('Y-m-d H:i:s');
+					$this->Sendpassword->save($data);
+				}
 				$last_appointment = $_POST['last_appointment'];
 				$this->Customer->create();
 				$datac['Customer']['user_id'] = $userId;
@@ -1247,6 +1341,16 @@ class PagesController extends AppController
 			}
 
 			if ($this->User->save($data)) {
+
+				if( isset($_POST['sendEditPassword']) ){
+					$this->Sendpassword->query('delete from sendpasswords where id_user='.$_POST['idEditCustomer']);
+					$this->Sendpassword->create();
+					$data['Sendpassword']['id_user'] = $_POST['idEditCustomer'];
+					$data['Sendpassword']['status_password'] = 0;
+					$data['Sendpassword']['creation_date'] = date('Y-m-d H:i:s');
+					$this->Sendpassword->save($data);
+				}
+
 				$this->Customer->user_id = $_POST['idEditCustomer'];
 				$idRegister = $_POST['idEditCustomerId'];
 				$this->Customer->id =$idRegister;
@@ -1263,6 +1367,7 @@ class PagesController extends AppController
 
 	public function users()
 	{
+		$this->checksession(10);
 	}
 
 
@@ -1304,11 +1409,12 @@ class PagesController extends AppController
 			)),
 			'recursive' => 2
 		));
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
 	public function edit_user()
-	{
+	{  
 		$this->autoRender = false;
 		$this->layout = 'ajax';
 		$searchUser = $_POST['idUser'];
@@ -1317,6 +1423,9 @@ class PagesController extends AppController
 			'conditions' => array('User.id' => $searchUser),
 			'recursive' => 2
 		));
+		$roles = $this->Role->find('all',array('fields' => array('Role.id_module'),'conditions'=>array('Role.id_user'=>$searchUser)));
+		array_push($user,$roles);
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -1327,6 +1436,7 @@ class PagesController extends AppController
 		$service = $this->Service->find('all', array(
 			'fields' => array('Service.id', 'Service.service_name')
 		));
+		$service = mb_convert_encoding($service, 'UTF-8', 'UTF-8');
 		echo json_encode($service);
 	}
 
@@ -1350,6 +1460,7 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
+		$duration = mb_convert_encoding($duration, 'UTF-8', 'UTF-8');
 		echo json_encode($duration);
 	}
 
@@ -1371,6 +1482,16 @@ class PagesController extends AppController
 					'fields' => array('Service.id')
 				));
 				$barberId = $this->User->getLastInsertID();
+				for( $i=1; $i<=9; $i++){
+					if( isset($_POST['role'.$i]) ){
+						$this->Role->create();
+						$dataRole['Role']['id_user'] = $barberId;
+						$dataRole['Role']['id_module'] = $i;
+						$dataRole['Role']['creation_date'] = date('Y-m-d');
+						$this->Role->save($dataRole);
+					}
+				}
+
 				foreach ($services as $service) {
 					$this->Duration->create();
 					if (empty($_POST['inputService_' . $service['Service']['id']])) {
@@ -1409,6 +1530,19 @@ class PagesController extends AppController
 			}
 
 			if ($this->User->save($data)) {
+				$barberId = $_POST['idEdit'];
+				$this->Role->query('delete from roles where id_user='.$barberId);
+				for( $i=1; $i<=9; $i++){
+					if( isset($_POST['roleEdit'.$i]) ){
+						
+						$this->Role->create();
+						$dataRole['Role']['id_user'] = $barberId;
+						$dataRole['Role']['id_module'] = $i;
+						$dataRole['Role']['creation_date'] = date('Y-m-d');
+						$this->Role->save($dataRole);
+					}
+				}
+
 				$services = $this->Service->find('all', array(
 					'fields' => array('Service.id')
 				));
@@ -1543,6 +1677,7 @@ class PagesController extends AppController
 				)
 			)
 		));
+		$reservation = mb_convert_encoding($reservation, 'UTF-8', 'UTF-8');
 		echo json_encode($reservation);
 	}
 
@@ -1771,6 +1906,7 @@ class PagesController extends AppController
 											)
 						)
 			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 			$payload = json_encode($data);
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -1889,6 +2025,7 @@ class PagesController extends AppController
 											)
 						)
 			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 			$payload = json_encode($data);
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2018,7 +2155,7 @@ class PagesController extends AppController
 											)
 						)
 			);
-
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 			$payload = json_encode($data);
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2056,7 +2193,7 @@ class PagesController extends AppController
 		);
 
 
-
+		$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
 		$payload = json_encode($data);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);
 		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
@@ -2108,16 +2245,34 @@ class PagesController extends AppController
 		Cache::clear();
 	}
 
-	public function checksession()
+	public function checksession($moduleId)
 	{
 		if (!isset($_SESSION['User'])) {
 			$this->redirect(array('action' => 'home'));
+		}else{
+			if( $moduleId != 1 && $_SESSION['User']['User']['type'] != 1){
+				$permission = $this->checkRole( $moduleId );
+				if( !$permission ){
+					$this->redirect(array('action' => 'home'));
+				}
+			}
+			
 		}
+	}
+
+	public function checkRole( $moduleId ){
+		$roles = $_SESSION['Role'];
+		foreach( $roles as $role ){
+			if( $moduleId == $role['Role']['id_module'] ){
+				return true;
+			}
+		}
+		return false;
 	}
 
 	public function work()
 	{
-		$this->checksession();
+		$this->checksession(6);
 		if ($this->request->is('post')) {
 			$this->Workhour->query('delete from workhours');
 			$days = array('mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun');
@@ -2144,6 +2299,7 @@ class PagesController extends AppController
 		$barber_block = $_POST['barber_block'];
 		if ($_POST['barber_block'] != 0) {
 			$conditions['Reservation.reservation_barber'] = $barber_block;
+		}
 			$schedule_block = $_POST['schedule_block'];
 
 			switch ($schedule_block) {
@@ -2160,14 +2316,16 @@ class PagesController extends AppController
 					$conditions['Reservation.reservation_time >='] = date('H:i:s', strtotime('12:00:00'));
 					$conditions['Reservation.reservation_time <='] = date('H:i:s', strtotime('17:59:59'));
 					break;
-				case 2:
+				case 3:
 					$conditions['Reservation.reservation_time >='] = date('H:i:s', strtotime('18:00:00'));
 					$conditions['Reservation.reservation_time <='] = date('H:i:s', strtotime('23:59:59'));
 					break;
 			}
-		}
+		
 
-
+				
+	
+				
 		$date_block = $_POST['date_block'];
 		if ($date_block == '') {
 			$date_block = date('Y-m-d');
@@ -2175,15 +2333,17 @@ class PagesController extends AppController
 
 
 		$reservation = $this->Reservation->find('first', array('conditions' => array('Reservation.reservation_date' => $date_block, 'Reservation.reservation_status <>' => 2, $conditions)));
-
+		
+		
 		if (!empty($reservation)) {
 			$response = 'no';
 		}
+		
 		return $response;
 	}
 
 	public function product_sales(){
-		$this->checksession();
+		$this->checksession(8);
 	    $dateFrom = '';
 		$dateTo = '';
 		if ($this->request->is('post')) {
@@ -2400,10 +2560,10 @@ class PagesController extends AppController
    * die;		
    */
 	public function products(){
-		
+		$this->checksession(5);
 	}
 	public function products_edit(){
-		
+		$this->checksession(5);
 	}
 	public function add_product()
 	{
@@ -2445,6 +2605,7 @@ class PagesController extends AppController
 				'recursive' => 2
 			));
 		}
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -2458,6 +2619,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
 		echo json_encode($product);
 	}
 
@@ -2515,6 +2677,7 @@ class PagesController extends AppController
 			'conditions' => array('Expense.expense_title LIKE' => "%$expenseName%"),
 			'recursive' => 2
 		));
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -2528,6 +2691,7 @@ class PagesController extends AppController
 			'conditions' => array('Expense.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
 		echo json_encode($product);
 	}
 
@@ -2621,6 +2785,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$cantidad = mb_convert_encoding($cantidad, 'UTF-8', 'UTF-8');
 		echo json_encode($cantidad);
 	}
 
@@ -2634,6 +2799,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.name LIKE' => "%$searchUser%"),
 			'recursive' => 2
 		));
+		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
 		echo json_encode($user);
 	}
 
@@ -2647,6 +2813,7 @@ class PagesController extends AppController
 			'conditions' => array('Product.id' => $searchProduct),
 			'recursive' => 2
 		));
+		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
 		echo json_encode($product);
 	}
 
@@ -2688,5 +2855,140 @@ class PagesController extends AppController
 		}
 		return true;
 		
+	}
+
+	function profile_save()
+	{
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		if ($this->request->is('post')) {
+			//Initialize
+			$nombreUsuario = $_POST['usuario_perfil'];
+			$celular = $_POST['telefono_perfil'];
+			$userId = $_POST['id_perfil'];
+			$userContrasena = $_POST['contrasena_perfil'];
+			//Save user
+			$this->User->id = $userId;
+			$data['User']['name'] = $nombreUsuario;
+			$data['User']['phone'] = $celular;
+			if ($userContrasena != '') {
+				$pass = $this->Encrypt->encrypt($userContrasena);
+				$data['User']['password'] = $pass;
+			}
+
+			if ($this->User->save($data)) {
+				sleep(5);
+				$this->redirect(array('action' => '../'));
+			} 
+		}
+	}
+
+	/**
+	 * Run onces a day
+	 */
+
+	 public function notification_register(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+
+		$registers = $this->Sendpassword->find('all',array('fields'=>array('User.id,User.phone'),
+												   'conditions'=> array('Sendpassword.status_password'=>0),
+												    'joins' => array(
+																	array(
+																		'table' => 'users',
+																		'alias' => 'User',
+																		'type' => 'inner',
+																		'foreignKey' => false,
+																		'conditions'=> array('User.id = Sendpassword.id_user'),
+																		)
+																	)
+												   ));
+		
+		foreach( $registers as $register ){
+			
+			//$phone = $register["User"]["phone"];
+			$info = base64_encode($register["User"]["id"]);
+			$phone = '83481182';
+			$data = array();
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'change_password',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'button',
+													"index"=> "0",
+													"sub_type"=> "url",
+														'parameters'=> array(
+															array(
+															'type'=>'text',
+															'text'=> $info
+														)
+													)
+												),
+											)
+						)
+			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			var_dump($server_output);
+			curl_close($ch);
+			
+		}
+	}
+
+	public function register($idUser){
+		$this->layout = 'cron_register';
+		//http://localhost/barberia/barber/register/NDY=
+		$userId = base64_encode($idUser);
+		$this->set('userId',$userId);
+	}
+	
+	public function save_password(){
+		$this->layout = 'cron_register';
+		$this->autoRender = false;
+		if ($this->request->is('post')) {
+			//Initialize
+			
+			$userId = base64_decode(base64_decode($_POST['idUser']));
+			$userContrasena = $_POST['passwordregister'];
+			//Save user
+			$this->User->id = $userId;
+			if ($userContrasena != '') {
+				$pass = $this->Encrypt->encrypt($userContrasena);
+				$data['User']['password'] = $pass;
+			}
+
+			if ($this->User->save($data)) {
+				sleep(5);
+				$this->redirect(array('action' => '../'));
+			} 
+		}
 	}
 }

@@ -19,7 +19,7 @@ var slide_images = [
 $(document).ready(function(){
     var slidetotal = slide_images.length;
     var randomslide =  Math.floor((Math.random() * slidetotal));
-    $("#sliderbox").find(".slide").html('<img alt="" src="img/slider/'+slide_images[randomslide]+'">');
+    $("#sliderbox").find(".slide").html('<img alt="" src="https://storage.googleapis.com/videos-vr/'+slide_images[randomslide]+'">');
 });
 
 

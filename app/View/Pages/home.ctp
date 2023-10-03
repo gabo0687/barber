@@ -41,7 +41,7 @@ if( $user['User']['type'] == 1 ){ ?>
 }
 if( isset($user['User']) ){ ?> 
 </br> 
-<h1 style="color:white">Citas Activas</h1> 
+<h1 style="color:white">Citas (<?php echo count($reservations);?>)</h1> 
    
         <section class="event-list-section">
             <ul class="eventlist" id="eventlist">

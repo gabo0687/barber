@@ -157,12 +157,13 @@
 	Router::connect('/products_edit', array('controller' => 'pages', 'action' =>  'products_edit'));
 	Router::connect('/check_barcode', array('controller' => 'pages', 'action' =>  'check_barcode'));
 	
-	
+	Router::connect('/profile_save', array('controller' => 'pages', 'action' =>  'profile_save'));
+
+	Router::connect('/register/*', array('controller' => 'pages', 'action' =>  'register'));
+	Router::connect('/notification_register', array('controller' => 'pages', 'action' => 'notification_register'));
+	Router::connect('/save_password', array('controller' => 'pages', 'action' => 'save_password'));
 
 	
-
-
-
 	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.

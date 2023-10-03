@@ -1,5 +1,5 @@
 <?php 
-    Class Product extends appModel{
+    Class Product extends AppModel{
         public $name = "Product";
     }
 ?>

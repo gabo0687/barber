@@ -32,7 +32,7 @@
             <span class="description">Cliente:</span>
             <span class="tax">
 
-              <input type="search" list="clients" class="form-control" id="client" name="client" placeholder="Escribe el nombre del cliente">
+              <input type="search" list="clients" class="form-control" id="clientSale" name="clientSale" placeholder="Escribe el nombre del cliente">
 
               <datalist id="clients">
                 <?php foreach ($clients as $client) { ?>

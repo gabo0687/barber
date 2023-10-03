@@ -28,7 +28,66 @@
     opacity: 0;
   }
 }
-</style>
+
+  /* Add your custom styles here */
+
+    .searchable-dropdown {
+        position: relative;
+        width: 200px;
+    }
+
+    #client {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #dropdown-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #dropdown-list li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #dropdown-list li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+
+
+
+.input-container {
+    position: relative;
+    width: 100%;
+}
+
+
+#clear-button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+
+</style>  
 <?php
 date_default_timezone_set('America/Costa_Rica');
 
@@ -37,7 +96,11 @@ date_default_timezone_set('America/Costa_Rica');
 
 <body>
     <header>
-
+    <div style="display:none;" id="userUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Usuario actualizado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+        <hr>
+      </div>
     <div style="display:none;" id="userCreated" class="alert alert-success alert-dismissible fade show" role="alert">
         <h4 class="alert-heading">Usuario creado! </h4>
         <p><img src="img/icon-success.png" height="20px" width="20px" />Utiliza el login para ingresar al sistema</p>
@@ -68,6 +131,10 @@ date_default_timezone_set('America/Costa_Rica');
         <h4 class="alert-heading">Cliente actualizado! </h4>
         <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
       </div>
+      <div style="display:none;" id="profileUpdated" class="alert alert-success alert-dismissible fade show" role="alert">
+        <h4 class="alert-heading">Perfil actualizado! </h4>
+        <p><img src="img/icon-success.png" height="20px" width="20px" /></p>
+      </div>
         <div class="slider">
         
             <div class="sliderbox" id="sliderbox">
@@ -81,7 +148,7 @@ date_default_timezone_set('America/Costa_Rica');
                  if(!empty($_SESSION['User'])){ ?>
                  <div class="username"><a class="user-edit" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>|  <a href="logout" class="logout">Logout</a> </div>
                  <?php }else{ ?>
-                 <div class="username"> <a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | <a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
+                 <div class="username"> <!--<a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | --><a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
                  <?php } ?>
              </div>
          <?php if(!empty($_SESSION['User'])){ ?>
@@ -89,7 +156,15 @@ date_default_timezone_set('America/Costa_Rica');
          <div class="event-info-buttons"> 
            <a class="ticket-btn" data-bs-toggle="modal" data-bs-target="#compraModal" onclick="filterReservations()">💈Reservar espacio</a> 
            <?php 
-           if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '2' ){ ?> 
+            $hasPermission = false;
+            $menuRoles = $_SESSION['Role'];
+            foreach( $menuRoles as $menuRole ){
+              $moduleId = $menuRole['Role']['id_module'];
+              if( $moduleId == 2 ){
+                $hasPermission = true;
+              }
+            }
+           if( $_SESSION['User']['User']['type'] == '1' || $hasPermission ){ ?> 
            <a class="ticket-btn" id="calendar" href="calendario" type="button" >💈Vista del Calendario</a>
            </div>
           </form>
@@ -133,7 +208,7 @@ date_default_timezone_set('America/Costa_Rica');
             <input type="password" class="form-control" name="loginPass" id="loginPass"  placeholder="Password">
           </div>
             <div class="form-group text-right">                
-              <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>
+             <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#signup">Registro</button>-->
               <button type="button" class="btn btn-primary" id="loginNumbers" onclick="login()">Login</button>
             </div>
             <div class="form-group" id="noerror-mail" style="display:none;">
@@ -142,9 +217,9 @@ date_default_timezone_set('America/Costa_Rica');
             <div class="form-group" id="login-error" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Usuario o contraseña invalidos.</b></span></label>
             </div>
-            <div class="form-group text-right">
+            <!--<div class="form-group text-right">
                 <small><a>¿Olvidó su contraseña?</a></small>
-            </div>
+            </div>-->
         </form>
       </div>
     </div>
@@ -212,20 +287,31 @@ date_default_timezone_set('America/Costa_Rica');
         <input class="form-control" type="text" onchange="filterReservations()" onfocus="changeReservationDate()" placeholder="<?php echo date('m/d/Y');?>" name="fecha_reserva" id="fecha_reserva" >
         <input type="hidden" name="user_type" id="user_type" value="<?php echo $user['User']['type'];?>">
       
+
+
+        
+
+
         <?php 
         if( $user['User']['type'] == 1 || $user['User']['type'] == 2 ){ ?>  
-      <span class="description">Cliente:</span>                
-      <span class="tax">
+          <span class="description">Cliente:</span>        
+         <span class="tax">
 
-        <input type="search" list="clients" class="form-control" id="client" name="client" placeholder="Escribe el nombre del cliente">
+         <div class="input-container">
+          <input type="text" id="client" name="client" class="form-control" placeholder="Escribe el nombre del cliente">
+          <span id="clear-button" class="hidden">×</span>
+        </div>
 
-        <datalist id="clients">
-          <?php foreach( $clients as $client ){?>
-          <option value="<?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?>">
-          <?php } ?>
-        </datalist>
-      </span>
-      <?php } ?>
+        <ul id="dropdown-list" class="hidden">
+        <?php foreach( $clients as $client ){
+          $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
+           ?>
+            <li onclick="selectClient(<?php echo $clientSelected;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
+            <?php } ?>
+        </ul>
+        </span>
+        <?php } ?>
+        
       <span id="clientError" style="display:none; color:red">Selecciona un cliente</br></span>
       <span id="clientFormatError" style="display:none; color:red">Debes seleccionar a un cliente de la lista</br></span>
       
@@ -233,9 +319,14 @@ date_default_timezone_set('America/Costa_Rica');
 
       <span class="description">Servicio:</span>
       <span class="tax">
-                      <select class="form-control" onchange="filterReservations()" name="services" id="services">
-                        <?php foreach( $services as $service ){ ?>
-                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                      <select class="form-control" onchange="filterReservations()" name="services" id="services" multiple>
+                        <?php foreach( $services as $service ){ 
+                          $serviceType = '';
+                          if( $service['Service']['gender'] == 1 ){ $serviceType = 'Hombre'; }
+                          if( $service['Service']['gender'] == 2 ){ $serviceType = 'Mujer'; }
+                          if( $service['Service']['gender'] == 3 ){ $serviceType = 'Unisex'; }
+                          ?>
+                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'].' / '.$serviceType;?></option>
                         <?php } ?>
                       </select>
       </span>   
@@ -243,8 +334,8 @@ date_default_timezone_set('America/Costa_Rica');
       <span class="tax">
                       <select class="form-control" onchange="filterReservations()" name="barber" id="barber">
                       <option value="0">Todos</option>
-                      <?php foreach( $users as $user ){?>
-                      <option value="<?php echo $user['User']['id'];?>"><?php echo $user['User']['name'];?></option>
+                      <?php foreach( $users as $barberUser ){?>
+                      <option value="<?php echo $barberUser['User']['id'];?>"><?php echo $barberUser['User']['name'];?></option>
                       <?php } ?>
                       </select>
       </span>             
@@ -282,12 +373,14 @@ date_default_timezone_set('America/Costa_Rica');
       <div id="notificaciones_check" style="display:none">
       </br>
       <span class="description" id="notificaciones_text"></span>
-      </br><button type="button" class="btn btn-success" onclick="saveNotification()"><a>Guardar Notificación</a> <span class="spinner-border-sm" id="loadingNotification"></span></button>
+      </br><button type="button" class="btn btn-success" onclick="saveNotification(<?php echo $_SESSION['User']['User']['type'];?>)"><a>Guardar Notificación</a> <span class="spinner-border-sm" id="loadingNotification"></span></button>
       </br>
       
       </br>
       </div>
       <span style="color:green; display:none" id="notificationMessage"><b>Notificación guardada exitosamente!</b></span>
+      <span id="notificationError" style="display:none; color:red">Debes seleccionar a un cliente de la lista para crear la notificación</br></span>
+      
       </br>
       <label id="ServiceText"></label>
           <ul class="ticket-list">  
@@ -300,6 +393,61 @@ date_default_timezone_set('America/Costa_Rica');
 </body>
 </html>
 <script>
+        
+        const inputField = document.getElementById("client");
+        const clearButton = document.getElementById("clear-button");
+
+        const searchInput = document.getElementById("client");
+        const dropdownList = document.getElementById("dropdown-list");
+
+        inputField.addEventListener("input", function () {
+            if (inputField.value.trim() !== "") {
+                clearButton.classList.remove("hidden");
+            } else {
+                clearButton.classList.add("hidden");
+            }
+        });
+
+        clearButton.addEventListener("click", function () {
+            inputField.value = "";
+            clearButton.classList.add("hidden");
+            $('#client').removeAttr('readonly');
+            dropdownList.classList.add("hidden");
+            $('#dropdown-list').removeAttr('style');
+            $('#client').focus();
+        });
+
+
+        function selectClient(client){
+          $('#client').val(client);
+          $('#dropdown-list').hide();
+          $('#client').attr('readonly','readonly');
+          
+        }
+        
+        
+
+        searchInput.addEventListener("input", function () {
+            const filter = searchInput.value.toLowerCase();
+            const options = dropdownList.getElementsByTagName("li");
+
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option.textContent.toLowerCase().includes(filter)) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+
+            if (filter === "") {
+                dropdownList.classList.add("hidden");
+            } else {
+                dropdownList.classList.remove("hidden");
+            }
+        });
+
+
 
 function reservar(reservationNumber){
  
@@ -393,28 +541,44 @@ function reservar(reservationNumber){
  }
 }
 
-function saveNotification(){
-  var reservationDate = $('#fecha_reserva').val();
-  var reservationFilterTime = $('#reservation_time').val();
-  $.ajax({
-                type: 'POST', 
-                url: 'save_notification', 
-                data: 'reservationDate='+reservationDate+'&reservationFilterTime='+reservationFilterTime,
-                beforeSend:function() {  
-                  $('#loadingNotification').addClass('spinner-border');
-                },
-                error: function(){
-                    
-                alert('No hay internet');    
-                },
-                success: function(notification) {
-                 
-             
-                  $('#loadingNotification').removeClass('spinner-border');
-                  $('#notificaciones_check').hide();
-                  $('#notificationMessage').show();  
-                }
-	});
+function saveNotification(UserType){
+  var clientCurrent = '';
+  var showError = false;
+  if( UserType == 1 || UserType == 2 ){
+    var CurrentUser = $('#client').val();
+    var reservaUser = CurrentUser.split('-');
+    clientCurrent = reservaUser[0]; 
+    if( CurrentUser == '' ){
+      showError = true;
+    }
+  }
+  if( !showError ){
+    $('#notificationError').hide();
+    var reservationDate = $('#fecha_reserva').val();
+    var reservationFilterTime = $('#reservation_time').val();
+    $.ajax({
+                  type: 'POST', 
+                  url: 'save_notification', 
+                  data: 'reservationDate='+reservationDate+'&reservationFilterTime='+reservationFilterTime+'&clientCurrent='+clientCurrent,
+                  beforeSend:function() {  
+                    $('#loadingNotification').addClass('spinner-border');
+                  },
+                  error: function(){
+                      
+                  alert('No hay internet');    
+                  },
+                  success: function(notification) {
+                  
+              
+                    $('#loadingNotification').removeClass('spinner-border');
+                    $('#notificaciones_check').hide();
+                    $('#notificationMessage').show();  
+                  }
+    });
+  }else{
+    $('#notificationError').show();
+  }
+  
 }
 
 function filterReservations(){
@@ -522,7 +686,7 @@ function filterReservations(){
                             var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
                             reservationDate = day+' de '+meses[month-1];
                           }
-                          $('.ticket-list').html('<h2>No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h2>');  
+                          $('.ticket-list').html('<h4 style="text-align: center;">No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h4>');  
                         }
                       }
                   

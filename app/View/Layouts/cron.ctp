@@ -88,9 +88,13 @@ date_default_timezone_set('America/Costa_Rica');
 
       <span class="description">Servicio:</span>
       <span class="tax">
-                      <select class="form-control" onchange="filterReservations()" name="services" id="services">
-                        <?php foreach( $services as $service ){ ?>
-                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                      <select class="form-control" onchange="filterReservations()" name="services" id="services" multiple>
+                        <?php foreach( $services as $service ){
+                          $serviceType = '';
+                          if( $service['Service']['gender'] == 1 ){ $serviceType = 'Hombre'; }
+                          if( $service['Service']['gender'] == 2 ){ $serviceType = 'Mujer'; }
+                          if( $service['Service']['gender'] == 3 ){ $serviceType = 'Unisex'; } ?>
+                        <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'].' / '.$serviceType;?></option>
                         <?php } ?>
                       </select>
       </span>   
@@ -349,7 +353,7 @@ function filterReservations(){
                             var meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
                             reservationDate = day+' de '+meses[month-1];
                           }
-                          $('.ticket-list').html('<h2>No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h2>');  
+                          $('.ticket-list').html('<h4 style="text-align: center;">No hay reservaciones disponibles en ese horario por favor selecciona otra fecha</h4>');  
                         }
                       }
                   
@@ -376,7 +380,7 @@ var slide_images = [
 $(document).ready(function(){
     var slidetotal = slide_images.length;
     var randomslide =  Math.floor((Math.random() * slidetotal));
-    $("#sliderbox").find(".slide").html('<img alt="" src="../img/slider/'+slide_images[randomslide]+'">');
+    $("#sliderbox").find(".slide").html('<img alt="" src="https://storage.googleapis.com/videos-vr/'+slide_images[randomslide]+'">');
 });
 </script>
 

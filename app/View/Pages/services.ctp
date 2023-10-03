@@ -6,7 +6,7 @@
       </ul>
        </br>
       <div class="list-group" id="myList" role="tablist">
-      <a class="list-group-item list-group-item-action active" data-toggle="list" href="#home" role="tab" style="color:black;">Agregar servicio Nuevo</a>
+      <a class="list-group-item list-group-item-action active" data-toggle="list" href="#home" role="tab" style="color:black;"><b>Agregar servicio Nuevo</b></a>
         <?php 
 
           foreach( $services as $service ){ 
