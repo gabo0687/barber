@@ -143,7 +143,6 @@
 	Router::connect('/add_sales', array('controller' => 'pages', 'action' =>  'add_sales'));
 	Router::connect('/search_quantity', array('controller' => 'pages', 'action' =>  'search_quantity'));
 
-	Router::connect('/update_sales', array('controller' => 'pages', 'action' =>  'update_sales'));
 	Router::connect('/search_sales', array('controller' => 'pages', 'action' =>  'search_sales'));
 	Router::connect('/edit_sales', array('controller' => 'pages', 'action' =>  'edit_sales'));
 	Router::connect('/saleproducts', array('controller' => 'pages', 'action' =>  'saleproducts'));

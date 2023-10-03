@@ -2891,7 +2891,7 @@ class PagesController extends AppController
 					'alias' => 'Seller',
 					'type' => 'inner',
 					'foreignKey' => false,
-					'conditions'=> array('Sale.client_id = Seller.id')
+					'conditions'=> array('Sale.seller_id = Seller.id')
 				),
 				array(
 					'table' => 'users',
@@ -2916,23 +2916,59 @@ class PagesController extends AppController
 
 	public function update_sales()
 	{
+		
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
-			$this->Product->id = $_POST['idEdit'];
-			$data['Product']['name'] = $_POST['nameEdit'];
+			$this->Sale->id = $_POST['idSaleEdit'];
+			$client = explode('-', $_POST['clientSaleEdit']);
+			$clientId = $client[0];
+			$product = explode('-', $_POST['productSalesEdit']);
+			$productId = $product[0];
+			$seller = explode('-', $_POST['sellerEdit']);
+			$sellerId = $seller[0];
+			//$this->Sale->create();
+			$data['Sale']['client_id'] = $clientId;
+			$data['Sale']['seller_id'] = $sellerId;
+			$data['Sale']['creation_date'] = date('Y-m-d');
+			if ($this->Sale->save($data)) {
+				echo "entro2";
+				$this->Saleproduct->id = $_POST['idSaleProductEdit'];
+				//$this->Saleproduct->create();
+				//$saleId = $this->Sale->getLastInsertID();
+				$datac['Saleproduct']['sales_id'] = $_POST['idSaleEdit'];
+				if (empty($_POST['dateAddSaleEdit'])) {
+					$datac['Saleproduct']['sale_date'] = date('Y-m-d');
+				} else {
+					$datac['Saleproduct']['sale_date'] = $_POST['dateAddSaleEdit'];
+				}
+				$quantitySelected = $_POST['MaxCountAddEdit'];
 
-			$data['Product']['price'] = $_POST['priceEdit'];
-			$data['Product']['provider'] = $_POST['sellerEdit'];
+				$stock = ($_POST['idSaleCantEdit']-$quantitySelected);
 
-			if (empty($_POST['countEdit'])) {
-				$data['Product']['quantity'] = 0;
-			} else {
-				$data['Product']['quantity'] = $_POST['countEdit'];
-			}
+				$datac['Saleproduct']['product_id'] = $productId;
+				$datac['Saleproduct']['price'] = $_POST['originalPriceAddSaleEdit'];
+				echo "entro3";
+				if(empty($_POST['priceDiscountEdit'])){
+					$datac['Saleproduct']['discount'] = 0;
+				}else{
+					$discount = ($_POST['priceDiscountEdit']/100);
+					$datac['Saleproduct']['discount'] = $discount;
+				}
+				
+				$datac['Saleproduct']['notes'] = $_POST['notesAddSaleEdit'];
+				$datac['Saleproduct']['quantity'] = $quantitySelected;
+				$datac['Saleproduct']['payment_type'] = $_POST['payAddSaleEdit'];
+				$datac['Saleproduct']['date_creation'] = date('Y-m-d');
 
-			if ($this->Product->save($data)) {
+				$this->Product->id = $this->Product->field('id', array('id' => $productId));
+				echo "entro4";
+				if ($this->Product->id) {
+					$this->Product->saveField('quantity', $stock);
+				}
+				echo "entro5";
+				$this->Saleproduct->save($datac);
 				sleep(3);
-				$this->redirect(array('action' => '../products'));
+				$this->redirect(array('action' => '../sales'));
 			}
 		}
 	}

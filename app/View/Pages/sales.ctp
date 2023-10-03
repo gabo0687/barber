@@ -131,6 +131,7 @@
 
 var lastResult, countResults = 0;
 let html5QrcodeScanner = 0;
+
 function scanearCodigo(){
   $('#qr-reader').show();
   html5QrcodeScanner = new Html5QrcodeScanner(
@@ -147,7 +148,6 @@ function onScanSuccess(decodedText, decodedResult) {
         $('#codigo_barra').val(decodedText);
         $('#codigo_barra_text').val(decodedText);
 
-       
       var audio = document.getElementById("audio");
       audio.play();
       getBarCodeInfo(decodedText);
@@ -156,9 +156,10 @@ function onScanSuccess(decodedText, decodedResult) {
 
 
 function getBarCodeInfo(barCode){
+  
   $.ajax({
       type: 'POST',
-      url: 'searchSale_barcode',
+      url: 'searchProduct_barcode',
       data: 'barcode=' +barCode,
       beforeSend: function() {
 
@@ -168,12 +169,13 @@ function getBarCodeInfo(barCode){
         alert('No hay internet');
       },
       success: function(barcode) {
-        const res = JSON.parse(barcode);
-        if(res[0]["Product"]["id"] == ''){
-          $('#countAdd').focus();
+        if(barcode == '[]'){
+          alert("prducto no registrado");
+          $('#MaxCountAdd').focus();
         html5QrcodeScanner.clear();
         $('#qr-reader').hide();
         }else{
+          const res = JSON.parse(barcode);
         $('#priceAddSale').val(res[0]["Product"]["price"]);
         var productName = res[0]["Product"]["id"]+"-"+res[0]["Product"]["name"]+" / "+res[0]["Product"]["provider"]+" | "+res[0]["Product"]["price"];
         $('#productSales').val(productName);
@@ -372,54 +374,7 @@ function getBarCodeInfo(barCode){
   }
 
 
-  function showEditSales(id) {
-    $('#editSale_' + id).addClass('active');
-    $('#home_editSales').show();
-
-
-    $.ajax({
-      type: 'POST',
-      url: 'edit_sales',
-      data: 'idSale=' + id,
-      beforeSend: function() {
-
-      },
-      error: function() {
-
-        alert('No hay internet');
-      },
-      success: function(editSale) {
-        const res = JSON.parse(editSale);
-
-        $('#idSaleEdit').val(res["Sale"]["id"]);
-        $('#countAddAvaiableProductEdit').val(res["Product"]["quantity"]);
-        $('#payAddSaleEdit').val(res["Saleproduct"]["payment_type"]);
-        $('#notesAddSaleEdit').val(res["Saleproduct"]["notes"]);
-        $('#priceDiscountEdit').val((res["Saleproduct"]["discount"])*100);
-        $('#originalPriceAddSaleEdit').val(res["Saleproduct"]["price"]);
-        $('#priceAddSaleEdit').val(res["Saleproduct"]["price"]);
-        $('#dateAddSaleEdit').val(res["Saleproduct"]["sale_date"]);
-        
-
-        //calculated$('#priceAddSaleEdit').val(res["Product"]["discount"]);
-       
-        
-        //$('#clientsSaleEdit').val(res["Product"]["id"]);
-
-        //$('#products-salesEdit').val(res["Product"]["name"]);
-
-        
-        //$('#MaxCountAddEdit').val(res["Saleproduct"]["sale_date"]);
-       
-        
-        //$('#sellersEdit').val(res["Product"]["provider"]);
-
-        
-        
-      }
-
-    });
-  }
+ 
 
   $("#createNewSale").on("submit", function(event) {
     var client = 0;

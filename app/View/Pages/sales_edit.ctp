@@ -33,6 +33,8 @@
                                 <label for="accountInputEmail">idSale</label>
                                 <input type="number" class="form-control" id="idSaleEdit" name="idSaleEdit"
                                     aria-describedby="emailHelp" placeholder="Precio">
+                                    <input type="number" class="form-control" id="idSaleProductEdit" name="idSaleProductEdit"
+                                    aria-describedby="emailHelp" placeholder="Precio">
                                     <input type="number" class="form-control" id="idSaleCantEdit" name="idSaleCantEdit"
                                     aria-describedby="emailHelp" placeholder="Precio">
                             </div>
@@ -77,7 +79,7 @@
                             <div class="form-group" id="scanSaleEdit" name="scanSaleEdit" style="display:none;">
                                 <span onclick="scanearCodigo()" id="botonScanEdit" class="btn btn-secondary">Scanear
                                     Código de Barras</span></br></br>
-                                <div id="qr-reader" style="display:none;" class="form-control"></div>
+                                <div id="qr-readerEdit" style="display:none;" class="form-control"></div>
                                 </br>
                                 <input type="hidden" class="form-control" name="codigo_barra_textEdit"
                                     id="codigo_barra_textEdit" placeholder="Código de barras" readonly>
@@ -111,7 +113,7 @@
                             </div>
                             <div class="form-group">
                                 <label for="accountInputUser">Pago</label>
-                                <select name="payAddSale" id="payAddSaleEdit" class="form-control">
+                                <select name="payAddSaleEdit" id="payAddSaleEdit" class="form-control">
                                     <option value="2">Efectivo</option>
                                     <option value="1">Tarjeta</option>
                                 </select>
@@ -152,7 +154,6 @@
                                 <button type="submit" class="btn btn-primary">Editar</button>
                             </div>
                         </form>
-                        </form>
                     </div>
                 </div>
     </article>
@@ -168,7 +169,7 @@ let html5QrcodeScanner = 0;
 function scanearCodigo() {
     $('#qr-readerEdit').show();
     html5QrcodeScanner = new Html5QrcodeScanner(
-        "qr-reader", {
+        "qr-readerEdit", {
             fps: 10,
             qrbox: 250
         });
@@ -195,7 +196,7 @@ function onScanSuccess(decodedText, decodedResult) {
 function getBarCodeInfo(barCode) {
     $.ajax({
         type: 'POST',
-        url: 'searchSale_barcode',
+        url: 'searchProduct_barcode',
         data: 'barcode=' + barCode,
         beforeSend: function() {
 
@@ -205,27 +206,27 @@ function getBarCodeInfo(barCode) {
             alert('No hay internet');
         },
         success: function(barcode) {
-            const res = JSON.parse(barcode);
-            if (res[0]["Product"]["id"] == '') {
-                $('#countAddEdit').focus();
-                html5QrcodeScanner.clear();
-                $('#qr-readerEdit').hide();
-            } else {
-                $('#priceAddSaleEdit').val(res[0]["Product"]["price"]);
-                var productName = res[0]["Product"]["id"] + "-" + res[0]["Product"]["name"] + " / " + res[0]
-                    ["Product"]["provider"] + " | " + res[0]["Product"]["price"];
-                $('#productSalesEdit').val(productName);
-                html5QrcodeScanner.clear();
-                searchQuantity();
-                $('#qr-readerEdit').hide();
-                $('#codigo_barraEdit').val('');
-                $('#codigo_barra_textEdit').val('');
-                $('#error-codigoEdit').show();
-                window.scrollTo(0, document.body.scrollHeight);
-            }
-            window.scrollTo(0, document.body.scrollHeight);
-
+        if(barcode == '[]'){
+          alert("prducto no registrado");
+          $('#MaxCountAddEdit').focus();
+        html5QrcodeScanner.clear();
+        $('#qr-readerEdit').hide();
+        }else{
+          const res = JSON.parse(barcode);
+        $('#priceAddSaleEdit').val(res[0]["Product"]["price"]);
+        var productName = res[0]["Product"]["id"]+"-"+res[0]["Product"]["name"]+" / "+res[0]["Product"]["provider"]+" | "+res[0]["Product"]["price"];
+        $('#productSalesEdit').val(productName);
+        html5QrcodeScanner.clear();
+        searchQuantity();
+        $('#qr-readerEdit').hide();
+          $('#codigo_barraEdit').val('');
+         $('#codigo_barra_textEdit').val('');
+        $('#error-codigoEdit').show();
+        window.scrollTo(0, document.body.scrollHeight);
         }
+        window.scrollTo(0, document.body.scrollHeight);
+
+      }
 
     });
 }
@@ -248,10 +249,12 @@ function searchOption(valor) {
 }
 
 var cantProductos = 0;
-var productOriginalPrice = "";
 var productPrice = 0;
 var editCantProducto = 0;
 var editCantProductoId = "A";
+var cantProductosComprados = 0;
+var globalDiscount = 0;
+var globalPrice = 0;
 $('#searchSaleEdit').on('submit', function(e) {
     e.preventDefault();
     search();
@@ -295,25 +298,35 @@ function showEditForm() {
 
 function calculatePrice() {
     $('#priceAddSaleEdit').val('');
+    var descuento = "";
     var descuento = $('#priceDiscountEdit').val();
     var cant = $('#MaxCountAddEdit').val();
-    var newPrice = (productPrice * cant) - (((productPrice * cant) * descuento) / 100);
+    var newPrice = (productPrice * cant) - (((productPrice * cant) * (descuento / 100)));
+    $('#originalPriceAddSaleEdit').val(productPrice);
     $('#priceAddSaleEdit').val(newPrice);
 }
 
 function searchQuantity() {
+    var product = 0;
+    product = $('#productSalesEdit').val();
+        var splitProduct = product.split('-');
     
-
-if(editCantProductoId == $('#idSaleCantEdit').val()){
+//comparar si el id del producto es el mismo que el de el edit
+if(editCantProductoId == splitProduct[0]){
     $('#MaxCountAddEdit').empty();
-                    var i = 0;
-                        while (i < editCantProducto) {
-                            i++;
-                            $('#MaxCountAddEdit').append('<option onfocus="calculatePrice()" >' + i +
+                    var k = 0;
+                        while (k < editCantProducto) {
+                            k++;
+                            $('#MaxCountAddEdit').append('<option onfocus="calculatePrice()" >' + k +
                                 '</option>');
 
                         }
+                        
+                        $('#priceDiscountEdit').val(globalDiscount);
+                        productPrice = globalPrice;
+                        
                         $("#MaxCountAddEdit").val(cantProductosComprados).change();
+                       
      
 }else {
 
@@ -348,7 +361,7 @@ if(editCantProductoId == $('#idSaleCantEdit').val()){
                                 '</option>');
 
                         }
-
+                        $('#priceDiscountEdit').val(0);
                         $('#countAddAvailableEdit').val(cantProductos);
 
                         $('#countAddAvaiableProductEdit').val(cantProductos);
@@ -452,11 +465,15 @@ function showEditSales(id) {
             const res = JSON.parse(editSale);
                 editCantProducto = "";
                editCantProductoId = "";
+               cantProductosComprados = 0;
             $('#idSaleEdit').val(res["Sale"]["id"]);
+            $('#idSaleProductEdit').val(res["Saleproduct"]["id"]);
+            
             $('#countAddAvaiableProductEdit').val(res["Product"]["quantity"]);
             $('#payAddSaleEdit').val(res["Saleproduct"]["payment_type"]);
             $('#notesAddSaleEdit').val(res["Saleproduct"]["notes"]);
-            $('#priceDiscountEdit').val((res["Saleproduct"]["discount"]) * 100);
+            globalDiscount = (res["Saleproduct"]["discount"]) * 100;
+            $('#priceDiscountEdit').val(globalDiscount);
             $('#dateAddSaleEdit').val(res["Saleproduct"]["sale_date"]);
 
             var productName = res["Product"]["id"] + "-" + res["Product"]["name"] + " / " + res["Product"]["provider"] + " | " + res["Product"]["price"];
@@ -467,7 +484,7 @@ function showEditSales(id) {
             $('#sellerEdit').val(sellerName);
 
             var cantProductosInventario = res['Product']['quantity'];
-            var cantProductosComprados = res['Saleproduct']['quantity'];
+             cantProductosComprados = res['Saleproduct']['quantity'];
             var cantProductosEdit = cantProductosInventario + cantProductosComprados;
             $('#idSaleCantEdit').val(cantProductosEdit);
             $('#MaxCountAddEdit').empty();
@@ -478,25 +495,16 @@ function showEditSales(id) {
                     $('#MaxCountAddEdit').append('<option onfocus="calculatePrice()" >' + i + '</option>');
                 }
                $("#MaxCountAddEdit").val(cantProductosComprados).change();
+               productPrice = 0;
                productPrice = res["Product"]["price"];
+               globalPrice = productPrice;
                editCantProducto = cantProductosEdit;
                editCantProductoId = res["Product"]["id"] ;
                calculatePrice();
                //validar que si cambia de producto, y vuelve al mismo, mantener mismo stock
 
-
-               //$('#priceAddSaleEdit').val((res["Product"]["price"]*cantProductosComprados));
-/*
-                $('#countAddAvailableEdit').val(cantProductos);
-
-                $('#countAddAvaiableProductEdit').val(cantProductos);
-
-                $('#priceAddSaleEdit').val(price);
-                $('#originalPriceAddSaleEdit').val(price);
-                $('#MaxCountAddEdit').css('border', '');
                 $('#error-quantitySalesEdit').hide;
-                productPrice = price;*/
-            } /*else {
+            } else {
                 $('#MaxCountAddEdit').append('<option onfocus="calculatePrice()" >0</option>');
                 $('#error-quantitySalesEdit').show;
 
@@ -504,11 +512,7 @@ function showEditSales(id) {
                 alert('Producto agotado en inventario');
                 $('#countAddAvailableEdit').val(0);
                 $('#countAddAvaiableProductEdit').val(0);
-            } */
-
-            //calculated$('#priceAddSaleEdit').val(res["Product"]["discount"]);
-
-            //$('#MaxCountAddEdit').val(res["Saleproduct"]["sale_date"]);
+            } 
 
         }
 
@@ -519,10 +523,10 @@ $("#editSales").on("submit", function(event) {
     var client = 0;
     var clientEmpty = true;
     var clientFormat = true;
-    client = $('#clientSale').val();
+    client = $('#clientSaleEdit').val();
     var splitClient = client.split('-');
 
-    if ($('#clientSale').val() == '') {
+    if ($('#clientSaleEdit').val() == '') {
         clientEmpty = false;
     } else {
         var splitClient = client.split('-');
@@ -534,10 +538,10 @@ $("#editSales").on("submit", function(event) {
     var product = 0;
     var productEmpty = true;
     var productFormat = true;
-    product = $('#productSales').val();
+    product = $('#productSalesEdit').val();
     var splitProduct = product.split('-');
 
-    if ($('#productSales').val() == '') {
+    if ($('#productSalesEdit').val() == '') {
         productEmpty = false;
     } else {
         var splitProduct = product.split('-');
@@ -549,10 +553,10 @@ $("#editSales").on("submit", function(event) {
     var seller = 0;
     var sellerEmpty = true;
     var sellerFormat = true;
-    seller = $('#seller').val();
+    seller = $('#sellerEdit').val();
     var splitSeller = seller.split('-');
 
-    if ($('#seller').val() == '') {
+    if ($('#sellerEdit').val() == '') {
         sellerEmpty = false;
     } else {
         var splitSeller = seller.split('-');
@@ -561,48 +565,48 @@ $("#editSales").on("submit", function(event) {
         sellerFormat = false;
     }
 
-    inventory = $('#MaxCountAdd').val();
-    if (!clientEmpty && !clientFormat || !productEmpty && !productFormat || !sellerEmpty && !sellerFormat ||
-        inventory == 0) {
+    inventory = $('#MaxCountAddEdit').val();
+
+    if (!clientEmpty && !clientFormat || !productEmpty && !productFormat || !sellerEmpty && !sellerFormat || inventory == 0) {
         event.preventDefault();
         $showError = false;
         if (!clientEmpty && !clientFormat) {
-            $('#clientSale').css('border', '2px solid red');
+            $('#clientSaleEdit').css('border', '2px solid red');
             $showError = true;
         } else {
-            $('#clientSale').css('border', '');
+            $('#clientSaleEdit').css('border', '');
         }
         if (!productEmpty && !productFormat) {
-            $('#productSales').css('border', '2px solid red');
+            $('#productSalesEdit').css('border', '2px solid red');
             $showError = true;
         } else {
-            $('#productSales').css('border', '');
+            $('#productSalesEdit').css('border', '');
         }
         if (!sellerEmpty && !sellerFormat) {
-            $('#seller').css('border', '2px solid red');
+            $('#sellerEdit').css('border', '2px solid red');
             $showError = true;
         } else {
-            $('#seller').css('border', '');
+            $('#sellerEdit').css('border', '');
         }
         if (inventory == 0) {
-            $('#MaxCountAdd').css('border', '2px solid red');
-            $('#error-quantitySales').show;
+            $('#MaxCountAddEdit').css('border', '2px solid red');
+            $('#error-quantitySalesEdit').show;
         } else {
-            $('#MaxCountAdd').css('border', '');
-            $('#error-quantitySales').hide;
+            $('#MaxCountAddEdit').css('border', '');
+            $('#error-quantitySalesEdit').hide;
         }
 
         if ($showError) {
-            $('#error-emptySales').show();
+            $('#error-emptySalesEdit').show();
         } else {
-            $('#error-emptySales').hide();
+            $('#error-emptySalesEdit').hide();
         }
     } else {
-        $('#error-emptySales').hide();
-        $('#error-quantitySales').hide;
-        $('#clientSale').css('border', '');
-        $('#productSales').css('border', '');
-        $('#seller').css('border', '');
+        $('#error-emptySalesEdit').hide();
+        $('#error-quantitySalesEdit').hide;
+        $('#clientSaleEdit').css('border', '');
+        $('#productSalesEdit').css('border', '');
+        $('#sellerEdit').css('border', '');
         window.scrollTo(0, 0);
         $('.close').click();
         $('#saleDone').show();
