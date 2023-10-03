@@ -65,16 +65,16 @@ if( isset($user['User']) ){ ?>
                 <li>
                     <span class="event-list-item-content">
                     <div class="event-list-info">
-                        <h3><?php echo $reservation['Service']['service_name'];?></h3>
+                        <h3><?php echo $reservation[1];?></h3>
                         <p>Fecha : <?php echo $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;?></p>
                         <p>Hora : <?php echo $reservation['Reservation']['reservation_time'];?></p>
                         <p>Barbero : <?php echo $reservation['Barber']['name'];?></p>
                         <p>Cliente : <?php echo $reservation['User']['name'];?> <a taget="_blank" href="https://api.whatsapp.com/send?phone=506<?php echo $reservation['User']['phone'];?>&text=Hola <?php echo $reservation['User']['name'];?>!
 
 💈 Tienes cita para corte a las <?php echo $reservation['Reservation']['reservation_time'];?> , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width='30px' src="img/layout/whatsapp.png" alt=""></a></p>
-                        <p>Tiempo : <?php echo $reservation[0]['Duration']['duration'];?> minutos</p>
+                        <p>Tiempo : <?php echo $reservation[0];?> minutos</p>
                         <p>Estatus de la cita : <?php if( $reservation['Reservation']['reservation_status'] == 0 ){ echo 'Sin Confirmar'; }if( $reservation['Reservation']['reservation_status'] == 1 ){ echo 'Confirmada'; }if( $reservation['Reservation']['reservation_status'] == 2 ){ echo '<b class="blink_me">CANCELADA</b>'; }?></p>
-                        <p>Precio : ₡<?php echo number_format($reservation['Service']['price']);?></p>
+                        <p>Precio : ₡<?php echo number_format($reservation['Reservation']['reservation_price']);?></p>
 
                     <?php if( $reservation['Reservation']['reservation_status'] == 1 && $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  && $reservation['Reservation']['reservation_status'] != 2 ){?>    
                     <p>Selecciona el tipo de pago:</p>  
