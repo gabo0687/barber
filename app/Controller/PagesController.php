@@ -2765,14 +2765,14 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
 
-			$client = explode('-', $_POST['client']);
+			$client = explode('-', $_POST['clientSale']);
 			$clientId = $client[0];
 			$product = explode('-', $_POST['productSales']);
 			$productId = $product[0];
 			$seller = explode('-', $_POST['seller']);
 			$sellerId = $seller[0];
-
 			$this->Sale->create();
+
 			$data['Sale']['client_id'] = $clientId;
 			$data['Sale']['seller_id'] = $sellerId;
 			$data['Sale']['creation_date'] = date('Y-m-d');
@@ -2780,20 +2780,27 @@ class PagesController extends AppController
 				$this->Saleproduct->create();
 				$saleId = $this->Sale->getLastInsertID();
 				$datac['Saleproduct']['sales_id'] = $saleId;
-				if (empty($_POST['dateAdd'])) {
+				if (empty($_POST['dateAddSale'])) {
 					$datac['Saleproduct']['sale_date'] = date('Y-m-d');
 				} else {
-					$datac['Saleproduct']['sale_date'] = $_POST['dateAdd'];
+					$datac['Saleproduct']['sale_date'] = $_POST['dateAddSale'];
 				}
-				$quantitySelected = $_POST['countAdd'];
+				$quantitySelected = $_POST['MaxCountAdd'];
 
 				$stock = ($_POST['countAddAvaiableProduct']-$quantitySelected);
 
 				$datac['Saleproduct']['product_id'] = $productId;
-				$datac['Saleproduct']['price'] = $_POST['priceAdd'];
-				$datac['Saleproduct']['notes'] = $_POST['notesAdd'];
+				$datac['Saleproduct']['price'] = $_POST['originalPriceAddSale'];
+				if(empty($_POST['priceDiscount'])){
+					$datac['Saleproduct']['discount'] = 0;
+				}else{
+					$discount = ($_POST['priceDiscount']/100);
+					$datac['Saleproduct']['discount'] = $discount;
+				}
+				
+				$datac['Saleproduct']['notes'] = $_POST['notesAddSale'];
 				$datac['Saleproduct']['quantity'] = $quantitySelected;
-				$datac['Saleproduct']['payment_type'] = $_POST['payAdd'];
+				$datac['Saleproduct']['payment_type'] = $_POST['payAddSale'];
 				$datac['Saleproduct']['date_creation'] = date('Y-m-d');
 
 				$this->Product->id = $this->Product->field('id', array('id' => $productId));
@@ -2825,10 +2832,35 @@ class PagesController extends AppController
 	{
 		$this->autoRender = false;
 		$this->layout = 'ajax';
-		$searchUser = $_POST['searchProduct'];
-		$user = $this->Product->find('all', array(
-			'fields' => array('Product.id', 'Product.name', 'Product.provider'),
-			'conditions' => array('Product.name LIKE' => "%$searchUser%"),
+		$dateSearch = $_POST['searchSales'];
+		$sales = $this->Sale->find('all', array(
+			'fields' => array('Sale.id','Sale.client_id','Sale.seller_id','Saleproduct.sales_id','Saleproduct.product_id','Saleproduct.sale_date',
+			'User.name','Product.name'),
+			'conditions' => array('Saleproduct.sale_date' => "$dateSearch"),
+			'joins' =>
+			array(
+				array(
+					'table' => 'saleproducts',
+					'alias' => 'Saleproduct',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions' => array('Sale.id = Saleproduct.sales_id')
+				),
+				array(
+					'table' => 'users',
+					'alias' => 'User',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions' => array('Sale.client_id = User.id')
+				),
+				array(
+					'table' => 'products',
+					'alias' => 'Product',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions' => array('Saleproduct.product_id = Product.id')
+				)
+			),
 			'recursive' => 2
 		));
 		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
@@ -2839,10 +2871,43 @@ class PagesController extends AppController
 	{
 		$this->autoRender = false;
 		$this->layout = 'ajax';
-		$searchProduct = $_POST['idProduct'];
-		$product = $this->Product->find('first', array(
-			'fields' => array('Product.id', 'Product.name', 'Product.price', 'Product.quantity', 'Product.provider'),
-			'conditions' => array('Product.id' => $searchProduct),
+		$idSearch = $_POST['idSale'];
+		$sales = $this->Sale->find('first', array(
+			'fields' => array('Sale.id','Sale.client_id','Sale.seller_id','Saleproduct.id','Saleproduct.sales_id','Saleproduct.product_id','Saleproduct.price',
+			'Saleproduct.quantity','Saleproduct.payment_type','Saleproduct.sale_date','Saleproduct.notes','Saleproduct.discount','User.id','User.name','User.phone',
+			'Product.name','Product.id','Product.provider','Product.quantity','Product.price','Seller.id','Seller.name'),
+			'conditions' => array('Saleproduct.sales_id' => "$idSearch"),
+			'joins' =>
+			array(
+				array(
+					'table' => 'saleproducts',
+					'alias' => 'Saleproduct',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions' => array('Sale.id = Saleproduct.sales_id')
+				),
+				array(
+					'table' => 'users',
+					'alias' => 'Seller',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions'=> array('Sale.seller_id = Seller.id')
+				),
+				array(
+					'table' => 'users',
+					'alias' => 'User',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions' => array('Sale.client_id = User.id')
+				),
+				array(
+					'table' => 'products',
+					'alias' => 'Product',
+					'type' => 'inner',
+					'foreignKey' => false,
+					'conditions' => array('Saleproduct.product_id = Product.id')
+				)
+			),
 			'recursive' => 2
 		));
 		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
@@ -2851,23 +2916,59 @@ class PagesController extends AppController
 
 	public function update_sales()
 	{
+		
 		$this->layout = 'ajax';
 		if ($this->request->is('post')) {
-			$this->Product->id = $_POST['idEdit'];
-			$data['Product']['name'] = $_POST['nameEdit'];
+			$this->Sale->id = $_POST['idSaleEdit'];
+			$client = explode('-', $_POST['clientSaleEdit']);
+			$clientId = $client[0];
+			$product = explode('-', $_POST['productSalesEdit']);
+			$productId = $product[0];
+			$seller = explode('-', $_POST['sellerEdit']);
+			$sellerId = $seller[0];
+			//$this->Sale->create();
+			$data['Sale']['client_id'] = $clientId;
+			$data['Sale']['seller_id'] = $sellerId;
+			$data['Sale']['creation_date'] = date('Y-m-d');
+			if ($this->Sale->save($data)) {
+				echo "entro2";
+				$this->Saleproduct->id = $_POST['idSaleProductEdit'];
+				//$this->Saleproduct->create();
+				//$saleId = $this->Sale->getLastInsertID();
+				$datac['Saleproduct']['sales_id'] = $_POST['idSaleEdit'];
+				if (empty($_POST['dateAddSaleEdit'])) {
+					$datac['Saleproduct']['sale_date'] = date('Y-m-d');
+				} else {
+					$datac['Saleproduct']['sale_date'] = $_POST['dateAddSaleEdit'];
+				}
+				$quantitySelected = $_POST['MaxCountAddEdit'];
 
-			$data['Product']['price'] = $_POST['priceEdit'];
-			$data['Product']['provider'] = $_POST['sellerEdit'];
+				$stock = ($_POST['idSaleCantEdit']-$quantitySelected);
 
-			if (empty($_POST['countEdit'])) {
-				$data['Product']['quantity'] = 0;
-			} else {
-				$data['Product']['quantity'] = $_POST['countEdit'];
-			}
+				$datac['Saleproduct']['product_id'] = $productId;
+				$datac['Saleproduct']['price'] = $_POST['originalPriceAddSaleEdit'];
+				echo "entro3";
+				if(empty($_POST['priceDiscountEdit'])){
+					$datac['Saleproduct']['discount'] = 0;
+				}else{
+					$discount = ($_POST['priceDiscountEdit']/100);
+					$datac['Saleproduct']['discount'] = $discount;
+				}
+				
+				$datac['Saleproduct']['notes'] = $_POST['notesAddSaleEdit'];
+				$datac['Saleproduct']['quantity'] = $quantitySelected;
+				$datac['Saleproduct']['payment_type'] = $_POST['payAddSaleEdit'];
+				$datac['Saleproduct']['date_creation'] = date('Y-m-d');
 
-			if ($this->Product->save($data)) {
+				$this->Product->id = $this->Product->field('id', array('id' => $productId));
+				echo "entro4";
+				if ($this->Product->id) {
+					$this->Product->saveField('quantity', $stock);
+				}
+				echo "entro5";
+				$this->Saleproduct->save($datac);
 				sleep(3);
-				$this->redirect(array('action' => '../products'));
+				$this->redirect(array('action' => '../sales'));
 			}
 		}
 	}
@@ -3022,5 +3123,32 @@ class PagesController extends AppController
 				$this->redirect(array('action' => '../'));
 			} 
 		}
+	}
+	
+	public function searchProduct_barcode()
+	{
+		$this->autoRender = false;
+		$this->layout = 'ajax';
+		$barCodes = $_POST['barcode'];
+		$barcode = $this->Product->find('all', array(
+			'fields' => array('Product.id', 'Product.name', 'Product.price','Product.provider','Product.quantity'),
+			'conditions' => array('Product.codigo_barra'=>$barCodes),
+			'recursive' => 2
+		));
+		echo json_encode($barcode);
+	}
+
+	public function sales_edit(){
+		$products = array();
+		$products = $this->Product->find('all');
+		$this->set('products', $products);
+
+		$sellers = array();
+		$sellers = $this->User->find('all', array(
+			'fields' => array('id', 'User.name'),
+			'conditions' => array('User.type' => 2),
+			'recursive' => 2
+		));
+		$this->set('sellers', $sellers);
 	}
 }

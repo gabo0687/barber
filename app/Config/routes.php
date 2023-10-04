@@ -143,7 +143,6 @@
 	Router::connect('/add_sales', array('controller' => 'pages', 'action' =>  'add_sales'));
 	Router::connect('/search_quantity', array('controller' => 'pages', 'action' =>  'search_quantity'));
 
-	Router::connect('/update_sales', array('controller' => 'pages', 'action' =>  'update_sales'));
 	Router::connect('/search_sales', array('controller' => 'pages', 'action' =>  'search_sales'));
 	Router::connect('/edit_sales', array('controller' => 'pages', 'action' =>  'edit_sales'));
 	Router::connect('/saleproducts', array('controller' => 'pages', 'action' =>  'saleproducts'));
@@ -156,6 +155,8 @@
 	
 	Router::connect('/products_edit', array('controller' => 'pages', 'action' =>  'products_edit'));
 	Router::connect('/check_barcode', array('controller' => 'pages', 'action' =>  'check_barcode'));
+	Router::connect('/searchProduct_barcode', array('controller' => 'pages', 'action' =>  'searchProduct_barcode'));
+	Router::connect('/sales_edit', array('controller' => 'pages', 'action' =>  'sales_edit'));
 	
 	Router::connect('/profile_save', array('controller' => 'pages', 'action' =>  'profile_save'));
 
