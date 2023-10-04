@@ -532,38 +532,79 @@ class PagesController extends AppController
 		$block= '';
 		if( $service != '' ){
 			$barber_id = $barber['User']['id'];
-			$reservations = $this->Activereservation->find('all',array('conditions'=>array('Activereservation.reservation_status <> '=>2,'Activereservation.reservation_time <= '=>$current_time,'Activereservation.reservation_barber'=>$barber_id,'Activereservation.reservation_date '=>$reservationDate)));
+			$reservations = $this->Activereservation->find('all',array('conditions'=>array('Activereservation.reservation_status <> '=>2,'Activereservation.reservation_barber'=>$barber_id,'Activereservation.reservation_date '=>$reservationDate),'order'=>array('Activereservation.reservation_time'=>'ASC')));
 			
-			foreach( $reservations as $reservation ){
-				$services = explode(',',$reservation['Activereservation']['reservation_service']);
-				$durations = $this->Duration->find('all',array('conditions'=>array('Duration.service_id'=>$services,'Duration.barber'=>$barber_id)));
-				$time_duration = 0;
-				foreach( $durations as $duration ){
-					$time_duration = $time_duration + $duration['Duration']['duration'];
-				}
-				
-				$sumarTime = strtotime('+'.$time_duration.' minute', strtotime($reservation['Activereservation']['reservation_time']));
-				$sumarTime = date('H:i:s', $sumarTime);
-				
-				if( strtotime($current_time) < strtotime($sumarTime) ){
-					$horaInicio = new DateTime($current_time);
-					$horaTermino = new DateTime($sumarTime);
-					
-					$interval = $horaInicio->diff($horaTermino); 
-					$minutes = $interval->format('%i');
-					$currentNumHora = date('H',strtotime($current_time));
-					$sumarNumHora = date('H',strtotime($sumarTime));
-					if( strtotime($current_time) <= strtotime($sumarTime) && $minutes == 0 ){
-						$minutes = 60;
-					}
-					if( $minutes >= 30 && strtotime($current_time) <= strtotime($sumarTime) ){
-						$block= 'bloquear';	
-					}
+			$current_services = explode(',',$service);
+			$current_durations = $this->Duration->find('all',array('conditions'=>array('Duration.service_id'=>$current_services,'Duration.barber'=>$barber_id)));
+				$current_time_duration = 0;
+				foreach( $current_durations as $current_duration ){
+					$current_time_duration = $current_time_duration + $current_duration['Duration']['duration'];
 				}
 
+				
+		    $reservation_previous = date('H:i:s'); 
+
+//var_dump($reservations);
+			foreach( $reservations as $reservation ){
+//echo $current_time.' '; 
+				
+					
+					$current_reservation_time = $reservation['Activereservation']['reservation_time'];
+					$hora_previous = new DateTime($reservation_previous);
+					$hora_current = new DateTime($current_reservation_time);
+					$interval = $hora_previous->diff($hora_current); 
+					$minutes_current = $interval->format('%i');
+					$hours_current = $interval->format('%H');
+					$total_minutes = $minutes_current + ($hours_current*60);
+					$restarTime = strtotime('-30 minute', strtotime($reservation_previous));
+					$reservation_previous = date('H:i:s', $restarTime);
+					
+					
+					if( $total_minutes < $current_time_duration && strtotime($current_time.':00') >= strtotime($reservation_previous) && strtotime($current_time.':00') <= strtotime($current_reservation_time) ){
+						
+						$block= 'bloquear';
+					}
+					
+				
+					$services = explode(',',$reservation['Activereservation']['reservation_service']);
+					$durations = $this->Duration->find('all',array('conditions'=>array('Duration.service_id'=>$services,'Duration.barber'=>$barber_id)));
+					$time_duration = 0;
+					foreach( $durations as $duration ){
+						$time_duration = $time_duration + $duration['Duration']['duration'];
+					}
+					
+					$sumarTime = strtotime('+'.$time_duration.' minute', strtotime($reservation['Activereservation']['reservation_time']));
+					$sumarTime = date('H:i:s', $sumarTime);
+					
+					if( strtotime($current_time) < strtotime($sumarTime) ){
+						$horaInicio = new DateTime($current_time);
+						$horaTermino = new DateTime($sumarTime);
+						
+						$interval = $horaInicio->diff($horaTermino); 
+						$minutes = $interval->format('%i');
+						$currentNumHora = date('H',strtotime($current_time));
+						$sumarNumHora = date('H',strtotime($sumarTime));
+						if( strtotime($current_time) <= strtotime($sumarTime) && $minutes == 0 ){
+							$minutes = 60;
+						}
+						if( $minutes >= 30 && strtotime($current_time) <= strtotime($sumarTime) && strtotime($current_time.':00') >= strtotime($current_reservation_time) && strtotime($current_time) <= strtotime($sumarTime) ){
+							
+							$block= 'bloquear';	
+						}
+					}
+				
+				
+
+				if( $current_time == '12:30'){
+					// echo $block;
+				 }
+
+				 $reservation_previous = $sumarTime;
 			}
 			
+			
 		}
+		
 		return $block;
 			
 	}
