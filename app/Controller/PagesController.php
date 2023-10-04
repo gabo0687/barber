@@ -1800,10 +1800,10 @@ class PagesController extends AppController
                     		  <div class="event-list-info">
                         	  <h3>'.substr($reservation[1],0,-1).'</h3>
                         	  <p>Fecha : '.$dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year.'</p>
-                        	  <p>Hora : '.$reservation['Reservation']['reservation_time'].'</p>
+                        	  <p>Hora : '.date("h:i A", strtotime($reservation['Reservation']['reservation_time'])).'</p>
                         	  <p>Barbero : '.$reservation['Barber']['name'].'</p>
                         	  <p>Cliente : '.$reservation['User']['name'].'<a taget="_blank" href="https://api.whatsapp.com/send?phone=506'.$reservation['User']['phone'].'&text=Hola '.$reservation['User']['name'].'!
-							   💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
+							   💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confirm/'.base64_encode($reservation['Reservation']['id'].'|'.$reservation['Reservation']['reservation_time'].'|'.$reservation['Reservation']['reservation_date']).'"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
                         	  <p>Tiempo : '.$reservation[0].' minutos</p>
                         	  <p>Estatus de la cita :';
 							  if( $reservation['Reservation']['reservation_status'] == 0 ){ $response .= 'Sin Confirmar'; }
@@ -1832,9 +1832,10 @@ class PagesController extends AppController
 							}
 							$reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
 							$reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
-						
-							$response .= '<button type="button" class="btn btn-danger" onclick="cancelAppointment('.$reservation['Reservation']['id'].','.$reservatioTime.','.$reservatioDate.')"><a>Eliminar</a></button>
-										  </div>
+							if(  $user['User']['type'] == 1  ||  $user['User']['type'] == 2  ){ 
+							$response .= '<button type="button" class="btn btn-danger" onclick="cancelAppointment('.$reservation['Reservation']['id'].','.$reservatioTime.','.$reservatioDate.')"><a>Eliminar</a></button>';
+							}
+							$response .= '</div>
 										  </span>';
 						   }else{ 
 								if( $reservation['Reservation']['reservation_status'] == 0 ){
@@ -2397,7 +2398,7 @@ class PagesController extends AppController
 			/**
 			 * Services
 			 */
-			$resevationsTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.reservation_status'=>1)));
+			$resevationsTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.payment_type <>'=>0)));
 			$bankTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.payment_type'=>1)));
 			$cashTotal = $this->Reservation->find('all',array('fields' => array('sum(Reservation.reservation_price)   AS ctotal'),'conditions'=>array('Reservation.reservation_date >='=>$dateFrom,'Reservation.reservation_date <='=>$dateTo,'Reservation.payment_type'=>2)));
 			/**
@@ -2555,19 +2556,25 @@ class PagesController extends AppController
 		$appointment = explode('|',$appointmentInfo);
 		
 		$appointmentId = $appointment[0];
-		$reservation_time = $appointment[1];
-		$reservation_date = $appointment[2]; 
-		$this->Reservation->id = $appointment[0];
-		$data['Reservation']['reservation_status'] = 2;
-		if($this->Reservation->save($data)){
-			$activeReservationid = $this->getActiveReservationId($appointmentId);
-			$this->Activereservation->id = $activeReservationid;
-			$data['Activereservation']['reservation_status'] = 2;
-			$this->Activereservation->save($data);
-			//Guardar Notification
-			$this->validate_cancel($appointmentId,$reservation_time,$reservation_date);
-			Cache::clear();
+		$check = $this->Reservation->find('first',array('conditions'=>array('Reservation.id'=>$appointmentId,'Reservation.reservation_status '=>0)));
+		$cancelada = 0;
+		if( !empty($check) ){
+			$cancelada = 1;
+			$reservation_time = $appointment[1];
+			$reservation_date = $appointment[2]; 
+			$this->Reservation->id = $appointment[0];
+			$data['Reservation']['reservation_status'] = 2;
+			if($this->Reservation->save($data)){
+				$activeReservationid = $this->getActiveReservationId($appointmentId);
+				$this->Activereservation->id = $activeReservationid;
+				$data['Activereservation']['reservation_status'] = 2;
+				$this->Activereservation->save($data);
+				//Guardar Notification
+				$this->validate_cancel($appointmentId,$reservation_time,$reservation_date);
+				Cache::clear();
+			}
 		}
+		$this->set('cancelada',$cancelada);
 	}
 
 	public function confirm($info){

@@ -355,7 +355,7 @@ date_default_timezone_set('America/Costa_Rica');
         if( $time_minute != 60 ){
         ?>    
       
-        <option value="<?php echo $time_hour.':'.$time_minute;?>"><?php echo $time_hour.':'.$time_minute;?></option>      
+        <option value="<?php echo $time_hour.':'.$time_minute;?>"><?php echo date("h:i A", strtotime($time_hour.':'.$time_minute));?></option>      
       <?php
         }
       if( $time_minute == 30 ){
@@ -651,7 +651,7 @@ function filterReservations(){
                           reservationPrice = entry[1].Price;
                           reservationBarbers = entry[1].Barbers;
                           if( reservationBarbers.length > 0 && reservationPrice > 0 ){
-                            responseHtml += '<li class="ticket-on-sale"><span class="number">Hora: '+reservationTime+'</span>';
+                            responseHtml += '<li class="ticket-on-sale"><span class="number">Hora: '+convertirHoraAMPM(reservationTime)+'</span>';
                             responseHtml += '<input type="hidden" name="time_'+reservationNumber+'" id="time_'+reservationNumber+'" value="'+reservationTime+'">';
                             
                             responseHtml += '<span class="price">Servicio: '+reservationService+'</span>';
@@ -698,7 +698,27 @@ function filterReservations(){
 	});
 }
 
+function convertirHoraAMPM(horaMilitar) {
+  // Divide la cadena de la hora militar en horas y minutos
+  var partesHora = horaMilitar.split(":");
+  var horas = parseInt(partesHora[0]);
+  var minutos = parseInt(partesHora[1]);
 
+  // Determina si es AM o PM
+  var periodo = horas < 12 ? "AM" : "PM";
+
+  // Convierte las horas al formato de 12 horas
+  if (horas > 12) {
+    horas = horas - 12;
+  } else if (horas === 0) {
+    horas = 12;
+  }
+
+  // Formatea la hora en AM/PM
+  var horaAMPM = horas.toString().padStart(2, "0") + ":" + minutos.toString().padStart(2, "0") + " " + periodo;
+
+  return horaAMPM;
+}
 
 
 var checkNumber = false;

@@ -67,11 +67,14 @@ if( isset($user['User']) ){ ?>
                     <div class="event-list-info">
                         <h3><?php echo substr($reservation[1],0,-1);?></h3>
                         <p>Fecha : <?php echo $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;?></p>
-                        <p>Hora : <?php echo $reservation['Reservation']['reservation_time'];?></p>
+                        <p>Hora : <?php echo date("h:i A", strtotime($reservation['Reservation']['reservation_time']));?></p>
                         <p>Barbero : <?php echo $reservation['Barber']['name'];?></p>
-                        <p>Cliente : <?php echo $reservation['User']['name'];?> <a taget="_blank" href="https://api.whatsapp.com/send?phone=506<?php echo $reservation['User']['phone'];?>&text=Hola <?php echo $reservation['User']['name'];?>!
+                        <p>Cliente : <?php echo $reservation['User']['name'];?> 
+                        <?php if(  $user['User']['type'] == 1  ||  $user['User']['type'] == 2  ){ ?>
+                        <a taget="_blank" href="https://api.whatsapp.com/send?phone=506<?php echo $reservation['User']['phone'];?>&text=Hola <?php echo $reservation['User']['name'];?>!
 
-💈 Tienes cita para corte a las <?php echo $reservation['Reservation']['reservation_time'];?> , por favor confirmar en el siguiente link: https://alofresa.com/confimar/jhakjahsd"><img width='30px' src="img/layout/whatsapp.png" alt=""></a></p>
+💈 Tienes cita para corte a las <?php echo $reservation['Reservation']['reservation_time'];?> , por favor confirmar en el siguiente link: https://alofresa.com/confirm/<?php echo base64_encode($reservation['Reservation']['id'].'|'.$reservation['Reservation']['reservation_time'].'|'.$reservation['Reservation']['reservation_date']);?>"><img width='30px' src="img/layout/whatsapp.png" alt=""></a></p>
+                        <?php } ?>   
                         <p>Tiempo : <?php echo $reservation[0];?> minutos</p>
                         <p>Estatus de la cita : <?php if( $reservation['Reservation']['reservation_status'] == 0 ){ echo 'Sin Confirmar'; }if( $reservation['Reservation']['reservation_status'] == 1 ){ echo 'Confirmada'; }if( $reservation['Reservation']['reservation_status'] == 2 ){ echo '<b class="blink_me">CANCELADA</b>'; }?></p>
                         <p>Precio : ₡<?php echo number_format($reservation['Reservation']['reservation_price']);?></p>
@@ -99,8 +102,9 @@ if( isset($user['User']) ){ ?>
                          }
                          $reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
                          $reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
-                     ?>
+                     if(  $user['User']['type'] == 1  ||  $user['User']['type'] == 2  ){ ?>
                     <button type="button" class="btn btn-danger" onclick="cancelAppointment(<?php echo $reservation['Reservation']['id'];?>,<?php echo $reservatioTime;?>,<?php echo $reservatioDate;?>)"><a>Eliminar</a></button>
+                    <?php } ?>
                     </div>
                     </span>
                     <?php }else{ 
