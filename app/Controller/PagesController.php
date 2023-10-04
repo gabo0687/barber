@@ -479,7 +479,7 @@ class PagesController extends AppController
 		echo json_encode($reservationsAvailable);
 	}
 
-	public function checkBlockBarber($reservationDate, $timeList, $barberResponse)
+	public function checkBlockBarber($reservationDate, $timeList, $barberResponse,$reservationService,$reservationTime)
 	{
 
 		$blocks = $this->Block->find('all', array('conditions' => array('Block.block_date' => $reservationDate, 'Block.barber_id' => $barberResponse['User']['id'], 'Block.barber_id <>' => 0)));
@@ -524,7 +524,48 @@ class PagesController extends AppController
 					break;
 			}
 		}
+		$blockReservations = $this->moveReservation($barberResponse,$current_time,$reservationDate,$reservationService);
 		return $blockReservations;
+	}
+
+	public function moveReservation($barber,$current_time,$reservationDate,$service){
+		$block= '';
+		if( $service != '' ){
+			$barber_id = $barber['User']['id'];
+			$reservations = $this->Activereservation->find('all',array('conditions'=>array('Activereservation.reservation_status <> '=>2,'Activereservation.reservation_time <= '=>$current_time,'Activereservation.reservation_barber'=>$barber_id,'Activereservation.reservation_date '=>$reservationDate)));
+			
+			foreach( $reservations as $reservation ){
+				$services = explode(',',$reservation['Activereservation']['reservation_service']);
+				$durations = $this->Duration->find('all',array('conditions'=>array('Duration.service_id'=>$services,'Duration.barber'=>$barber_id)));
+				$time_duration = 0;
+				foreach( $durations as $duration ){
+					$time_duration = $time_duration + $duration['Duration']['duration'];
+				}
+				
+				$sumarTime = strtotime('+'.$time_duration.' minute', strtotime($reservation['Activereservation']['reservation_time']));
+				$sumarTime = date('H:i:s', $sumarTime);
+				
+				if( strtotime($current_time) < strtotime($sumarTime) ){
+					$horaInicio = new DateTime($current_time);
+					$horaTermino = new DateTime($sumarTime);
+					
+					$interval = $horaInicio->diff($horaTermino); 
+					$minutes = $interval->format('%i');
+					$currentNumHora = date('H',strtotime($current_time));
+					$sumarNumHora = date('H',strtotime($sumarTime));
+					if( strtotime($current_time) <= strtotime($sumarTime) && $minutes == 0 ){
+						$minutes = 60;
+					}
+					if( $minutes >= 30 && strtotime($current_time) <= strtotime($sumarTime) ){
+						$block= 'bloquear';	
+					}
+				}
+
+			}
+			
+		}
+		return $block;
+			
 	}
 
 	public function checkBlockDayPass($reservationDate, $reservationTime)
@@ -660,7 +701,7 @@ class PagesController extends AppController
 						 */
 						$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 						if ($validateBarberService) {
-							$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse);
+							$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse,$reservationService,$reservationTime);
 							if ($blockBarber == '') {
 								array_push($reservationBarberResponse, $barberResponse);
 							}
@@ -679,7 +720,7 @@ class PagesController extends AppController
 					if ($barberExist == false) {
 						$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 						if ($validateBarberService) {
-							$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse);
+							$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse,$reservationService,$reservationTime);
 							if ($blockBarber == '') {
 								array_push($reservationBarberResponse, $barberResponse);
 							}
@@ -707,7 +748,7 @@ class PagesController extends AppController
 					if ($filterBarber == $barberResponse['User']['id']) {
 						$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 						if ($validateBarberService) {
-							$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse);
+							$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse,$reservationService,$reservationTime);
 							if ($blockBarber == '') {
 								array_push($reservationBarberResponse, $barberResponse);
 							}
@@ -730,7 +771,7 @@ class PagesController extends AppController
 				foreach ($barbers as $barberResponse) {
 					$validateBarberService = $this->validateBarberService($reservationService, $barberResponse['User']['id']);
 					if ($validateBarberService) {
-						$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse);
+						$blockBarber = $this->checkBlockBarber($reservationDate, $timeList, $barberResponse,$reservationService,$reservationTime);
 						if ($blockBarber == '') {
 							array_push($reservationBarberResponse, $barberResponse);
 						}
