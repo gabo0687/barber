@@ -2657,6 +2657,10 @@ class PagesController extends AppController
 		$appointmentInfo = base64_decode($info);
 		$appointment = explode('|',$appointmentInfo);
 		$appointmentId = $appointment[0];
+		$check = $this->Reservation->find('first',array('conditions'=>array('Reservation.id'=>$appointmentId,'Reservation.reservation_status '=>2)));
+		$confirm = 0;
+		if( empty($check) ){
+		$confirm = 1;
 		$this->Reservation->id = $appointmentId;
 		$data['Reservation']['reservation_status'] = 1;
 		if($this->Reservation->save($data)){
@@ -2666,6 +2670,8 @@ class PagesController extends AppController
 			$this->Activereservation->save($data);
 			Cache::clear();
 		}
+	   }
+	   $this->set('confirm',$confirm);
 	}
   /**
    * $log = $this->Model->getDataSource()->getLog(false, false);

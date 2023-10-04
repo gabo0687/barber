@@ -47,7 +47,7 @@ date_default_timezone_set('America/Costa_Rica');
          <form class="header-search">   
          <div class="event-info-buttons"> 
           <?php if( $cancelada == 0 ){ ?>
-            <span class="ticket-btn">💈Su reservación ya fue confirmada NO puede ser cancelada, comuniquese con la barberia<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width='30px' src="../img/layout/whatsapp.png" alt=""></a></span>
+            <span class="ticket-btn">💈Su reservación ya fue confirmada NO puede ser cancelada, por favor comuniquese con la barberia para cancelarla. Muchas gracias!<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width='30px' src="../img/layout/whatsapp.png" alt=""></a></span>
           <?php }else{?>
            <a class="ticket-btn">💈Su reservación a sido cancelada con exito!</a> 
           <?php }?>

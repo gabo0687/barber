@@ -46,8 +46,12 @@ date_default_timezone_set('America/Costa_Rica');
          
          <form class="header-search">   
          <div class="event-info-buttons"> 
+         <?php if( $confirm == 1 ){ ?>
            <a class="ticket-btn">💈Su reservación a sido confirmada con exito, muchas gracias!</a> 
-         </div>
+         <?php }else{ ?>
+          <span class="ticket-btn">💈Su reservación ya fue cancelada NO puede ser confirmada, por favor comuniquese con la barberia o vuelva a reservar. Muchas gracias!<a taget="_blank" href="https://api.whatsapp.com/send?phone=50684937440"><img width='30px' src="../img/layout/whatsapp.png" alt=""></a></span>
+          <?php } ?>
+          </div>
         </form>
       </div>
         
@@ -75,7 +79,7 @@ date_default_timezone_set('America/Costa_Rica');
 setTimeout(() => {
 
 window.location.href = "../";
-}, "5000");
+}, "7000");
 
  
 var slide_images = [
