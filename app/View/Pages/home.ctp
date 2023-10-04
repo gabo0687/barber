@@ -97,7 +97,7 @@ if( isset($user['User']) ){ ?>
                     <button type="button" class="btn btn-secondary" onclick="confirmAppointment(<?php echo $reservation['Reservation']['id'];?>)"><a>Confirmar Cita</a></button>
                     <?php
                          }else{?>
-                    <button type="submit" class="btn btn-success"><a>Guardar</a></button>
+                    <button type="submit" class="btn btn-success"><a>Realizar Pago</a></button>
                     <?php
                          }
                          $reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";

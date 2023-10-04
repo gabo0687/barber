@@ -1903,7 +1903,7 @@ class PagesController extends AppController
 							if( $reservation['Reservation']['reservation_status'] == 0 ){
 							$response .= '<button type="button" class="btn btn-secondary" onclick="confirmAppointment('.$reservation['Reservation']['id'].')"><a>Confirmar Cita</a></button>';
 						    }else{
-							$response .= '<button type="submit" class="btn btn-success"><a>Guardar</a></button>';
+							$response .= '<button type="submit" class="btn btn-success"><a>Realizar Pago</a></button>';
 							}
 							$reservatioTime = "'".$reservation['Reservation']['reservation_time']."'";
 							$reservatioDate = "'".$reservation['Reservation']['reservation_date']."'";
