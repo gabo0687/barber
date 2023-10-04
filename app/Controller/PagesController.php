@@ -544,10 +544,7 @@ class PagesController extends AppController
 				
 		    $reservation_previous = date('H:i:s'); 
 
-//var_dump($reservations);
 			foreach( $reservations as $reservation ){
-//echo $current_time.' '; 
-				
 					
 					$current_reservation_time = $reservation['Activereservation']['reservation_time'];
 					$hora_previous = new DateTime($reservation_previous);
@@ -594,10 +591,6 @@ class PagesController extends AppController
 					}
 				
 				
-
-				if( $current_time == '12:30'){
-					// echo $block;
-				 }
 
 				 $reservation_previous = $sumarTime;
 			}
