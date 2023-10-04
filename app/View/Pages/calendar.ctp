@@ -251,7 +251,7 @@
                 <?php 
                   $time_hour = 7;
                   $time_minute = '00';
-                  for($i=0; $i <= 30; $i++){ 
+                  for($i=0; $i <= 60; $i++){ 
                     if( $time_minute != 60 ){
                       if( $time_hour < 10 ){
                         if(strlen($time_hour) == 2){
@@ -264,7 +264,7 @@
                     <option value="<?php echo $time_hour.':'.$time_minute.':00';?>"><?php echo $time_hour.':'.$time_minute;?></option>      
                   <?php
                     }
-                  if( $time_minute == 30 ){
+                  if( $time_minute == 45 ){
                     $time_minute = '00';
                     $time_hour = $time_hour + 1;
                   }else{
@@ -272,8 +272,8 @@
                       $time_minute = '00';
                     $time_hour = $time_hour + 1;
                     }else{
-                      if( $time_minute == 00 || $time_minute == 30 ){
-                        $time_minute = $time_minute +30;
+                      if( $time_minute == 00 || $time_minute == 15|| $time_minute == 30 ){
+                        $time_minute = $time_minute +15;
                       }
                     }  
                   } 
