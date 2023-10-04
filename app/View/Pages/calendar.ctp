@@ -158,12 +158,14 @@
 <div class="page-header">
 <div class="pull-left form-inline">
 <div class="btn-group">
-<a class="btn btn-success" href="home">Regresar a página principal</a></br>
-
+<a class="btn btn-success" href="home">Regresar a página principal</a>
+</div></br></br>
+<div class="btn-group">
 <?php foreach( $barbers as $barber ){ ?>
   <a class="btn" style="background-color:<?php echo $barber['User']['color'];?> ; color:white"><?php echo $barber['User']['name'];?></a>
 <?php } ?>
 </div>
+</br></br>
 </div>
 </div>
 </div>

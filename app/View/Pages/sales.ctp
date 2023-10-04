@@ -70,7 +70,7 @@
           </div>
           <div class="form-group">
             <label for="accountInputEmail">Descuento %</label>
-            <input type="number" class="form-control" id="priceDiscount" name="priceDiscount" onchange="calculatePrice()" aria-describedby="emailHelp" placeholder="Porcentaje de descuento">
+            <input type="number" class="form-control" id="priceDiscount" name="priceDiscount" onkeyup="calculatePrice()" aria-describedby="emailHelp" placeholder="Porcentaje de descuento">
           </div>
           <div class="form-group">
             <label for="accountInputEmail">Precio</label>
@@ -196,7 +196,7 @@ function getBarCodeInfo(barCode){
 
 </script>
 <script>
-  let html5QrcodeScannerSearch = 0;
+  
   function searchOption(valor){
   
   if( valor == 2 ){
@@ -214,11 +214,11 @@ function getBarCodeInfo(barCode){
   var cantProductos = 0;
   var productOriginalPrice= "";
   var productPrice = 0;
-  $('#searchSaleEdit').on('submit', function(e) {
+ /* $('#searchSaleEdit').on('submit', function(e) {
     e.preventDefault();
     search();
   });
-
+*/
 
   window.scrollTo(0, document.body.scrollHeight);
   $('#myList a').on('click', function(e) {
@@ -305,6 +305,7 @@ function getBarCodeInfo(barCode){
             $('#MaxCountAdd').css('border', '');
             $('#error-quantitySales').hide;
             productPrice = price;
+            calculatePrice();
             } else{
               $('#MaxCountAdd').append('<option onfocus="calculatePrice()" >0</option>');
               $('#error-quantitySales').show;
@@ -329,13 +330,9 @@ function getBarCodeInfo(barCode){
 
 
   function search() {
-    var date = "";
-    if ($('#searchSale').val() == '') {
-      var today = new Date();
-      var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-    }else{
-      date = $('#searchSale').val();
-    }
+  
+    var date = $('#searchSale').val();
+    
     $('#createNewSale').hide();
     $('#home_list').show();
     $('#saleList').show();

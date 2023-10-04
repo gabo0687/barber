@@ -53,19 +53,11 @@
                                 </datalist>
                             </span>
                             </br>
-                            <div class="form-group text-left">
-                                <label for="accountInputUser">Buscar Producto:</label></br></br>
-                                <input type="radio" id="search_nombreSaleEdit" value="1"
-                                    onclick="searchOption(this.value)" name="search_productoEdit" checked>Por nombre
-                                <input type="radio" id="search_codeSaleEdit" value="2"
-                                    onclick="searchOption(this.value)" name="search_productoEdit">Por código de barras
-                                </br></br>
-                            </div>
                             <span class="tax">
 
                                 <input type="search" list="products-salesEdit" onchange="searchQuantity()"
                                     class="form-control" id="productSalesEdit" name="productSalesEdit"
-                                    placeholder="Escribe el nombre del producto">
+                                    placeholder="Escribe el nombre del producto" readonly>
 
                                 <datalist id="products-salesEdit">
 
@@ -76,15 +68,6 @@
                                 </datalist>
                             </span>
                             </br>
-                            <div class="form-group" id="scanSaleEdit" name="scanSaleEdit" style="display:none;">
-                                <span onclick="scanearCodigo()" id="botonScanEdit" class="btn btn-secondary">Scanear
-                                    Código de Barras</span></br></br>
-                                <div id="qr-readerEdit" style="display:none;" class="form-control"></div>
-                                </br>
-                                <input type="hidden" class="form-control" name="codigo_barra_textEdit"
-                                    id="codigo_barra_textEdit" placeholder="Código de barras" readonly>
-                                <input type="hidden" class="form-control" name="codigo_barraEdit" id="codigo_barraEdit">
-                            </div>
                             <div class="form-group" style="display:none;">
                                 <input type="hidden" id="countAddAvaiableProductEdit" name="countAddAvaiableProductEdit"
                                     value="0">
@@ -98,7 +81,7 @@
                             <div class="form-group">
                                 <label for="accountInputEmail">Descuento %</label>
                                 <input type="number" class="form-control" id="priceDiscountEdit"
-                                    name="priceDiscountEdit" onchange="calculatePrice()" aria-describedby="emailHelp"
+                                    name="priceDiscountEdit" onkeyup="calculatePrice()" aria-describedby="emailHelp"
                                     placeholder="Porcentaje de descuento">
                             </div>
                             <div class="form-group">
@@ -158,81 +141,8 @@
                 </div>
     </article>
 </section>
-<audio id="audio" controls style="display:none">
-    <source type="audio/mp3" src="codigos/beep-beep.mp3">
-</audio>
 
 <script>
-var lastResult, countResults = 0;
-let html5QrcodeScanner = 0;
-
-function scanearCodigo() {
-    $('#qr-readerEdit').show();
-    html5QrcodeScanner = new Html5QrcodeScanner(
-        "qr-readerEdit", {
-            fps: 10,
-            qrbox: 250
-        });
-    html5QrcodeScanner.render(onScanSuccess);
-    $('#html5-qrcode-anchor-scan-type-change').hide();
-}
-
-function onScanSuccess(decodedText, decodedResult) {
-
-    ++countResults;
-    lastResult = decodedText;
-    // Handle on success condition with the decoded message.
-    $('#codigo_barraEdit').val(decodedText);
-    $('#codigo_barra_textEdit').val(decodedText);
-
-
-    var audio = document.getElementById("audio");
-    audio.play();
-    getBarCodeInfo(decodedText);
-
-}
-
-
-function getBarCodeInfo(barCode) {
-    $.ajax({
-        type: 'POST',
-        url: 'searchProduct_barcode',
-        data: 'barcode=' + barCode,
-        beforeSend: function() {
-
-        },
-        error: function() {
-
-            alert('No hay internet');
-        },
-        success: function(barcode) {
-        if(barcode == '[]'){
-          alert("prducto no registrado");
-          $('#MaxCountAddEdit').focus();
-        html5QrcodeScanner.clear();
-        $('#qr-readerEdit').hide();
-        }else{
-          const res = JSON.parse(barcode);
-        $('#priceAddSaleEdit').val(res[0]["Product"]["price"]);
-        var productName = res[0]["Product"]["id"]+"-"+res[0]["Product"]["name"]+" / "+res[0]["Product"]["provider"]+" | "+res[0]["Product"]["price"];
-        $('#productSalesEdit').val(productName);
-        html5QrcodeScanner.clear();
-        searchQuantity();
-        $('#qr-readerEdit').hide();
-          $('#codigo_barraEdit').val('');
-         $('#codigo_barra_textEdit').val('');
-        $('#error-codigoEdit').show();
-        window.scrollTo(0, document.body.scrollHeight);
-        }
-        window.scrollTo(0, document.body.scrollHeight);
-
-      }
-
-    });
-}
-</script>
-<script>
-let html5QrcodeScannerSearch = 0;
 
 function searchOption(valor) {
 
@@ -463,9 +373,9 @@ function showEditSales(id) {
         },
         success: function(editSale) {
             const res = JSON.parse(editSale);
-                editCantProducto = "";
-               editCantProductoId = "";
-               cantProductosComprados = 0;
+            editCantProducto = "";
+            editCantProductoId = "";
+            cantProductosComprados = 0;
             $('#idSaleEdit').val(res["Sale"]["id"]);
             $('#idSaleProductEdit').val(res["Saleproduct"]["id"]);
             
@@ -476,7 +386,7 @@ function showEditSales(id) {
             $('#priceDiscountEdit').val(globalDiscount);
             $('#dateAddSaleEdit').val(res["Saleproduct"]["sale_date"]);
 
-            var productName = res["Product"]["id"] + "-" + res["Product"]["name"] + " / " + res["Product"]["provider"] + " | " + res["Product"]["price"];
+            var productName = res["Product"]["id"] + "-" + res["Product"]["name"] + " / " + res["Product"]["provider"] + " | " + res["Saleproduct"]["price"];
             $('#productSalesEdit').val(productName);
             var clientName = res["User"]["id"] + "-" + res["User"]["name"] + " | " + res["User"]["phone"];
             $('#clientSaleEdit').val(clientName);
@@ -496,7 +406,7 @@ function showEditSales(id) {
                 }
                $("#MaxCountAddEdit").val(cantProductosComprados).change();
                productPrice = 0;
-               productPrice = res["Product"]["price"];
+               productPrice = res["Saleproduct"]["price"];
                globalPrice = productPrice;
                editCantProducto = cantProductosEdit;
                editCantProductoId = res["Product"]["id"] ;
@@ -513,7 +423,7 @@ function showEditSales(id) {
                 $('#countAddAvailableEdit').val(0);
                 $('#countAddAvaiableProductEdit').val(0);
             } 
-
+            window.scrollTo(0, document.body.scrollHeight);
         }
 
     });

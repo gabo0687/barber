@@ -41,7 +41,7 @@ if( $user['User']['type'] == 1 ){ ?>
 }
 if( isset($user['User']) ){ ?> 
 </br> 
-<h1 style="color:white">Citas (<?php echo count($reservations);?>)</h1> 
+<h1 style="color:white" id="countReservations">Citas (<?php echo count($reservations);?>)</h1> 
    
         <section class="event-list-section">
             <ul class="eventlist" id="eventlist">
@@ -65,7 +65,7 @@ if( isset($user['User']) ){ ?>
                 <li>
                     <span class="event-list-item-content">
                     <div class="event-list-info">
-                        <h3><?php echo $reservation[1];?></h3>
+                        <h3><?php echo substr($reservation[1],0,-1);?></h3>
                         <p>Fecha : <?php echo $dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year;?></p>
                         <p>Hora : <?php echo $reservation['Reservation']['reservation_time'];?></p>
                         <p>Barbero : <?php echo $reservation['Barber']['name'];?></p>
@@ -251,8 +251,10 @@ function comprobanteShow(comprobante_imagen){
             alert('No hay internet3');    
             },
             success: function(reservation) {
-               
-             $('#eventlist').html(reservation);
+            var infoReservations = reservation.split('***');
+            var citas = infoReservations[0];    
+             $('#countReservations').text('Citas '+citas);  
+             $('#eventlist').html(infoReservations[1]);
             }
             });
     }

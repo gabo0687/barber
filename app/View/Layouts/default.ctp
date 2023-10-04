@@ -650,7 +650,7 @@ function filterReservations(){
                           reservationDuration = entry[1].Duration;
                           reservationPrice = entry[1].Price;
                           reservationBarbers = entry[1].Barbers;
-                          if( reservationBarbers.length > 0 ){
+                          if( reservationBarbers.length > 0 && reservationPrice > 0 ){
                             responseHtml += '<li class="ticket-on-sale"><span class="number">Hora: '+reservationTime+'</span>';
                             responseHtml += '<input type="hidden" name="time_'+reservationNumber+'" id="time_'+reservationNumber+'" value="'+reservationTime+'">';
                             

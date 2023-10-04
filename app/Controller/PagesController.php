@@ -1779,7 +1779,7 @@ class PagesController extends AppController
 		}
 
 
-		$response = '';
+		$response = '('.count($reservationResponse).')***';
 
 		if (!empty($reservationResponse)) {
 
@@ -1798,7 +1798,7 @@ class PagesController extends AppController
                 			  <li>
                     		  <span class="event-list-item-content">
                     		  <div class="event-list-info">
-                        	  <h3>'.$reservation[1].'</h3>
+                        	  <h3>'.substr($reservation[1],0,-1).'</h3>
                         	  <p>Fecha : '.$dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year.'</p>
                         	  <p>Hora : '.$reservation['Reservation']['reservation_time'].'</p>
                         	  <p>Barbero : '.$reservation['Barber']['name'].'</p>
@@ -2833,10 +2833,13 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		$this->layout = 'ajax';
 		$dateSearch = $_POST['searchSales'];
+		if( $dateSearch == '' ){
+			$dateSearch = date('Y-m-d');
+		}
 		$sales = $this->Sale->find('all', array(
 			'fields' => array('Sale.id','Sale.client_id','Sale.seller_id','Saleproduct.sales_id','Saleproduct.product_id','Saleproduct.sale_date',
 			'User.name','Product.name'),
-			'conditions' => array('Saleproduct.sale_date' => "$dateSearch"),
+			'conditions' => array('Saleproduct.sale_date' => $dateSearch),
 			'joins' =>
 			array(
 				array(
@@ -2863,8 +2866,8 @@ class PagesController extends AppController
 			),
 			'recursive' => 2
 		));
-		$user = mb_convert_encoding($user, 'UTF-8', 'UTF-8');
-		echo json_encode($user);
+		$sales = mb_convert_encoding($sales, 'UTF-8', 'UTF-8');
+		echo json_encode($sales);
 	}
 
 	public function edit_sales()
@@ -2908,10 +2911,10 @@ class PagesController extends AppController
 					'conditions' => array('Saleproduct.product_id = Product.id')
 				)
 			),
-			'recursive' => 2
+			'recursive' => -1
 		));
-		$product = mb_convert_encoding($product, 'UTF-8', 'UTF-8');
-		echo json_encode($product);
+		$sales = mb_convert_encoding($sales, 'UTF-8', 'UTF-8');
+		echo json_encode($sales);
 	}
 
 	public function update_sales()
