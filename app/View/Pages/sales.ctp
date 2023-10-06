@@ -1,4 +1,74 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+  .blink_me {
+  animation: blinker 1s linear infinite;
+}
+
+@keyframes blinker {
+  50% {
+    opacity: 0;
+  }
+}
+
+  /* Add your custom styles here */
+
+    .searchable-dropdown {
+        position: relative;
+        width: 200px;
+    }
+
+    #clientSales2 {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #clientsSale3 {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 100%;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #clientsSale3 li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #clientsSale3 li:hover {
+        background-color: #f0f0f0;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+
+
+
+.input-container {
+    position: relative;
+    width: 100%;
+}
+
+
+#clear-button {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+
+</style>  
 <section class="event-detail">
   <article id="profile">
     <h2>Inventario</h2>
@@ -35,6 +105,19 @@
               </datalist>
             </span>
             </br>
+            <div class="input-container">
+          <input type="text" id="clientSales2" name="clientSales2" class="form-control" placeholder="Escribe el nombre del cliente">
+          <span id="clear-button" class="hidden">×</span>
+        </div>
+
+        <ul id="clientsSale3" class="hidden">
+        <?php foreach( $clients as $client ){
+          $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
+           ?>
+            <li onclick="selectClient(<?php echo $clientSelected;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
+            <?php } ?>
+        </ul>
+        </span>
           <div class="form-group text-left">
         <label for="accountInputUser">Buscar Producto:</label></br></br>
         <input type="radio" id="search_nombreSale" value="1" onclick="searchOption(this.value)" name="search_producto" checked>Por nombre
@@ -194,9 +277,59 @@ function getBarCodeInfo(barCode){
     });
 }
 
-</script>
-<script>
-  
+        const inputField2 = document.getElementById("clientSales2");
+        const clearButton2 = document.getElementById("clear-button");
+
+        const searchInput2 = document.getElementById("clientSales2");
+        const dropdownList2 = document.getElementById("clientsSale3");
+
+        inputField2.addEventListener("input", function () {
+            if (inputField2.value.trim() !== "") {
+                clearButton2.classList.remove("hidden");
+            } else {
+                clearButton2.classList.add("hidden");
+            }
+        });
+
+        clearButton2.addEventListener("click", function () {
+            inputField2.value = "";
+            clearButton2.classList.add("hidden");
+            $('#clientSales2').removeAttr('readonly');
+            dropdownList2.classList.add("hidden");
+            $('#clientsSale3').removeAttr('style');
+            $('#clientSales2').focus();
+        });
+
+
+        function selectClient(client){
+          $('#clientSales2').val(client);
+          $('#clientsSale3').hide();
+          $('#clientSales2').attr('readonly','readonly');
+          
+        }
+        
+        
+
+        searchInput2.addEventListener("input", function () {
+            const filter = searchInput2.value.toLowerCase();
+            const options = dropdownList2.getElementsByTagName("li");
+
+            for (let i = 0; i < options.length; i++) {
+                const option = options[i];
+                if (option.textContent.toLowerCase().includes(filter)) {
+                    option.style.display = "block";
+                } else {
+                    option.style.display = "none";
+                }
+            }
+
+            if (filter === "") {
+                dropdownList2.classList.add("hidden");
+            } else {
+                dropdownList2.classList.remove("hidden");
+            }
+        });
+
   function searchOption(valor){
   
   if( valor == 2 ){
