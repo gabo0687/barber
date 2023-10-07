@@ -270,12 +270,20 @@
                                     aria-describedby="emailHelp" placeholder="Precio">
                             </div>
                             <h4 class="offset-sm-3">Editar Venta</h4>
+                            </br>
+                            <span class="description">Producto:</span>
+
+                            <div class="input-container">
+          <input type="text" id="productSalesEdit" name="productSalesEdit" class="form-control" disabled>
+        </div>
+ 
+       
                             <span class="description">Cliente:</span>
 
 
                             <div class="input-container">
-          <input type="text" id="clientSaleEdit" name="clientSaleEdit" class="form-control" placeholder="Escribe el nombre del cliente">
-          <span id="clear-buttonClientEdit" class="hidden">×</span>
+          <input type="text" id="clientSaleEdit" name="clientSaleEdit" class="form-control" placeholder="Escribe el nombre del cliente" readonly>
+          <span id="clear-buttonClientEdit" class="">×</span>
         </div>
 
         <ul id="clientsSaleEdit" class="hidden">
@@ -285,21 +293,7 @@
             <li style="color:black" onclick="selectClientSaleEdit(<?php echo $clientSelectedSale;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
             <?php } ?>
         </ul>
-                            </br>
-                            <span class="description">Producto:</span>
-
-                            <div class="input-container">
-          <input type="text" id="productSalesEdit" name="productSalesEdit" onchange="searchQuantity()" class="form-control" placeholder="Escribe el nombre del producto">
-          <span id="clear-buttonProductsEdit" class="hidden">×</span>
-        </div>
-
-        <ul id="productOptionSalesEdit" class="hidden"  >
-        <?php foreach( $products as $product ){
-          $productSelected = "'".$product['Product']['id'].'-'.$product['Product']['name'].' | '.$product['Product']['provider'].' | '.$product['Product']['price']."'";
-           ?>
-            <li style="color:black"  onclick="selectProductSaleEdit(<?php echo $productSelected;?>)" ><?php echo $product['Product']['id'];?>-<?php echo $product['Product']['name'];?> | <?php echo $product['Product']['provider'];?>| <?php echo $product['Product']['price'];?></li>
-            <?php } ?>
-        </ul>
+                           
 
                             </br>
                             <div class="form-group" style="display:none;">
@@ -436,59 +430,8 @@ const inputFieldClientEdit = document.getElementById("clientSaleEdit");
 
         /******Products****** */
 
-        const inputFieldProductsEdit = document.getElementById("productSalesEdit");
-        const clearButtonProductsEdit = document.getElementById("clear-buttonProductsEdit");
-
-        const searchInputProductsEdit = document.getElementById("productSalesEdit");
-        const dropdownListProductsEdit = document.getElementById("productOptionSalesEdit");
-
-        inputFieldProductsEdit.addEventListener("input", function () {
-            if (inputFieldProductsEdit.value.trim() !== "") {
-                clearButtonProductsEdit.classList.remove("hidden");
-            } else {
-                clearButtonProductsEdit.classList.add("hidden");
-            }
-        });
-
-        clearButtonProductsEdit.addEventListener("click", function () {
-            inputFieldProductsEdit.value = "";
-            clearButtonProductsEdit.classList.add("hidden");
-            $('#productSalesEdit').removeAttr('readonly');
-            dropdownListProductsEdit.classList.add("hidden");
-            $('#productOptionSalesEdit').removeAttr('style');
-            $('#productSalesEdit').focus();
-        });
-
-
-        function selectProductSaleEdit(client){
-          $('#productSalesEdit').val(client);
-          $('#productOptionSalesEdit').hide();
-          searchQuantity();
-          $('#productSalesEdit').attr('readonly','readonly');
-          
-        }
         
         
-
-        searchInputProductsEdit.addEventListener("input", function () {
-            const filterProductsEdit = searchInputProductsEdit.value.toLowerCase();
-            const optionsProductsEdit = dropdownListProductsEdit.getElementsByTagName("li");
-
-            for (let i = 0; i < optionsProductsEdit.length; i++) {
-                const optionEdit = optionsProductsEdit[i];
-                if (optionEdit.textContent.toLowerCase().includes(filterProductsEdit)) {
-                    optionEdit.style.display = "block";
-                } else {
-                    optionEdit.style.display = "none";
-                }
-            }
-
-            if (filterProductsEdit === "") {
-                dropdownListProductsEdit.classList.add("hidden");
-            } else {
-                dropdownListProductsEdit.classList.remove("hidden");
-            }
-        });
 
         /**Barbers**** */
         const inputFieldSellerEdit = document.getElementById("sellerEdit");
