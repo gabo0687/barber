@@ -3013,8 +3013,6 @@ class PagesController extends AppController
 			$this->Sale->id = $_POST['idSaleEdit'];
 			$client = explode('-', $_POST['clientSaleEdit']);
 			$clientId = $client[0];
-			$product = explode('-', $_POST['productSalesEdit']);
-			$productId = $product[0];
 			$seller = explode('-', $_POST['sellerEdit']);
 			$sellerId = $seller[0];
 			//$this->Sale->create();
@@ -3036,7 +3034,6 @@ class PagesController extends AppController
 
 				$stock = ($_POST['idSaleCantEdit']-$quantitySelected);
 
-				$datac['Saleproduct']['product_id'] = $productId;
 				$datac['Saleproduct']['price'] = $_POST['originalPriceAddSaleEdit'];
 				echo "entro3";
 				if(empty($_POST['priceDiscountEdit'])){

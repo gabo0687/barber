@@ -1,4 +1,235 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
+<style>
+
+    #clientSaleEdit {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #clientsSaleEdit {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #clientsSaleEdit li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #clientsSaleEdit li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonClientEdit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+    /* Products */
+    #productSalesEdit {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #productOptionSalesEdit {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #productOptionSalesEdit li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #productOptionSalesEdit li:hover {
+        background-color: #f0f0f0;
+    }
+
+    #clear-buttonProductsEdit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+    /* Seller */
+    #sellerEdit {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #sellerOptionSalesEdit {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #sellerOptionSalesEdit li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #sellerOptionSalesEdit li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonSellerEdit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+    /* Responsive */
+
+
+    @media all and (max-width: 768px){
+
+      
+    #clientSaleEdit {
+        width: 100%;
+        padding: 10px;
+        
+    }
+      #clientsSaleEdit {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 95%;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+  
+
+#clientsSaleEdit li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#clientsSaleEdit li:hover {
+    background-color: #f0f0f0;
+}
+#clear-buttonClientEdit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+/*Responsive Product */
+
+#productSalesEdit {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #productOptionSalesEdit {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #productOptionSalesEdit li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #productOptionSalesEdit li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonProductsEdit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+/*Responsive Seller */
+
+#sellerEdit {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #sellerOptionSalesEdit {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #sellerOptionSalesEdit li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #sellerOptionSalesEdit li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonSellerEdit {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+    }
+
+</style>  
 <section class="event-detail">
     <article id="profile">
         <h2>Inventario</h2>
@@ -39,34 +270,31 @@
                                     aria-describedby="emailHelp" placeholder="Precio">
                             </div>
                             <h4 class="offset-sm-3">Editar Venta</h4>
-                            <span class="description">Cliente:</span>
-                            <span class="tax">
-
-                                <input type="search" list="clientsSaleEdit" class="form-control" id="clientSaleEdit"
-                                    name="clientSaleEdit" placeholder="Escribe el nombre del cliente">
-
-                                <datalist id="clientsSaleEdit">
-                                    <?php foreach ($clients as $client) { ?>
-                                    <option
-                                        value="<?php echo $client['User']['id']; ?>-<?php echo $client['User']['name']; ?> | <?php echo $client['User']['phone']; ?>">
-                                        <?php } ?>
-                                </datalist>
-                            </span>
                             </br>
-                            <span class="tax">
+                            <span class="description">Producto:</span>
 
-                                <input type="search" list="products-salesEdit" onchange="searchQuantity()"
-                                    class="form-control" id="productSalesEdit" name="productSalesEdit"
-                                    placeholder="Escribe el nombre del producto" readonly>
+                            <div class="input-container">
+          <input type="text" id="productSalesEdit" name="productSalesEdit" class="form-control" disabled>
+        </div>
+ 
+       
+                            <span class="description">Cliente:</span>
 
-                                <datalist id="products-salesEdit">
 
-                                    <?php foreach ($products as $product) { ?>
-                                    <option id="productOptionSalesEdit" name="productOptionSalesEdit"
-                                        value="<?php echo $product['Product']['id']; ?>-<?php echo $product['Product']['name']; ?> / <?php echo $product['Product']['provider']; ?> | ₡<?php echo $product['Product']['price']; ?>">
-                                        <?php } ?>
-                                </datalist>
-                            </span>
+                            <div class="input-container">
+          <input type="text" id="clientSaleEdit" name="clientSaleEdit" class="form-control" placeholder="Escribe el nombre del cliente" readonly>
+          <span id="clear-buttonClientEdit" class="">×</span>
+        </div>
+
+        <ul id="clientsSaleEdit" class="hidden">
+        <?php foreach( $clients as $client ){
+          $clientSelectedSale = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
+           ?>
+            <li style="color:black" onclick="selectClientSaleEdit(<?php echo $clientSelectedSale;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
+            <?php } ?>
+        </ul>
+                           
+
                             </br>
                             <div class="form-group" style="display:none;">
                                 <input type="hidden" id="countAddAvaiableProductEdit" name="countAddAvaiableProductEdit"
@@ -102,18 +330,20 @@
                                 </select>
                             </div>
                             <span class="description">Vendedor:</span>
-                            <span class="tax">
 
-                                <input type="search" list="sellersEdit" class="form-control" id="sellerEdit"
-                                    name="sellerEdit" placeholder="Escribe el nombre del vendedor">
+                            <div class="input-container">
+                    <input type="text" id="sellerEdit" name="sellerEdit" class="form-control" placeholder="Escribe el nombre del vendedor">
+                    <span id="clear-buttonSellerEdit" class="hidden">×</span>
+                    </div>
 
-                                <datalist id="sellersEdit">
-                                    <?php foreach ($sellers as $seller) { ?>
-                                    <option id="sellerOptionSalesEdit" name="sellerOptionSalesEdit"
-                                        value="<?php echo $seller['User']['id']; ?>-<?php echo $seller['User']['name']; ?>">
-                                        <?php } ?>
-                                </datalist>
-                            </span>
+                    <ul id="sellerOptionSalesEdit" class="hidden">
+                    <?php foreach( $sellers as $seller ){
+                    $SelectedSeller = "'".$seller['User']['id'].'-'.$seller['User']['name']."'";
+                    ?>
+                        <li style="color:black" onclick="selectSellerSaleEdit(<?php echo $SelectedSeller;?>)"><?php echo $seller['User']['id'];?>-<?php echo $seller['User']['name'];?></li>
+                        <?php } ?>
+                    </ul>
+
                             </br>
                             <div class="form-group">
                                 <label for="accountInputEmail">Fecha</label>
@@ -143,6 +373,120 @@
 </section>
 
 <script>
+
+const inputFieldClientEdit = document.getElementById("clientSaleEdit");
+        const clearButtonClientsEdit = document.getElementById("clear-buttonClientEdit");
+
+        const searchInputClientsEdit = document.getElementById("clientSaleEdit");
+        const dropdownListClientsEdit = document.getElementById("clientsSaleEdit");
+
+        inputFieldClientEdit.addEventListener("input", function () {
+            if (inputFieldClientEdit.value.trim() !== "") {
+                clearButtonClientsEdit.classList.remove("hidden");
+            } else {
+                clearButtonClientsEdit.classList.add("hidden");
+            }
+        });
+
+        clearButtonClientsEdit.addEventListener("click", function () {
+            inputFieldClientEdit.value = "";
+            clearButtonClientsEdit.classList.add("hidden");
+            $('#clientSaleEdit').removeAttr('readonly');
+            dropdownListClientsEdit.classList.add("hidden");
+            $('#clientsSaleEdit').removeAttr('style');
+            $('#clientSaleEdit').focus();
+        });
+
+
+        function selectClientSaleEdit(client){
+          $('#clientSaleEdit').val(client);
+          $('#clientsSaleEdit').hide();
+          $('#clientSaleEdit').attr('readonly','readonly');
+          
+        }
+        
+        
+
+        searchInputClientsEdit.addEventListener("input", function () {
+            const filterClientsEdit = searchInputClientsEdit.value.toLowerCase();
+            const optionsClientsEdit = dropdownListClientsEdit.getElementsByTagName("li");
+
+            for (let i = 0; i < optionsClientsEdit.length; i++) {
+                const optionCEdit = optionsClientsEdit[i];
+                if (optionCEdit.textContent.toLowerCase().includes(filterClientsEdit)) {
+                  optionCEdit.style.display = "block";
+                } else {
+                  optionCEdit.style.display = "none";
+                }
+            }
+
+            if (filterClientsEdit === "") {
+                dropdownListClientsEdit.classList.add("hidden");
+            } else {
+                dropdownListClientsEdit.classList.remove("hidden");
+            }
+        });
+
+
+        /******Products****** */
+
+        
+        
+
+        /**Barbers**** */
+        const inputFieldSellerEdit = document.getElementById("sellerEdit");
+        const clearButtonSellerEdit = document.getElementById("clear-buttonSellerEdit");
+
+        const searchInputSellerEdit = document.getElementById("sellerEdit");
+        const dropdownListSellerEdit = document.getElementById("sellerOptionSalesEdit");
+
+        inputFieldSellerEdit.addEventListener("input", function () {
+            if (inputFieldSellerEdit.value.trim() !== "") {
+                clearButtonSellerEdit.classList.remove("hidden");
+            } else {
+                clearButtonSellerEdit.classList.add("hidden");
+            }
+        });
+
+        clearButtonSellerEdit.addEventListener("click", function () {
+            inputFieldSellerEdit.value = "";
+            clearButtonSellerEdit.classList.add("hidden");
+            $('#sellerEdit').removeAttr('readonly');
+            dropdownListSellerEdit.classList.add("hidden");
+            $('#sellerOptionSalesEdit').removeAttr('style');
+            $('#sellerEdit').focus();
+        });
+
+
+        function selectSellerSaleEdit(client){
+          $('#sellerEdit').val(client);
+          $('#sellerOptionSalesEdit').hide();
+          $('#sellerEdit').attr('readonly','readonly');
+          
+        }
+        
+        
+
+        searchInputSellerEdit.addEventListener("input", function () {
+            const filterSellerEdit = searchInputSellerEdit.value.toLowerCase();
+            const optionsSellerEdit = dropdownListSellerEdit.getElementsByTagName("li");
+
+            for (let i = 0; i < optionsSellerEdit.length; i++) {
+                const optionSellEdit = optionsSellerEdit[i];
+                if (optionSellEdit.textContent.toLowerCase().includes(filterSellerEdit)) {
+                  optionSellEdit.style.display = "block";
+                } else {
+                  optionSellEdit.style.display = "none";
+                }
+            }
+
+            if (filterSellerEdit === "") {
+                dropdownListSellerEdit.classList.add("hidden");
+            } else {
+                dropdownListSellerEdit.classList.remove("hidden");
+            }
+        });
+
 
 function searchOption(valor) {
 
