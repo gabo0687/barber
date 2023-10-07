@@ -1,63 +1,33 @@
 <script src="https://unpkg.com/html5-qrcode"></script>
 <style>
-  .blink_me {
-  animation: blinker 1s linear infinite;
-}
 
-@keyframes blinker {
-  50% {
-    opacity: 0;
-  }
-}
-
-  /* Add your custom styles here */
-
-    .searchable-dropdown {
-        position: relative;
-        width: 200px;
-    }
-
-    #clientSales2 {
+    #clientSale {
         width: 100%;
         padding: 10px;
         
     }
 
-    #clientsSale3 {
+    #clientsSale {
         list-style: none;
         padding: 0;
         margin: 0;
         position: absolute;
-        width: 100%;
+        width: 550px;
         border: 1px solid #ccc;
         max-height: 150px;
         overflow-y: auto;
         background-color: #fff;
     }
 
-    #clientsSale3 li {
+    #clientsSale li {
         padding: 10px;
         cursor: pointer;
     }
 
-    #clientsSale3 li:hover {
+    #clientsSale li:hover {
         background-color: #f0f0f0;
     }
-
-    .hidden {
-        display: none;
-    }
-
-
-
-
-.input-container {
-    position: relative;
-    width: 100%;
-}
-
-
-#clear-button {
+    #clear-buttonClient {
     position: absolute;
     top: 50%;
     right: 10px;
@@ -67,6 +37,197 @@
     color: #999;
 }
 
+    /* Products */
+    #productSales {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #productOptionSales {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #productOptionSales li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #productOptionSales li:hover {
+        background-color: #f0f0f0;
+    }
+
+    #clear-buttonProducts {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+    /* Seller */
+    #seller {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #sellerOptionSales {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #sellerOptionSales li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #sellerOptionSales li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonSeller {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+    /* Responsive */
+
+
+    @media all and (max-width: 768px){
+
+      
+    #clientSale {
+        width: 100%;
+        padding: 10px;
+        
+    }
+      #clientsSale {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 95%;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+  
+
+#clientsSale li {
+    padding: 10px;
+    cursor: pointer;
+}
+
+#clientsSale li:hover {
+    background-color: #f0f0f0;
+}
+#clear-buttonClient {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+/*Responsive Product */
+
+#productSales {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #productOptionSales {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #productOptionSales li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #productOptionSales li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonProducts {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+/*Responsive Seller */
+
+#seller {
+        width: 100%;
+        padding: 10px;
+        
+    }
+
+    #sellerOptionSales {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+        position: absolute;
+        width: 550px;
+        border: 1px solid #ccc;
+        max-height: 150px;
+        overflow-y: auto;
+        background-color: #fff;
+    }
+
+    #sellerOptionSales li {
+        padding: 10px;
+        cursor: pointer;
+    }
+
+    #sellerOptionSales li:hover {
+        background-color: #f0f0f0;
+    }
+    #clear-buttonSeller {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    font-size: 16px;
+    color: #999;
+}
+
+    }
 
 </style>  
 <section class="event-detail">
@@ -94,47 +255,44 @@
         <form action="add_sales" method="post" id="createNewSale" class="col-sm-6 offset-sm-3">
           <h4 class="offset-sm-3">Agregar venta</h4>
             <span class="description">Cliente:</span>
-            <span class="tax">
-
-              <input type="search" list="clientsSale" class="form-control" id="clientSale" name="clientSale" placeholder="Escribe el nombre del cliente">
-
-              <datalist id="clientsSale">
-                <?php foreach ($clients as $client) { ?>
-                  <option  value="<?php echo $client['User']['id']; ?>-<?php echo $client['User']['name']; ?> | <?php echo $client['User']['phone']; ?>">
-                  <?php } ?>
-              </datalist>
-            </span>
             </br>
             <div class="input-container">
-          <input type="text" id="clientSales2" name="clientSales2" class="form-control" placeholder="Escribe el nombre del cliente">
-          <span id="clear-button" class="hidden">×</span>
+          <input type="text" id="clientSale" name="clientSale" class="form-control" placeholder="Escribe el nombre del cliente">
+          <span id="clear-buttonClient" class="hidden">×</span>
         </div>
 
-        <ul id="clientsSale3" class="hidden">
+        <ul id="clientsSale" class="hidden">
         <?php foreach( $clients as $client ){
-          $clientSelected = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
+          $clientSelectedSale = "'".$client['User']['id'].'-'.$client['User']['name'].' | '.$client['User']['phone']."'";
            ?>
-            <li onclick="selectClient(<?php echo $clientSelected;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
+            <li style="color:black" onclick="selectClientSale(<?php echo $clientSelectedSale;?>)"><?php echo $client['User']['id'];?>-<?php echo $client['User']['name'];?> | <?php echo $client['User']['phone'];?></li>
             <?php } ?>
         </ul>
-        </span>
+     
           <div class="form-group text-left">
         <label for="accountInputUser">Buscar Producto:</label></br></br>
         <input type="radio" id="search_nombreSale" value="1" onclick="searchOption(this.value)" name="search_producto" checked>Por nombre
         <input type="radio" id="search_codeSale" value="2" onclick="searchOption(this.value)" name="search_producto">Por código de barras
         </br></br>
       </div>
-          <span class="tax">
+         
 
-            <input type="search" list="products-sales" onchange="searchQuantity()" class="form-control" id="productSales" name="productSales" placeholder="Escribe el nombre del producto">
-          
-            <datalist id="products-sales">
-              
-             <?php foreach ($products as $product) { ?>
-                <option id="productOptionSales" name="productOptionSales" value="<?php echo $product['Product']['id']; ?>-<?php echo $product['Product']['name']; ?> / <?php echo $product['Product']['provider']; ?> | ₡<?php echo $product['Product']['price']; ?>">
-                <?php } ?>
-            </datalist>
-          </span>
+
+
+            <div class="input-container">
+          <input type="text" id="productSales" name="productSales"  class="form-control" placeholder="Escribe el nombre del producto">
+          <span id="clear-buttonProducts" class="hidden">×</span>
+        </div>
+
+        <ul id="productOptionSales" class="hidden"  >
+        <?php foreach( $products as $product ){
+          $productSelected = "'".$product['Product']['id'].'-'.$product['Product']['name'].' | '.$product['Product']['provider'].' | '.$product['Product']['price']."'";
+           ?>
+            <li style="color:black"  onclick="selectProductSale(<?php echo $productSelected;?>)" ><?php echo $product['Product']['id'];?>-<?php echo $product['Product']['name'];?> | <?php echo $product['Product']['provider'];?>| <?php echo $product['Product']['price'];?></li>
+            <?php } ?>
+        </ul>
+      
+
           </br>
           <div class="form-group" id="scanSale" name="scanSale" style="display:none;">
             <span onclick="scanearCodigo()" id="botonScan" class="btn btn-secondary">Scanear Código de Barras</span></br></br>
@@ -171,16 +329,21 @@
             </select>
           </div>
           <span class="description">Vendedor:</span>
-          <span class="tax">
+        
 
-            <input type="search" list="sellers" class="form-control" id="seller" name="seller" placeholder="Escribe el nombre del vendedor">
+          <div class="input-container">
+          <input type="text" id="seller" name="seller" class="form-control" placeholder="Escribe el nombre del vendedor">
+          <span id="clear-buttonSeller" class="hidden">×</span>
+        </div>
 
-            <datalist id="sellers">
-              <?php foreach ($sellers as $seller) { ?>
-                <option id="sellerOptionSales" name="sellerOptionSales" value="<?php echo $seller['User']['id']; ?>-<?php echo $seller['User']['name']; ?>">
-                <?php } ?>
-            </datalist>
-          </span>
+        <ul id="sellerOptionSales" class="hidden">
+        <?php foreach( $sellers as $seller ){
+          $SelectedSeller = "'".$seller['User']['id'].'-'.$seller['User']['name']."'";
+           ?>
+            <li style="color:black" onclick="selectSellerSale(<?php echo $SelectedSeller;?>)"><?php echo $seller['User']['id'];?>-<?php echo $seller['User']['name'];?></li>
+            <?php } ?>
+        </ul>
+
           </br>
           <div class="form-group">
             <label for="accountInputEmail">Fecha</label>
@@ -277,58 +440,172 @@ function getBarCodeInfo(barCode){
     });
 }
 
-        const inputField2 = document.getElementById("clientSales2");
-        const clearButton2 = document.getElementById("clear-button");
+        const inputFieldClient = document.getElementById("clientSale");
+        const clearButtonClients = document.getElementById("clear-buttonClient");
 
-        const searchInput2 = document.getElementById("clientSales2");
-        const dropdownList2 = document.getElementById("clientsSale3");
+        const searchInputClients = document.getElementById("clientSale");
+        const dropdownListClients = document.getElementById("clientsSale");
 
-        inputField2.addEventListener("input", function () {
-            if (inputField2.value.trim() !== "") {
-                clearButton2.classList.remove("hidden");
+        inputFieldClient.addEventListener("input", function () {
+            if (inputFieldClient.value.trim() !== "") {
+                clearButtonClients.classList.remove("hidden");
             } else {
-                clearButton2.classList.add("hidden");
+                clearButtonClients.classList.add("hidden");
             }
         });
 
-        clearButton2.addEventListener("click", function () {
-            inputField2.value = "";
-            clearButton2.classList.add("hidden");
-            $('#clientSales2').removeAttr('readonly');
-            dropdownList2.classList.add("hidden");
-            $('#clientsSale3').removeAttr('style');
-            $('#clientSales2').focus();
+        clearButtonClients.addEventListener("click", function () {
+            inputFieldClient.value = "";
+            clearButtonClients.classList.add("hidden");
+            $('#clientSale').removeAttr('readonly');
+            dropdownListClients.classList.add("hidden");
+            $('#clientsSale').removeAttr('style');
+            $('#clientSale').focus();
         });
 
 
-        function selectClient(client){
-          $('#clientSales2').val(client);
-          $('#clientsSale3').hide();
-          $('#clientSales2').attr('readonly','readonly');
+        function selectClientSale(client){
+          $('#clientSale').val(client);
+          $('#clientsSale').hide();
+          $('#clientSale').attr('readonly','readonly');
           
         }
         
         
 
-        searchInput2.addEventListener("input", function () {
-            const filter = searchInput2.value.toLowerCase();
-            const options = dropdownList2.getElementsByTagName("li");
+        searchInputClients.addEventListener("input", function () {
+            const filterClients = searchInputClients.value.toLowerCase();
+            const optionsClients = dropdownListClients.getElementsByTagName("li");
 
-            for (let i = 0; i < options.length; i++) {
-                const option = options[i];
-                if (option.textContent.toLowerCase().includes(filter)) {
+            for (let i = 0; i < optionsClients.length; i++) {
+                const optionC = optionsClients[i];
+                if (optionC.textContent.toLowerCase().includes(filterClients)) {
+                  optionC.style.display = "block";
+                } else {
+                  optionC.style.display = "none";
+                }
+            }
+
+            if (filterClients === "") {
+                dropdownListClients.classList.add("hidden");
+            } else {
+                dropdownListClients.classList.remove("hidden");
+            }
+        });
+
+
+        /******Products****** */
+
+        const inputFieldProducts = document.getElementById("productSales");
+        const clearButtonProducts = document.getElementById("clear-buttonProducts");
+
+        const searchInputProducts = document.getElementById("productSales");
+        const dropdownListProducts = document.getElementById("productOptionSales");
+
+        inputFieldProducts.addEventListener("input", function () {
+            if (inputFieldProducts.value.trim() !== "") {
+                clearButtonProducts.classList.remove("hidden");
+            } else {
+                clearButtonProducts.classList.add("hidden");
+            }
+        });
+
+        clearButtonProducts.addEventListener("click", function () {
+            inputFieldProducts.value = "";
+            clearButtonProducts.classList.add("hidden");
+            $('#productSales').removeAttr('readonly');
+            dropdownListProducts.classList.add("hidden");
+            $('#productOptionSales').removeAttr('style');
+            $('#productSales').focus();
+        });
+
+
+        function selectProductSale(client){
+          $('#productSales').val(client);
+          $('#productOptionSales').hide();
+          searchQuantity();
+          $('#productSales').attr('readonly','readonly');
+          
+        }
+        
+        
+
+        searchInputProducts.addEventListener("input", function () {
+            const filterProducts = searchInputProducts.value.toLowerCase();
+            const optionsProducts = dropdownListProducts.getElementsByTagName("li");
+
+            for (let i = 0; i < optionsProducts.length; i++) {
+                const option = optionsProducts[i];
+                if (option.textContent.toLowerCase().includes(filterProducts)) {
                     option.style.display = "block";
                 } else {
                     option.style.display = "none";
                 }
             }
 
-            if (filter === "") {
-                dropdownList2.classList.add("hidden");
+            if (filterProducts === "") {
+                dropdownListProducts.classList.add("hidden");
             } else {
-                dropdownList2.classList.remove("hidden");
+                dropdownListProducts.classList.remove("hidden");
             }
         });
+
+        /**Barbers**** */
+        const inputFieldSeller = document.getElementById("seller");
+        const clearButtonSeller = document.getElementById("clear-buttonSeller");
+
+        const searchInputSeller = document.getElementById("seller");
+        const dropdownListSeller = document.getElementById("sellerOptionSales");
+
+        inputFieldSeller.addEventListener("input", function () {
+            if (inputFieldSeller.value.trim() !== "") {
+                clearButtonSeller.classList.remove("hidden");
+            } else {
+                clearButtonSeller.classList.add("hidden");
+            }
+        });
+
+        clearButtonSeller.addEventListener("click", function () {
+            inputFieldSeller.value = "";
+            clearButtonSeller.classList.add("hidden");
+            $('#seller').removeAttr('readonly');
+            dropdownListSeller.classList.add("hidden");
+            $('#sellerOptionSales').removeAttr('style');
+            $('#seller').focus();
+        });
+
+
+        function selectSellerSale(client){
+          $('#seller').val(client);
+          $('#sellerOptionSales').hide();
+          $('#seller').attr('readonly','readonly');
+          
+        }
+        
+        
+
+        searchInputSeller.addEventListener("input", function () {
+            const filterSeller = searchInputSeller.value.toLowerCase();
+            const optionsSeller = dropdownListSeller.getElementsByTagName("li");
+
+            for (let i = 0; i < optionsSeller.length; i++) {
+                const optionSell = optionsSeller[i];
+                if (optionSell.textContent.toLowerCase().includes(filterSeller)) {
+                  optionSell.style.display = "block";
+                } else {
+                  optionSell.style.display = "none";
+                }
+            }
+
+            if (filterSeller === "") {
+                dropdownListSeller.classList.add("hidden");
+            } else {
+                dropdownListSeller.classList.remove("hidden");
+            }
+        });
+
+     
+
 
   function searchOption(valor){
   
@@ -402,7 +679,6 @@ function getBarCodeInfo(barCode){
     prod = $('#productSales').val();
     if (prod != "") {
       var splitProd = prod.split('-');
-
       $.ajax({
         type: 'POST',
         url: 'search_quantity',
