@@ -3020,7 +3020,7 @@ class PagesController extends AppController
 			$data['Sale']['seller_id'] = $sellerId;
 			$data['Sale']['creation_date'] = date('Y-m-d');
 			if ($this->Sale->save($data)) {
-				echo "entro2";
+				
 				$this->Saleproduct->id = $_POST['idSaleProductEdit'];
 				//$this->Saleproduct->create();
 				//$saleId = $this->Sale->getLastInsertID();
@@ -3035,7 +3035,7 @@ class PagesController extends AppController
 				$stock = ($_POST['idSaleCantEdit']-$quantitySelected);
 
 				$datac['Saleproduct']['price'] = $_POST['originalPriceAddSaleEdit'];
-				echo "entro3";
+				
 				if(empty($_POST['priceDiscountEdit'])){
 					$datac['Saleproduct']['discount'] = 0;
 				}else{
@@ -3049,11 +3049,11 @@ class PagesController extends AppController
 				$datac['Saleproduct']['date_creation'] = date('Y-m-d');
 
 				$this->Product->id = $this->Product->field('id', array('id' => $productId));
-				echo "entro4";
+				
 				if ($this->Product->id) {
 					$this->Product->saveField('quantity', $stock);
 				}
-				echo "entro5";
+				
 				$this->Saleproduct->save($datac);
 				sleep(3);
 				$this->redirect(array('action' => '../sales'));
