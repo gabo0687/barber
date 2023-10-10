@@ -612,15 +612,17 @@ $( "#editUserButton" ).on( "click", function( ) {
                   var boton = '';
                   Object.entries(res).forEach((entry) => {
                     idUsers = entry[1].User.id;
-                    if(entry[1].User.type == 2){
-                        idType = "Barbero";
-                    }else{
-                        idType = "Administrador";
+                    if(entry[1].User.type != 4 ){
+                      if(entry[1].User.type == 2){
+                          idType = "Barbero";
+                      }else{
+                          idType = "Administrador";
+                      }
+                      nombreUsers = entry[1].User.name + " / " + entry[1].User.phone + " / " + idType;
+                      boton += ' <a class="list-group-item list-group-item-action" id="edit_'+idUsers+'" data-toggle="list" onclick="showEditUser('+idUsers+')" role="tab" style="color:black;">'+nombreUsers+'</a>';
+                    
+                      i++;
                     }
-                    nombreUsers = entry[1].User.name + " / " + entry[1].User.phone + " / " + idType;
-                    boton += ' <a class="list-group-item list-group-item-action" id="edit_'+idUsers+'" data-toggle="list" onclick="showEditUser('+idUsers+')" role="tab" style="color:black;">'+nombreUsers+'</a>';
-                   
-                    i++;
                   });
                   $('#usersList').html(boton);
                   window.scrollTo(0, document.body.scrollHeight);

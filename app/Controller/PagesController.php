@@ -1504,7 +1504,7 @@ class PagesController extends AppController
 		$searchUser = $_POST['searchUser'];
 		$user = $this->User->find('all', array(
 			'fields' => array('User.id', 'User.name', 'User.phone', 'User.type'),
-			'conditions' => array('User.type !=' => 3, 'OR' => array(
+			'conditions' => array('User.type <>' => 3, 'OR' => array(
 				array('User.name LIKE' => "%$searchUser%"),
 				array('User.phone' => $searchUser)
 			)),
@@ -2358,7 +2358,7 @@ class PagesController extends AppController
 		if (!isset($_SESSION['User'])) {
 			$this->redirect(array('action' => 'home'));
 		}else{
-			if( $moduleId != 1 && $_SESSION['User']['User']['type'] != 1){
+			if( $moduleId != 1 && $_SESSION['User']['User']['type'] != 1 && $_SESSION['User']['User']['type'] != 4){
 				$permission = $this->checkRole( $moduleId );
 				if( !$permission ){
 					$this->redirect(array('action' => 'home'));

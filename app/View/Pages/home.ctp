@@ -17,7 +17,7 @@ if( isset($user['User']['type']) ){?>
     </div>
 <?php 
 
-if( $user['User']['type'] == 1 ){ ?>
+if( $user['User']['type'] == 1 || $user['User']['type'] == 4 ){ ?>
          
 <label style="color:white">Seleccione la fecha que desea consultar</label>
 <input  placeholder="MM/DD/YYYY" onchange="filterBarber()" onfocus="changeDate()" oncc class="form-control" type="text" name="fecha_reserva_admin" id="fecha_reserva_admin">

@@ -51,7 +51,7 @@
       $hasBlockPermission = true;
     }
   }
-  if( $type == 1 || $hasBlockPermission ){ ?>
+  if( $type == 1 || $type == 4 || $hasBlockPermission ){ ?>
 
     
 

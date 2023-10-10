@@ -1,10 +1,10 @@
 
 <li class="nav-item"><a class="nav-link fa fa-user" aria-hidden="true" id="calendar" href="account" type="button" > Perfil</a></li>
-<?php if( $user['User']['type'] == '1' ){ ?>    
+<?php if( $user['User']['type'] == '1' || $user['User']['type'] == '4' ){ ?>    
 <li class="nav-item"><a class="nav-link fa fa-id-card" aria-hidden="true" id="calendar" href="users" type="button" > Usuarios</a></li>
 <?php } 
 $menuRoles = $_SESSION['Role'];
-if( $user['User']['type'] == '1' ){
+if( $user['User']['type'] == '1' || $user['User']['type'] == '4' ){
     $module2 = '';
     $module3 = '';
     $module4 = '';

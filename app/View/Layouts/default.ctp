@@ -169,7 +169,7 @@ date_default_timezone_set('America/Costa_Rica');
                 $hasPermission = true;
               }
             }
-           if( $_SESSION['User']['User']['type'] == '1' || $hasPermission ){ ?> 
+           if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '4' || $hasPermission ){ ?> 
            <a class="ticket-btn" id="calendar" href="calendario" type="button" >💈Vista del Calendario</a>
            </div>
           </form>
@@ -298,7 +298,7 @@ date_default_timezone_set('America/Costa_Rica');
 
 
         <?php 
-        if( $user['User']['type'] == 1 || $user['User']['type'] == 2 ){ ?>  
+        if( $user['User']['type'] == 1 || $user['User']['type'] == 2 || $user['User']['type'] == 4 ){ ?>  
           <span class="description">Cliente:</span>        
          <span class="tax">
 
