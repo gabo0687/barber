@@ -48,7 +48,7 @@
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>Los campos en rojo no pueden ir vacios.</b></span></label>
             </div>
             <div class="form-group text-right">
-              <input name="sendPassword" id="sendPassword" type="checkbox" value=""> Invitar a cambiar contraseña por Whatsapp</br></br>
+             <!-- <input name="sendPassword" id="sendPassword" type="checkbox" value=""> Invitar a cambiar contraseña por Whatsapp</br></br>-->
               <button type="button" id="creationCustomer" class="btn btn-primary">Guardar</button>
             </div>
           </form>

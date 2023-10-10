@@ -8,7 +8,7 @@
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
           <h4 class="offset-sm-3">Datos de cuenta</h4>
-          <form action="profile_save" method="post" id="saveProfile" class="col-sm-6 offset-sm-3">
+          <form action="" method="post" id="saveProfile" class="col-sm-6 offset-sm-3">
             <div class="form-group">
               <label for="accountInputUser">Usuario</label>
               <input type="text" name="usuario_perfil" value="<?php echo $currentUser['User']['name'];?>" class="form-control" id="usuario_perfil" aria-describedby="emailHelp" placeholder="Usuario">
@@ -37,7 +37,7 @@
             
             <div class="form-group text-right">
              <input type="hidden" name="id_perfil" value="<?php echo $currentUser['User']['id'];?>" id="id_perfil">
-             <button type="button" id="saveChanges" class="btn btn-primary">Guardar Cambios</button>
+             <button type="button" id="saveChanges" class="btn btn-primary"><span class="spinner-border-sm" id="loadingProfile"></span>Guardar Cambios</button>
             </div>
           </form>
         </div>
@@ -182,13 +182,14 @@
                   url: 'Pages/getPhoneEdit', 
                   data: 'user_id='+userId+'&phone='+celular,
                   beforeSend:function() {  
-
+                    $('#loadingProfile').addClass('spinner-border');
                   },
                   error: function(){
                       
                   alert('No hay internet');    
                   },
                   success: function(existPhone) {
+                    $('#loadingProfile').removeClass('spinner-border');
                     if(existPhone == 1 ){
                       checkNumberCustomers = true;
                       $('#error-number-profile').show();
@@ -222,14 +223,35 @@
                       $('#error-empty-profile').hide();
                     }
                   }else{
-                    $('#createCustomer').submit();
-                    $('#error-empty-profile').hide();
-                    $('#error-number-profile').hide();
-                    window.scrollTo(0, 0);
-                    $('#profileUpdated').show();
-                        setInterval(function() {
-                            $('#profileUpdated').hide('2000');
-                          }, 2000);
+
+                        var usuario_perfil = $('#usuario_perfil').val();
+                        var telefono_perfil = $('#telefono_perfil').val();
+                        var id_perfil = $('#id_perfil').val();
+                        var contrasena_perfil = $('#contrasena_perfil').val();
+                        $.ajax({
+                        type: 'POST', 
+                        url: 'profile_save', 
+                        data: 'id_perfil='+id_perfil+'&usuario_perfil='+usuario_perfil+'&telefono_perfil='+telefono_perfil+'&contrasena_perfil='+contrasena_perfil,
+                        beforeSend:function() {  
+                          $('#loadingProfile').addClass('spinner-border');
+                        },
+                        error: function(){
+                            
+                        alert('No hay internet');    
+                        },
+                        success: function(saveProfile) {
+                          $('#loadingProfile').removeClass('spinner-border');
+                          $('#error-empty-profile').hide();
+                          $('#error-number-profile').hide();
+                          window.scrollTo(0, 0);
+                          $('#profileUpdated').show();
+                          setInterval(function() {
+                              $('#profileUpdated').hide('2000');
+                            }, 2000);
+                        }
+                        });
+                    
+                    
                     }
                   }
     });

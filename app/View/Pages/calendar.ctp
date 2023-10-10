@@ -151,6 +151,18 @@
     color: #999;
 }
 
+
+
+.fc .fc-scroller-harness-liquid{
+        height: auto !important;
+    }
+    
+    .fc .fc-scroller-liquid-absolute{
+        position: relative !important;;
+    }
+
+
+
 </style>  
 </head>
 <body>

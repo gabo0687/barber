@@ -10,11 +10,11 @@
       </ul>
        </br>
       <div class="form-group text-left">
-      <button type="button" onclick="showAddForm()" class="btn btn-primary">Agregar Usuario</button>
       <button type="button" onclick="showEditForm(); search();" class="btn btn-primary">Editar Usuario</button>
+      <button type="button" onclick="showAddForm()" class="btn btn-primary">Agregar Usuario</button>
       </div>
       
-      <form method="post" id="searchUserEdit" style="display:none;" class="col-sm-6 offset-sm-3">
+      <form method="post" id="searchUserEdit" class="col-sm-6 offset-sm-3">
       <div class="form-group text-left">
       <label for="accountInputUser">Buscar Usuario</label>
       <input type="text" class="form-control" id="searchUser" name="searchUser" aria-describedby="emailHelp" placeholder="Nombre/telefono">
@@ -25,7 +25,7 @@
       </form>
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <form action="add_user" method="post" id="createNewUser" class="col-sm-6 offset-sm-3">
+          <form action="add_user" method="post" id="createNewUser"  style="display:none;" class="col-sm-6 offset-sm-3">
           <h4 class="offset-sm-3">Agregar usuario nuevo</h4>
             <div class="form-group">
               <label for="accountInputUser">Nombre</label>
@@ -220,7 +220,7 @@
     </article>
   </section>
   <script>
-
+search();
 function showColor(){
     $('#color').show();
 }
@@ -568,7 +568,9 @@ $( "#editUserButton" ).on( "click", function( ) {
                       moduleId = role[1].Role.id_module;
                       $( "#roleEdit"+moduleId ).prop( "checked", true );
                     });
-                    window.scrollTo(0, document.body.scrollHeight);
+                    var element = document.getElementById("editUser");
+                    element.scrollTo(0, 1000);
+                    //window.scrollTo(0, document.body.scrollHeight);
                 }
                
 	});
