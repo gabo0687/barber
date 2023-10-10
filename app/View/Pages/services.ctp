@@ -6,7 +6,7 @@
       </ul>
        </br>
       <div class="list-group" id="myList" role="tablist">
-      <a class="list-group-item list-group-item-action active" data-toggle="list" href="#home" role="tab" style="color:black;"><b>Agregar servicio Nuevo</b></a>
+      <a onclick="moveDown()" class="list-group-item list-group-item-action active" data-toggle="list" href="#home" role="tab" style="color:black;"><b>Agregar servicio Nuevo</b></a>
         <?php 
 
           foreach( $services as $service ){ 
@@ -67,7 +67,7 @@
       </div>
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <h4 class="offset-sm-3">Agregar servicio nuevo</h4>
+          <h4 class="offset-sm-3" id="agregaServicio">Agregar servicio nuevo</h4>
           <form action="add_service" method="post" class="col-sm-6 offset-sm-3">
             <div class="form-group">
               <label for="accountInputUser">Nombre</label>
@@ -107,7 +107,19 @@
     </article>
   </section>
   <script>
-    window.scrollTo(0, document.body.scrollHeight);
+    function moveDown(){
+      setTimeout(() => {
+
+        document.querySelector("#agregaServicio").scrollIntoView({
+                    behavior: 'smooth'
+                    });
+}, "1000");
+      
+    }
+    document.querySelector("#agregaServicio").scrollIntoView({
+                    behavior: 'smooth'
+                    });
+                    
     $('#myList a').on('click', function (e) {
       e.preventDefault()
       $(this).tab('show')
@@ -151,6 +163,9 @@
                   $('#precio_edit').val(precioServicio);
                   //$('select>option>value('+generoServicio+')').prop('selected', true);
                   $('#tiposervicio_edit').val(generoServicio);
+                  document.querySelector("#edit").scrollIntoView({
+                    behavior: 'smooth'
+                    });
                 }
 	});
     }

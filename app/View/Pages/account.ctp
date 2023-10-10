@@ -7,7 +7,7 @@
    
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
-          <h4 class="offset-sm-3">Datos de cuenta</h4>
+          <h4 class="offset-sm-3" id="datosCuenta">Datos de cuenta</h4>
           <form action="" method="post" id="saveProfile" class="col-sm-6 offset-sm-3">
             <div class="form-group">
               <label for="accountInputUser">Usuario</label>
@@ -259,5 +259,7 @@
 });
 
 
-    window.scrollTo(0, document.body.scrollHeight);
+document.querySelector("#datosCuenta").scrollIntoView({
+        behavior: 'smooth'
+        });
   </script>

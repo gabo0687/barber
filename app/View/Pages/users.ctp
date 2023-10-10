@@ -26,7 +26,7 @@
       <div class="tab-content" id="pills-tabContent">
         <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="nav-profile-tab">
           <form action="add_user" method="post" id="createNewUser"  style="display:none;" class="col-sm-6 offset-sm-3">
-          <h4 class="offset-sm-3">Agregar usuario nuevo</h4>
+          <h4 class="offset-sm-3" id="agregaUsuario">Agregar usuario nuevo</h4>
             <div class="form-group">
               <label for="accountInputUser">Nombre</label>
               <input type="text" class="form-control" id="nameAdd" name="nameAdd" aria-describedby="emailHelp" placeholder="Nombre">
@@ -248,6 +248,9 @@ function showAddForm(){
   $('#home_edit').hide();
   $('#usersList').hide();
   $('#searchUserEdit').hide();
+  document.querySelector("#agregaUsuario").scrollIntoView({
+                    behavior: 'smooth'
+                    });
   
 }
 
@@ -568,9 +571,10 @@ $( "#editUserButton" ).on( "click", function( ) {
                       moduleId = role[1].Role.id_module;
                       $( "#roleEdit"+moduleId ).prop( "checked", true );
                     });
-                    var element = document.getElementById("editUser");
-                    element.scrollTo(0, 1000);
-                    //window.scrollTo(0, document.body.scrollHeight);
+                    document.querySelector("#editUser").scrollIntoView({
+                    behavior: 'smooth'
+                    });
+                    
                 }
                
 	});
