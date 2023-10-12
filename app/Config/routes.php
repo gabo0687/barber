@@ -164,6 +164,7 @@
 	Router::connect('/notification_register', array('controller' => 'pages', 'action' => 'notification_register'));
 	Router::connect('/save_password', array('controller' => 'pages', 'action' => 'save_password'));
 
+	Router::connect('/whatsapp', array('controller' => 'pages', 'action' => 'whatsapp'));
 	
 	
 /**

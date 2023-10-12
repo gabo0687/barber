@@ -1418,7 +1418,7 @@ class PagesController extends AppController
 				$datac['Customer']['date_creation'] = date('Y-m-d H:i:s');
 				if($this->Customer->save($datac)){
 					Cache::clear();
-					sleep(3);
+					sleep(1);
 					$this->redirect(array('action' => '../customers'));
 					}
 				
@@ -1459,7 +1459,7 @@ class PagesController extends AppController
 				$datac['Customer']['user_id'] = $_POST['idEditCustomer'];
 				$datac['Customer']['date_creation'] = $_POST['EditCustomerCreationDate'];
 				if ($this->Customer->save($datac)) {
-					sleep(3);
+					sleep(1);
 					$this->redirect(array('action' => '../customers'));
 				}
 			}
@@ -1606,7 +1606,7 @@ class PagesController extends AppController
 					$this->Duration->save($data);
 				}
 
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../users'));
 			}
 		}
@@ -1661,11 +1661,11 @@ class PagesController extends AppController
 					$dataD['Duration']['service_id'] = $service['Service']['id'];
 					$this->Duration->save($dataD);
 				}
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../users'));
 			}
 		Cache::clear();
-		sleep(3);
+		sleep(1);
 		$this->redirect(array('action' => '../users'));
 		}
 	}
@@ -1956,8 +1956,8 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
-		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -1967,9 +1967,9 @@ class PagesController extends AppController
 		$customers = $this->Customer->query('SELECT DATEDIFF(CURDATE(),clientes.last_appointment) as dias_transcurridos,clientes.user_id,usuarios.name,usuarios.phone from customers as clientes INNER JOIN users as usuarios ON clientes.user_id=usuarios.id where DATEDIFF(CURDATE(),clientes.last_appointment) = 15');
 		foreach( $customers as $customer ){
 			$nombre = $customer["usuarios"]["name"];
-			//$phone = $customer["usuarios"]["phone"];
+			$phone = $customer["usuarios"]["phone"];
 			$info = base64_encode($customer["clientes"]["user_id"]);
-			$phone = '83481182';
+			//$phone = '83481182';
 			$data = array();
 			$data = array(
 				'messaging_product' => 'whatsapp',
@@ -2033,8 +2033,8 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
-		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -2043,7 +2043,8 @@ class PagesController extends AppController
 
 		$currentDate = date('Y-m-d');
 		$currentTime= date('H:i:s'); 
-		$newTime = strtotime ( '+3 hour' , strtotime ($currentTime) ) ; 
+		$newTime = strtotime ( '+1 hour' , strtotime ($currentTime) ) ; 
+		$newTime = strtotime ( '+30 minute' , $newTime ) ; 
 		$newTime = date ( 'H:i' , $newTime);
 		$newTime = $newTime.':00';
 		
@@ -2071,8 +2072,8 @@ class PagesController extends AppController
 		foreach( $reservations as $reservation ){
 			$data = array();
 			$nombre = $reservation['User']['name'];
-			//$phone = $reservation['User']['phone'];
-			$phone = '83481182';
+			$phone = $reservation['User']['phone'];
+			//$phone = '83481182';
 			$hora = $reservation['Activereservation']['reservation_time'];
 			$info = base64_encode($reservation['Activereservation']['id_reservation'].'|'.$hora.'|'.$reservation['Activereservation']['reservation_date']);
 			$data = array(
@@ -2153,8 +2154,8 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
-		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -2211,8 +2212,8 @@ class PagesController extends AppController
 			
 			$data = array();
 			$nombre = $reservation['User']['name'];
-			//$phone = $reservation['User']['phone'];
-			$phone = '72795112';
+			$phone = $reservation['User']['phone'];
+			//$phone = '83481182';
 			$info = base64_encode($reservation['User']['id']);
 			$hora = $dateFormat.' a las '.$reservation['Remove']['reservation_time'];
 			
@@ -2282,8 +2283,8 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
-		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL, "https://graph.facebook.com/v17.0/136967432828861/messages");
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -2700,7 +2701,7 @@ class PagesController extends AppController
 			$data['Product']['creation_date'] = date('Y-m-d');
 			if ($this->Product->save($data)) {
 				
-				sleep(2);
+				sleep(1);
 				$this->redirect(array('action' => '../products'));
 			}
 		}
@@ -2757,7 +2758,7 @@ class PagesController extends AppController
 			
 
 			if ($this->Product->save($data)) {
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../products_edit'));
 			}
 		}
@@ -2780,7 +2781,7 @@ class PagesController extends AppController
 			$data['Expense']['payment_type'] = $_POST['payAddExpense'];
 			$data['Expense']['date_creation'] = date('Y-m-d');
 			if ($this->Expense->save($data)) {
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../expenses'));
 			}
 		}
@@ -2827,7 +2828,7 @@ class PagesController extends AppController
 
 
 			if ($this->Expense->save($data)) {
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../expenses'));
 			}
 		}
@@ -2896,7 +2897,7 @@ class PagesController extends AppController
 					$this->Product->saveField('quantity', $stock);
 				}
 				$this->Saleproduct->save($datac);
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../sales'));
 			}
 		}
@@ -3055,7 +3056,7 @@ class PagesController extends AppController
 				}
 				
 				$this->Saleproduct->save($datac);
-				sleep(3);
+				sleep(1);
 				$this->redirect(array('action' => '../sales'));
 			}
 		}
@@ -3098,7 +3099,7 @@ class PagesController extends AppController
 			}
 
 			if ($this->User->save($data)) {
-				sleep(5);
+				sleep(1);
 				$this->redirect(array('action' => '../'));
 			} 
 		}
@@ -3112,8 +3113,8 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$ch = curl_init();
-		$token = "EAAZAeI4i9EJ8BOwPXWyIBLkuOHIpMAU0IwFqIeiX0aEr5zBQoNergR3WbZBk2zauyM7GosrbshJj6ZAytEktxTh88sJCRVZA9NY5RnDl4PM0yMdNXLh0ZBoL6YjT67EnbNBzunF2ew0kcOh2XvZCD7EDoZArydz9QHIrGnRhGLsOjoD6Vip08DrLZBZAnnaT1MnDHilqMkNYAG0VgZAeZCYVjWpyosqQdIZD";
-		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/136967432828861/messages");
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
 		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 			'Content-Type:application/json',
 			'Authorization: Bearer ' . $token
@@ -3136,9 +3137,9 @@ class PagesController extends AppController
 		
 		foreach( $registers as $register ){
 			
-			//$phone = $register["User"]["phone"];
+			$phone = $register["User"]["phone"];
 			$info = base64_encode($register["User"]["id"]);
-			$phone = '83481182';
+			//$phone = '83481182';
 			$data = array();
 			$data = array(
 				'messaging_product' => 'whatsapp',
@@ -3207,7 +3208,7 @@ class PagesController extends AppController
 			}
 
 			if ($this->User->save($data)) {
-				sleep(5);
+				sleep(1);
 				$this->redirect(array('action' => '../'));
 			} 
 		}
@@ -3238,5 +3239,12 @@ class PagesController extends AppController
 			'recursive' => 2
 		));
 		$this->set('sellers', $sellers);
+	}
+
+	public function whatsapp(){
+		$this->layout = 'whatsapp';
+		$this->autoRender = false;
+		header('Location: https://api.whatsapp.com/send?phone=50684937440');
+		
 	}
 }
