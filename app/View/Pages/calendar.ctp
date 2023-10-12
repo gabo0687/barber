@@ -171,6 +171,7 @@
 <div class="pull-left form-inline">
 <div class="btn-group">
 <a class="btn btn-success" href="home">Regresar a página principal</a>
+<a class="btn btn-info" onclick="openCita()" style="color:white">Crear Cita</a>
 </div></br></br>
 <div class="btn-group">
 <?php foreach( $barbers as $barber ){ ?>
@@ -309,6 +310,9 @@
 </html>
 <script>
 
+function openCita(){
+  $('#calendarModalAdd').modal("show");
+}
 
 function selectClient(client){
           $('#reservation_client').val(client);

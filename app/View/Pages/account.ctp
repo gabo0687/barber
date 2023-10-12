@@ -131,7 +131,7 @@
                   if(response == 'no'){
                     $('#blocker-error').show();
                   }else{
-                   // $("#block_form").submit();
+                    $("#block_form").submit();
                   }
                   
                 }

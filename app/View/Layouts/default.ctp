@@ -151,9 +151,9 @@ date_default_timezone_set('America/Costa_Rica');
                 <?php 
                  
                  if(!empty($_SESSION['User'])){ ?>
-                 <div class="username"><a class="user-edit" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>|  <a href="logout" class="logout">Logout</a> </div>
+                 <div class="username"><a class="user-edit btn btn-info" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>  <a href="logout" class="logout btn btn-danger">Logout</a> </div>
                  <?php }else{ ?>
-                 <div class="username"> <!--<a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | --><a data-bs-toggle="modal" data-bs-target="#login">Login</a> </div>
+                 <div class="username"> <!--<a data-bs-toggle="modal" data-bs-target="#signup">Registrarse</a> | --><a data-bs-toggle="modal" data-bs-target="#login" class="btn btn-success">Login</a> </div>
                  <?php } ?>
              </div>
          <?php if(!empty($_SESSION['User'])){ ?>
@@ -398,6 +398,11 @@ date_default_timezone_set('America/Costa_Rica');
 </body>
 </html>
 <script>
+ 
+  var loginNumber = localStorage.getItem("username");
+  var loginPass   = localStorage.getItem("password");
+  $('#loginNumber').val(loginNumber);
+  $('#loginPass').val(loginPass);
         
         const inputField = document.getElementById("client");
         const clearButton = document.getElementById("clear-button");
@@ -783,6 +788,7 @@ $.ajax({
 function login(){
   var logNumber = $('#loginNumber').val();
   var logPassword = $('#loginPass').val();
+  
   $.ajax({
               type: 'POST', 
               url: 'Pages/loginUser', 
@@ -796,6 +802,8 @@ function login(){
               },
               success: function(userExist) {
                 if(userExist == 1 ){
+                  localStorage.setItem("username", logNumber);
+                  localStorage.setItem("password", logPassword);
                   $('#login-error').hide();
                   window.location.reload();
                 } else{
