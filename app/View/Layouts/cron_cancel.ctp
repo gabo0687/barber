@@ -41,7 +41,7 @@ date_default_timezone_set('America/Costa_Rica');
           <div class="sliderbox" id="sliderbox">
               <div class="slide"></div>            
           </div>         
-          <a class="logo"></a>
+          <!--<a class="logo"></a>-->
           
          
          <form class="header-search">   

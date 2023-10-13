@@ -2047,11 +2047,8 @@ class PagesController extends AppController
 		$newTime = strtotime ( '+30 minute' , $newTime ) ; 
 		$newTime = date ( 'H:i' , $newTime);
 		$newTime = $newTime.':00';
+		 
 		
-		$reservations = Cache::read('notification_confirm');
-		
-		if( !$reservations ){
-
 		$reservations = $this->Activereservation->find('all',array('fields'=>array('Activereservation.id_reservation,Activereservation.reservation_date,Activereservation.reservation_time,User.id,User.name,User.phone'),
 															 'conditions'=>array(
 																				'Activereservation.reservation_time'=>$newTime,'Activereservation.reservation_date'=>$currentDate,'Activereservation.reservation_status <>'=>2
@@ -2065,10 +2062,8 @@ class PagesController extends AppController
 																			'conditions'=> array('User.id = Activereservation.reservation_user'),
 																		)
 																	)));
-		Cache::write('notification_confirm', $reservations);															
-																	
-		}
-
+		
+ 
 		foreach( $reservations as $reservation ){
 			$data = array();
 			$nombre = $reservation['User']['name'];
@@ -2141,6 +2136,7 @@ class PagesController extends AppController
 			$server_output = curl_exec($ch);
 			var_dump($server_output);
 			curl_close($ch);
+			
 		}
 		
 		
@@ -2348,9 +2344,9 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		$currenDate = date('Y-m-d');
 		$currenDate = "'" . $currenDate . "'";
-		$this->Remove->query('delete from removes where reservation_date <=' . $currenDate);
-		$this->Notification->query('delete from notifications where reservation_date <=' . $currenDate);
-		$this->Activereservation->query('delete from activereservations where reservation_date <=' . $currenDate);
+		$this->Remove->query('delete from removes where reservation_date <' . $currenDate);
+		$this->Notification->query('delete from notifications where reservation_date <' . $currenDate);
+		$this->Activereservation->query('delete from activereservations where reservation_date <' . $currenDate);
 		Cache::clear();
 	}
 

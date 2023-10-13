@@ -79,7 +79,7 @@ if( isset($user['User']) ){ ?>
                         <p>Estatus de la cita : <?php if( $reservation['Reservation']['reservation_status'] == 0 ){ echo 'Sin Confirmar'; }if( $reservation['Reservation']['reservation_status'] == 1 ){ echo 'Confirmada'; }if( $reservation['Reservation']['reservation_status'] == 2 ){ echo '<b class="blink_me">CANCELADA</b>'; }?></p>
                         <p>Precio : ₡<?php echo number_format($reservation['Reservation']['reservation_price']);?></p>
 
-                    <?php if( $reservation['Reservation']['reservation_status'] == 1 && $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  && $reservation['Reservation']['reservation_status'] != 2 ){?>    
+                    <?php if( $user['User']['type'] == 1 && $reservation['Reservation']['reservation_status'] == 1 && $reservation['Reservation']['payment_type'] != '2' && $reservation['Reservation']['payment_type'] != '1'  && $reservation['Reservation']['reservation_status'] != 2 ){?>    
                     <p>Selecciona el tipo de pago:</p>  
                     <select onchange="tipopago(this.value)" class="form-control" name="tipoPago<?php echo $reservation['Reservation']['id'];?>" id="tipoPago<?php echo $reservation['Reservation']['id'];?>">
                     <option value="1">SINPE Movil</option>
