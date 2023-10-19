@@ -166,7 +166,7 @@
 
 	Router::connect('/whatsapp', array('controller' => 'pages', 'action' => 'whatsapp'));
 	
-	
+	Router::connect('/reservation_price', array('controller' => 'pages', 'action' => 'reservation_price'));
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */

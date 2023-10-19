@@ -2322,10 +2322,23 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		$this->Reservation->id = $_POST['reservation_id'];
 		$data['Reservation']['reservation_barber'] = $_POST['barberId'];
+		$data['Reservation']['reservation_price'] = $_POST['appointmentPrice'];
+		if( $_POST['appointmentServiceSelect'] != 'null' ){
+			$data['Reservation']['reservation_service'] = $_POST['appointmentServiceSelect'];
+		}
+		if( $_POST['reservationTimeEdit'] != '0' ){
+			$data['Reservation']['reservation_time'] = $_POST['reservationTimeEdit'];
+		}
 		if ($this->Reservation->save($data)) {
 			$activeReservationid = $this->getActiveReservationId($_POST['reservation_id']);
 			$this->Activereservation->id = $activeReservationid;
 			$data['Activereservation']['reservation_barber'] = $_POST['barberId'];
+			if( $_POST['appointmentServiceSelect'] != 'null' ){
+				$data['Activereservation']['reservation_service'] = $_POST['appointmentServiceSelect'];
+			}
+			if( $_POST['reservationTimeEdit'] != '0' ){
+				$data['Activereservation']['reservation_time'] = $_POST['reservationTimeEdit'];
+			}
 			$this->Activereservation->save($data);
 			Cache::clear();
 			echo 1;
@@ -3175,6 +3188,8 @@ class PagesController extends AppController
 			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
 			$server_output = curl_exec($ch);
+			$this->Sendpassword->query('update sendpasswords set status_password = 2 where id_user =' . $register["User"]["id"]);
+			
 			var_dump($server_output);
 			curl_close($ch);
 			
@@ -3242,5 +3257,18 @@ class PagesController extends AppController
 		$this->autoRender = false;
 		header('Location: https://api.whatsapp.com/send?phone=50684937440');
 		
+	}
+
+	public function reservation_price(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+
+		$appointmentServiceSelect = explode(',',$_POST['appointmentServiceSelect']);
+		$reservationPrices = $this->Service->find('all',array('conditions'=>array('Service.id'=>$appointmentServiceSelect)));
+		$totalPrice = 0;
+		foreach( $reservationPrices as $reservationPrice ){
+			$totalPrice = $totalPrice + $reservationPrice["Service"]["price"]; 
+		}
+		echo $totalPrice;
 	}
 }

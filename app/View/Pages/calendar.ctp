@@ -197,9 +197,52 @@
                     <option value="<?php echo $barber['User']['id'];?>"><?php echo $barber['User']['name'];?></option>
                     <?php } ?>
                 </select></br>
-                <span class="description"><b>Servicio:</b> </span><span id="appointmentService"></span></br>
+                <span class="description"><b>Servicio:</b> </span>
+                <span id="appointmentService"></span>
+                  </br>
+                <select class="form-control" onchange="reservationPrice()" name="appointmentServiceSelect" id="appointmentServiceSelect" multiple>
+                  <?php foreach( $services as $service ){ ?>
+                  <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                  <?php } ?>
+                </select>
+              </br>
                 <span class="description"><b>Hora:</b> </span><span id="appointmentTime"></span></br>
-                <span class="description"><b>Precio:</b> </span><span id="appointmentPrice"></span></br>
+                <select name="reservationTimeEdit" id="reservationTimeEdit" class="form-control" >
+                <option value="0">Seleccione una nueva hora</option>      
+                <?php 
+                  $time_hour = 7;
+                  $time_minute = '00';
+                  for($i=0; $i <= 60; $i++){ 
+                    if( $time_minute != 60 ){
+                      if( $time_hour < 10 ){
+                        if(strlen($time_hour) == 2){
+                          $time_hour = substr($time_hour, 1);
+                        }
+                        $time_hour = '0'.$time_hour;
+                      }
+                    ?>    
+                  
+                    <option value="<?php echo $time_hour.':'.$time_minute.':00';?>"><?php echo $time_hour.':'.$time_minute;?></option>      
+                  <?php
+                    }
+                  if( $time_minute == 45 ){
+                    $time_minute = '00';
+                    $time_hour = $time_hour + 1;
+                  }else{
+                    if( $time_minute == 60 ){
+                      $time_minute = '00';
+                    $time_hour = $time_hour + 1;
+                    }else{
+                      if( $time_minute == 00 || $time_minute == 15|| $time_minute == 30 ){
+                        $time_minute = $time_minute +15;
+                      }
+                    }  
+                  } 
+                  } 
+                  ?>  
+                </select>
+                </br>
+                <span class="description"><b>Precio:</b> </span><input class="form-control" id="appointmentPrice" name="appointmentPrice" type="text"></br>
                 <input type="hidden" name="appointmentId" id="appointmentId" value="0"/>
                 </div>
                 <div class="modal-footer">
@@ -482,11 +525,13 @@ var calendar = '';
     if (response) {
       
       var barberId = $('#barberoAppointment').val();
-
+      var appointmentPrice = $('#appointmentPrice').val();
+      var appointmentServiceSelect = $('#appointmentServiceSelect').val();
+      var reservationTimeEdit = $('#reservationTimeEdit').val();
       $.ajax({
         type: 'POST', 
         url: 'edit_appointment', 
-        data: 'reservation_id='+appointmentId+'&barberId='+barberId,
+        data: 'reservation_id='+appointmentId+'&barberId='+barberId+'&appointmentPrice='+appointmentPrice+'&appointmentServiceSelect='+appointmentServiceSelect+'&reservationTimeEdit='+reservationTimeEdit,
         beforeSend:function() {  
           //$('#loadingNotification').addClass('spinner-border');
         },
@@ -519,11 +564,11 @@ var calendar = '';
             },
             success: function(reservation) {
               const res = JSON.parse(reservation);
-              
+          
               $('#appointmentService').html(res[0]);
               $('#barberoAppointment').val(res.Barber.id);
               $('#appointmentTime').html(res.Reservation.reservation_time);
-              $('#appointmentPrice').html(res.Reservation.reservation_price);
+              $('#appointmentPrice').val(res.Reservation.reservation_price);
             }
 	        });
   }
@@ -643,4 +688,24 @@ function saveAppointment(){
   $('#errorCliente').show();
  }
 }
+
+function reservationPrice(){
+var appointmentServiceSelect = $('#appointmentServiceSelect').val();
+$.ajax({
+            type: 'POST', 
+            url: 'reservation_price', 
+            data: 'appointmentServiceSelect='+appointmentServiceSelect,
+            beforeSend:function() {  
+              //$('#loadingNotification').addClass('spinner-border');
+            },
+            error: function(){
+                
+            alert('No hay internet');    
+            },
+            success: function(reservationPrice) {
+              $('#appointmentPrice').val(reservationPrice);
+            }
+          });
+}
+
   </script>
