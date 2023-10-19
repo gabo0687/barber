@@ -1,3 +1,17 @@
+<style>
+div.scroll
+{
+background-color:white;
+width:95%;
+height:200PX;
+FLOAT: center;
+margin-left: 5%;
+padding: 1%;
+overflow:scroll;
+}
+
+
+</style>
 <section class="event-detail">
     <article id="profile">
       <h2>Mi Perfil</h2>
@@ -60,8 +74,8 @@
           <h4 class="offset-sm-3">Bloquear reservaciones</h4>
 
           <?php if( !empty($blockReservations) ){ ?>
-          <div class="list-group" id="myList" role="tablist">
-          <h5>Bloqueos Activos</h5>
+          <div class="list-group scroll" id="myList" role="tablist" >
+          <h5 style="color:black">Bloqueos Activos</h5>
           <?php foreach( $blockReservations as $blockReservation ){ ?>
             <a class="list-group-item list-group-item-action block-list" data-toggle="list" id="block_<?php echo $blockReservation['id']; ?>" onclick="removeBlock(<?php echo $blockReservation['id']; ?>)" role="tab" style="color:black;"><?php echo $blockReservation['Barbero'];?> - (<?php echo $blockReservation['schedule'];?>) <?php echo $blockReservation['blockDate'];?>     <li class="nav-link fa fa-trash" ></li></a>
             
@@ -84,8 +98,12 @@
               </select> 
             </div>
             <div class="form-group">
-              <label for="accountInputEmail">Fecha bloquear</label>
+              <label for="accountInputEmail">Fecha bloquear Inicia</label>
               <input type="date" class="form-control" id="date_block" name="date_block" aria-describedby="emailHelp">
+            </div>
+            <div class="form-group">
+              <label for="accountInputEmail">Fecha bloquear Finaliza</label>
+              <input type="date" class="form-control" id="date_block_ends" name="date_block_ends" aria-describedby="emailHelp">
             </div>
             <div class="form-group">
               <label for="accountInputPassword">Horario bloquear</label>
@@ -114,12 +132,13 @@
       
       var barber_block= $('#barber_block').val();
       var date_block= $('#date_block').val();
+      var date_block_ends = $('#date_block_ends').val();
       var schedule_block= $('#schedule_block').val();
       $('#blocker-error').hide();
       $.ajax({
                 type: 'POST', 
                 url: 'block_check', 
-                data: 'barber_block='+barber_block+'&date_block='+date_block+'&schedule_block='+schedule_block,
+                data: 'barber_block='+barber_block+'&date_block='+date_block+'&schedule_block='+schedule_block+'&date_block_ends='+date_block_ends,
                 beforeSend:function() {  
                 //$('#loadingNotification').addClass('spinner-border');
                 },

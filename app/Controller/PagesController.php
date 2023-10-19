@@ -154,15 +154,47 @@ class PagesController extends AppController
 		if ($this->request->is('post')) {
 
 			$blockDate = $_POST['date_block'];
+			$blockDateEnds = $_POST['date_block_ends'];
 			if ($_POST['date_block'] == '') {
 				$blockDate = date('Y-m-d');
 			}
+			if ($_POST['date_block_ends'] == '') {
+				$blockDateEnds = date('Y-m-d');
+			}
+			if( strtotime($blockDate) == strtotime($blockDateEnds) ){
+				$this->Block->create();
+				$data['Block']['barber_id'] = $_POST['barber_block'];
+				$data['Block']['block_date'] = $blockDate;
+				$data['Block']['block_schedule'] = $_POST['schedule_block'];
+				$data['Block']['creation_date'] = date('Y-m-d');
+				$this->Block->save($data);
+			}else{
+				$dateDifference = abs(strtotime($blockDateEnds) - strtotime($blockDate));
+			// will output 2 days
+			$years  = floor($dateDifference / (365 * 60 * 60 * 24));
+			$months = floor(($dateDifference - $years * 365 * 60 * 60 * 24) / (30 * 60 * 60 * 24));
+			$days   = floor(($dateDifference - $years * 365 * 60 * 60 * 24 - $months * 30 * 60 * 60 *24) / (60 * 60 * 24));
 			$this->Block->create();
-			$data['Block']['barber_id'] = $_POST['barber_block'];
-			$data['Block']['block_date'] = $blockDate;
-			$data['Block']['block_schedule'] = $_POST['schedule_block'];
-			$data['Block']['creation_date'] = date('Y-m-d');
-			$this->Block->save($data);
+				$data['Block']['barber_id'] = $_POST['barber_block'];
+				$data['Block']['block_date'] = $blockDate;
+				$data['Block']['block_schedule'] = $_POST['schedule_block'];
+				$data['Block']['creation_date'] = date('Y-m-d');
+				$this->Block->save($data);
+				
+			for($j=0; $j < $days; $j++){
+
+				$blockDate =  date("Y-m-d",strtotime($blockDate."+ 1 days"));
+				$this->Block->create();
+				$data['Block']['barber_id'] = $_POST['barber_block'];
+				$data['Block']['block_date'] = $blockDate;
+				$data['Block']['block_schedule'] = $_POST['schedule_block'];
+				$data['Block']['creation_date'] = date('Y-m-d');
+				$this->Block->save($data);
+				
+			}		
+				
+			}
+			
 		}
 
 		$barbers = $this->User->find(
@@ -524,7 +556,9 @@ class PagesController extends AppController
 					break;
 			}
 		}
-		$blockReservations = $this->moveReservation($barberResponse,$current_time,$reservationDate,$reservationService);
+		if($blockReservations == ''){
+			$blockReservations = $this->moveReservation($barberResponse,$current_time,$reservationDate,$reservationService);
+		}
 		return $blockReservations;
 	}
 
