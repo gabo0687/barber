@@ -8,9 +8,19 @@
    $messageResponse = '';
    $mensajeTipo = '';
    $i=0;
+   $months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+   $days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
    foreach($messages as $message){
-
+    $date = $message['Message']['creation_date'];
+    $day  = date('w', strtotime($date));
+    $year = date('Y', strtotime($date));
+    $month = date('m', strtotime($date));
+    $currentDay = date('d', strtotime($date));
+    $dayOfTheWeek = $days[$day];
+    $timeDate = date('H:i:s',strtotime($message['Message']['creation_date']));
+    
     $messageWhatsapp = json_decode($message['Message']['message']);
+    
     
 //echo '<pre>';
   //  var_dump($messageWhatsapp);
@@ -19,7 +29,7 @@
     $messageResponse = '';
     if( isset($messageWhatsapp->entry[0]->changes[0]->value->messages[0]->text) ){
         $messageText = $messageWhatsapp->entry[0]->changes[0]->value->messages[0]->text->body;
-        $messageResponse = $messageText;
+        $messageResponse = '<b>'.$messageText.'</b>';
     }else{
         if( isset($messageWhatsapp->entry[0]->changes[0]->value->messages[0]->image)){
             $idMedia = $messageWhatsapp->entry[0]->changes[0]->value->messages[0]->image->id;
@@ -72,7 +82,9 @@
                 $file = fopen('media/'.$messages[0][0]['User']['id'].'_tmpFile'.$i.'.jpg', 'wb');
                 fwrite($file, $response);
                 fclose($file);
-                $messageResponse = '<img src="media/'.$messages[0][0]['User']['id'].'_tmpFile'.$i.'.jpg" width="150" height="100" alt="embedded folder icon"/>';
+                $comprobante = 'media/'.$messages[0][0]['User']['id'].'_tmpFile'.$i.'.jpg';
+                $comprobante = "'".$comprobante."'";
+                $messageResponse = '<img  onclick="comprobanteShow('.$comprobante.');" src="media/'.$messages[0][0]['User']['id'].'_tmpFile'.$i.'.jpg"  width="150" height="100" data-bs-toggle="modal" data-bs-target="#modalAmpliarImagenChat"/>';
             }else{
                 if( $mensajeTipo == 'audio' ){
                     $file = fopen('media/'.$messages[0][0]['User']['id'].'_tmpFile'.$i.'.ogg', 'wb');
@@ -92,6 +104,7 @@
     <div class="message userwhatsapp">
         
         <p><?php echo $messageResponse;?></p>
+        <p><small><?php echo $currentDay.' de '.$months[(int)$month-1].' '.$year.' </br>'.date("h:i A",strtotime($timeDate))?></small></p>
         
     </div>
     <style>
@@ -107,6 +120,8 @@
     <!-- Add more messages here -->
 </div>
 <div class="message-input">
-    <input type="text" placeholder="Escribe un mensaje...">
+    <input type="text" placeholder="Escribe un mensaje..." disabled>
     <button>Enviar</button>
 </div>
+
+

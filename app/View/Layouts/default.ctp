@@ -153,10 +153,12 @@ date_default_timezone_set('America/Costa_Rica');
                  if(!empty($_SESSION['User'])){
                   $_SESSION['Messagenotification'] = $Messagenotification; ?>
                  <div class="username">
+                 <?php if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '4' ){ ?> 
                  <a class="btn btn-secondary" href="whatsapp">
                   <i class="fa fa-bell"></i>
                   <span class="badge"><?php echo $Messagenotification;?></span>
                  </a> 
+                 <?php } ?>
                  <a class="user-edit btn btn-info" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>  <a href="logout" class="logout btn btn-danger">Logout</a> </div>
                  <?php }else{ ?>
                  <div class="username"><a data-bs-toggle="modal" data-bs-target="#signup" class="btn btn-warning" style="color:white">Registrarse</a> <a data-bs-toggle="modal" data-bs-target="#login" class="btn btn-success">Login</a> </div>

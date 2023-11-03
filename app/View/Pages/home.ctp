@@ -159,7 +159,7 @@ if( isset($user['User']) ){ ?>
             </div>
             <div class="modal-body">
                <img src="" id="modal_image" style="width: auto; height: auto;" ></br></br>
-               <a href="" id="modal_image_download" target="_blank" style="color:black"><h3><u>Descargar Comprobante</u></h3></a>
+               <a href="" id="modal_image_download" target="_blank" style="color:black"><h3><u>Descargar</u></h3></a>
             </div>
             
                             

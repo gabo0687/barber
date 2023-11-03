@@ -424,6 +424,7 @@ date_default_timezone_set('America/Costa_Rica');
           
             if (permission === 'granted') {
               let text;
+              <?php if($_SESSION['newNotification'] == 1){ ?>
                 if (confirm("Tienes un mensaje nuevo!") == true) {
                   text = "You pressed OK!";
                   
@@ -431,6 +432,7 @@ date_default_timezone_set('America/Costa_Rica');
                   text = "You canceled!";
                 }
                 alert(text);
+                <?php } ?>
             } else {
                 console.log('Permission denied for notifications');
             }
@@ -439,7 +441,7 @@ date_default_timezone_set('America/Costa_Rica');
         console.log('This browser does not support desktop notifications.');
     }
 }
-//setTimeout(triggerNotification, 5000);
+setTimeout(triggerNotification, 5000);
               
             
     

@@ -78,6 +78,7 @@ class WhatsappController extends AppController
     public function index(){
         $this->checksession(6);
         $this->layout = 'message';
+        
         $_SESSION['newNotification'] = 0;
         $users = $this->User->find('all',array('fields'=>array('User.id','User.name','User.phone'),'order'=>array('User.name ASC')));
         $user_reponse = array();

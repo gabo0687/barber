@@ -219,6 +219,31 @@ body {
         </div>
 
 </div>
+
+
+<div class="modal fade" id="modalAmpliarImagenChat" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+   <div class="modal-dialog">
+      <div class="modal-content">
+         <form role="form" method="post" enctype="multipart/form-data">
+         <!--=====================================
+                       CABEZA DEL MODAL
+         ======================================-->
+            <div class="modal-header" style="background:#3c8dbc; color:white">
+            <h4 class="modal-title">Comprobante</h4>
+            </div>
+            <div class="modal-body">
+               <img src="" id="modal_image" style="width: auto; height: auto;" ></br></br>
+               <a href="" id="modal_image_download" target="_blank" style="color:black"><h3><u>Descargar Comprobante</u></h3></a>
+            </div>
+            
+                            
+            <div class="modal-footer">
+               <button type="button" class="btn btn-default" onclick="closeComprobante()" data-dismiss="modal">Cerrar</button>
+            </div>
+         </div>
+      </div>
+   </div>
+
 </body>
 </html>
 <style>
@@ -240,7 +265,14 @@ body {
 </style>
 
 <script>
+function closeComprobante(){
+        $('#modalAmpliarImagenChat').modal("hide");
+    }
 
+function comprobanteShow(comprobante_imagen){
+    $('#modal_image').attr('src',comprobante_imagen);
+    $('#modal_image_download').attr('href','download?path='+comprobante_imagen);
+}
 
 const searchInpute = document.getElementById("whatsappSearch");
         const itemList = document.getElementById("chat_list");
