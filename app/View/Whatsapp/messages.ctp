@@ -10,6 +10,8 @@
    $i=0;
    $months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
    $days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+   
+   $to = $messages[0][0]['User']['phone'];
    foreach($messages as $message){
     $date = $message['Message']['creation_date'];
     $day  = date('w', strtotime($date));
@@ -18,13 +20,11 @@
     $currentDay = date('d', strtotime($date));
     $dayOfTheWeek = $days[$day];
     $timeDate = date('H:i:s',strtotime($message['Message']['creation_date']));
-    
+    if( $message['Message']['message_type'] == 0 ){
     $messageWhatsapp = json_decode($message['Message']['message']);
     
     
-//echo '<pre>';
-  //  var_dump($messageWhatsapp);
-
+    
     $messageText = '';
     $messageResponse = '';
     if( isset($messageWhatsapp->entry[0]->changes[0]->value->messages[0]->text) ){
@@ -111,17 +111,61 @@
         audio { width: 150px; }
     </style>    
     <?php } 
-     $i++;
-     } ?>
-    <!--<div class="message contact">
-        <p>I'm good, thanks for asking!</p>
-    </div>-->
+     $i++; 
+    }
+     if( $message['Message']['message_type'] == 1 ){?>
+     <div class="message contact">
+        <p><?php echo '<b>'.$message['Message']['message'].'</b>';?></p>
+        <p><small><?php echo $currentDay.' de '.$months[(int)$month-1].' '.$year.' </br>'.date("h:i A",strtotime($timeDate))?></small></p>
+    </div>
+     <?php
+     } 
+     }
+      ?>
+    
    
     <!-- Add more messages here -->
 </div>
 <div class="message-input">
-    <input type="text" placeholder="Escribe un mensaje..." disabled>
-    <button>Enviar</button>
+    <input type="text" id="messageWhatsapp" id="messageWhatsapp" placeholder="Escribe un mensaje..." >
+    <button onclick="sentMessage(<?php echo $to;?>)">Enviar</button>
 </div>
+
+
+<script>
+    setInterval(function () {
+        console.log(<?php echo '506'.$to;?>);
+        loadMessagesChat(<?php echo '506'.$to;?>);
+    }, 20000);
+    
+    
+function sentMessage(to){
+
+    var from = "50672795112";
+    var text = $('#messageWhatsapp').val();
+    if( text != '' ){
+        $.ajax({
+        type: 'POST',
+        url: 'send_whatsapp',
+        data: 'from=' + from + '&to='+ to + '&text='+ text,
+        beforeSend: function() {
+
+        },
+        error: function() {
+
+            alert('No hay internet');
+        },
+        success: function(response) {
+            $('#messageWhatsapp').val('');
+            $('.messages').append(response);
+            $('.messages').scrollTop(1000);
+        }
+
+        }); 
+    }
+
+}
+</script>
+
 
 

@@ -327,6 +327,24 @@ const searchInpute = document.getElementById("whatsappSearch");
 
       });
     }
+    function loadMessagesChat(phone){
+        $.ajax({
+        type: 'POST',
+        url: 'messages',
+        data: 'from=' + phone,
+        beforeSend: function() {
+                    },
+        error: function() {
+          alert('No hay internet');
+        },
+        success: function(response) {
+            $('.chat-window').html(response);
+            window.scrollTo(0, document.body.scrollHeight);
+            $('.messages').scrollTop(1000);
+        }
+
+      });
+    }
 
     function backpage(){
         window.location.reload();

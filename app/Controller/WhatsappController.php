@@ -78,7 +78,7 @@ class WhatsappController extends AppController
     public function index(){
         $this->checksession(6);
         $this->layout = 'message';
-        
+
         $_SESSION['newNotification'] = 0;
         $users = $this->User->find('all',array('fields'=>array('User.id','User.name','User.phone'),'order'=>array('User.name ASC')));
         $user_reponse = array();
@@ -94,7 +94,7 @@ class WhatsappController extends AppController
     public function messages(){
         $this->layout = 'ajax';
         $from = $_POST['from'];
-        $messages = $this->Message->find('all',array('fields'=>array('Message.from','Message.creation_date','Message.message'),'conditions'=>array('Message.from'=>$from),
+        $messages = $this->Message->find('all',array('fields'=>array('Message.from','Message.creation_date','Message.message','Message.message_type'),'conditions'=>array('Message.from'=>$from),
         'order'=> array('Message.id ASC')));
         $response = array();
         
@@ -157,5 +157,62 @@ class WhatsappController extends AppController
             exit;
         }*/
         
+    }
+    
+    public function send_whatsapp(){
+        $this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v18.0/135413842992132/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+        $from = $_POST['from'];
+        $to   = '506'.$_POST['to'];
+        $text = $_POST['text'];
+        $data = array(
+            'messaging_product' => 'whatsapp',
+            'recipient_type' => 'individual',
+				'to' => $to,
+				'type' => 'text',
+				'text' => array(
+                    'preview_url' => false,
+                    'body' => $text
+                )
+        );
+        $data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			//var_dump($server_output);
+			curl_close($ch);
+            $response = '';
+            $this->Message->create();
+            $data['Message']['message'] = $text;
+            $data['Message']['from'] = $to;
+            $data['Message']['new_message'] = 0;
+            $data['Message']['message_type'] = 1;
+            $data['Message']['creation_date'] = date('Y-m-d H:i:s');
+            if($this->Message->save($data)){
+                $months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+                $days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+                $date = date('Y-m-d H:i:s');
+                $day  = date('w', strtotime($date));
+                $year = date('Y', strtotime($date));
+                $month = date('m', strtotime($date));
+                $currentDay = date('d', strtotime($date));
+                $dayOfTheWeek = $days[$day];
+                $timeDate = date('H:i:s',strtotime(date('Y-m-d H:i:s')));
+                $response = '<div class="message contact"><p><b>'.$text.'</b></p>';
+                $response.= '<p><small>'.$currentDay.' de '.$months[(int)$month-1].' '.$year.' </br>'.date("h:i A",strtotime($timeDate)).'</small></p></div>';
+                
+            } 
+
+            return $response;
     }
 }
