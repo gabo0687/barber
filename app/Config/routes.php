@@ -63,6 +63,8 @@
 
 	
 	
+	Router::connect('/account_confirm/*', array('controller' => 'pages', 'action' => 'account_confirm'));
+	Router::connect('/notification_confirmaccount', array('controller' => 'pages', 'action' => 'notification_confirmaccount'));
 
 
 
@@ -164,9 +166,14 @@
 	Router::connect('/notification_register', array('controller' => 'pages', 'action' => 'notification_register'));
 	Router::connect('/save_password', array('controller' => 'pages', 'action' => 'save_password'));
 
-	Router::connect('/whatsapp', array('controller' => 'pages', 'action' => 'whatsapp'));
 	
 	Router::connect('/reservation_price', array('controller' => 'pages', 'action' => 'reservation_price'));
+	Router::connect('/lunch', array('controller' => 'pages', 'action' => 'lunch'));
+	Router::connect('/save_lunch', array('controller' => 'pages', 'action' => 'save_lunch'));
+	Router::connect('/whatsapp', array('controller' => 'whatsapp', 'action' => 'index'));
+	Router::connect('/webhook', array('controller' => 'whatsapp', 'action' => 'webhook'));
+	Router::connect('/messages', array('controller' => 'whatsapp', 'action' => 'messages'));
+	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.
  */

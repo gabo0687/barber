@@ -32,7 +32,7 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
-    public $uses = array('Service','Duration','User', 'Block');
+    public $uses = array('Service','Duration','User', 'Block','Messagenotification');
 
     function beforeFilter() {
      
@@ -62,6 +62,8 @@ class AppController extends Controller {
                 $clients = $this->User->find('all',array('conditions'=>array('User.type'=>3)));
                 $this->set('clients',$clients);
                 
+                $notificationsCount = $this->Messagenotification->find('first');
+                $this->set('Messagenotification',$notificationsCount['Messagenotification']['notification']);
                 
             }
             

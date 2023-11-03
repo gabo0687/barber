@@ -37,7 +37,7 @@ class PagesController extends AppController
 	 *
 	 * @var array
 	 */
-	public $uses = array('Service', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense', 'Role', 'Sendpassword');
+	public $uses = array('Lunch','Service','Account', 'Duration', 'User', 'Reservation', 'Notification', 'Customer', 'Remove', 'Activereservation', 'Workhour', 'Product', 'Sale', 'Saleproduct', 'Expense', 'Role', 'Sendpassword');
 	public $components = array('Encrypt');
 	/**
 	 * Displays a view
@@ -404,31 +404,137 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		if ($this->request->is('post')) {
+			
 			//Initialize
 			$nombreUsuario = $_POST['signupName'];
 			$celular = $_POST['signupPhone'];
 			//$userEmail = $_POST['signupEmail'];
 			$userContrasena = $_POST['signupPassword1'];
 			//Save user
-			$this->User->create();
-			$data['User']['name'] = $nombreUsuario;
-			$data['User']['phone'] = $celular;
-			//$data['User']['email'] = trim($userEmail);
-			$data['User']['type'] = 3;
-			$data['User']['status'] = 1;
-			$data['User']['creation_date'] = date('Y-m-d H:i:s');
-			if ($userContrasena != '') {
-				$pass = $this->Encrypt->encrypt($userContrasena);
-				$data['User']['password'] = $pass;
+			$checkNumber = $_POST['checkNumber'];
+			if( $checkNumber == 'true' ){
+				$user = $this->User->find('first',array('fields'=>array('User.id','User.type'),'conditions'=>array('User.phone'=>trim($celular))));
+			    $this->User->id = $user['User']['id'];
+				$data['User']['type'] = $user['User']['type'];
+			}else{
+				$this->User->create();
+				$data['User']['status'] = 0;
+				$data['User']['type'] = 3;
 			}
-
+			
+			$data['User']['name'] = $nombreUsuario;
+			$data['User']['phone'] = trim($celular);
+			
+			$data['User']['creation_date'] = date('Y-m-d H:i:s');
+			
 			if ($this->User->save($data)) {
+				if( $checkNumber == 'true' ){
+					$userId = $user['User']['id'];
+				}else{
+					$userId = $this->User->getLastInsertID();
+				}	
+
+				$this->Account->create();
+				$dataAccount['Account']['id_user'] = $userId;
+				$dataAccount['Account']['status_activation'] = 0;
+				$pass = $this->Encrypt->encrypt($userContrasena);
+				$dataAccount['Account']['password'] = $pass;
+				$dataAccount['Account']['creation_date'] = date('Y-m-d');
+				$this->Account->save($dataAccount);
+				$this->notification_confirmaccount();
 				sleep(10);
 				$this->redirect(array('action' => '../'));
 			} else {
 				$this->redirect(array('action' => '../error'));
 			}
 		}
+	}
+
+	public function account_confirm($info){
+		$this->layout = 'cron_confirm_account';
+		$userId = base64_decode($info);
+		$confirm = 0;
+		$account = $this->Account->find('first',array('conditions'=>array('Account.id_user'=>$userId)));
+		$this->User->id = $userId;
+		$data['User']['status'] = 1;
+		$data['User']['password'] = $account['Account']['password'];
+		if($this->User->save($data)){
+			$this->Account->query('delete from accounts where id_user=' . $userId);
+			$confirm = 1;
+		}
+	   $this->set('confirm',$confirm);
+	}
+/**
+	 * Run every minute
+	 * cachecron
+	 */
+	public function notification_confirmaccount(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+		$accountActivation = $this->Account->find('all',array('conditions'=>array('Account.status_activation'=>0)));
+ 
+		foreach( $accountActivation as $account ){
+			$phoneUser = $this->User->find('first',array('fields'=>array('User.phone'),'conditions'=>array('User.id'=>$account['Account']['id_user']))); 
+			$phone = $phoneUser['User']['phone'];
+			$data = array();
+			$userId = $account['Account']['id_user'];
+			$info = base64_encode($userId);
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'confirmation',
+						 'language' => array( 'code' => 'es_MX'),
+						 'components' =>array(
+												array(
+													'type'=>'header',
+													'parameters'=> array(
+														array(
+															'type'=> 'image',
+															'image' => array(
+																'link' => 'https://eibyz.com/app/webroot/barberiaimg/alofresa.jpeg'
+															)
+														)
+													)
+												),
+												array(
+													'type'=>'body',
+													),
+													array(
+														'type'=>'button',
+														"index"=> "0",
+														"sub_type"=> "url",
+															'parameters'=> array(
+															 array(
+																'type'=>'text',
+																'text'=> $info
+															)
+														)
+													)
+											)
+						)
+			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			//var_dump($server_output);
+			curl_close($ch);
+			
+		}
+		
+		
 	}
 
 	public function getPhone()
@@ -556,10 +662,28 @@ class PagesController extends AppController
 					break;
 			}
 		}
+		//$blockReservations = $this->checkLunch( $current_time, $barberResponse, $reservationDate );
 		if($blockReservations == ''){
 			$blockReservations = $this->moveReservation($barberResponse,$current_time,$reservationDate,$reservationService);
 		}
 		return $blockReservations;
+	}
+
+
+	public function checkLunch( $current_time, $barberResponse , $reservationDate){
+		$today = $reservationDate;
+		$lunches = $this->Lunch->find('first',array('conditions'=>array('Lunch.date_creation'=>$today,'Lunch.user_id'=>$barberResponse['User']['id'])));
+		if( !empty($lunches) ){
+			$timeStart = date('H:i:s',strtotime($lunches["Lunch"]['date_start']));
+			
+			$timeEnd = date('H:i:s',strtotime($lunches['Lunch']['date_end']));
+			$restarStartTime = date('H:i:s',strtotime('-20 minute', strtotime($timeStart)));
+			$restarEndTime = date('H:i:s',strtotime('-30 minute', strtotime($timeEnd)));
+			if( strtotime($restarStartTime) <= strtotime($current_time.':00') && strtotime($restarEndTime) >= strtotime($current_time.':00') ){
+				return 'lunch';
+			}
+		}
+		
 	}
 
 	public function moveReservation($barber,$current_time,$reservationDate,$service){
@@ -1221,7 +1345,7 @@ class PagesController extends AppController
 			$barberName = $reservation['Barber']['name'];
 			$barbercolor = $reservation['Barber']['color'];
 
-			$event = array('groupId' => $reservationId, 'id' => $service, 'title' => $userName, 'start' => $reservationdate . 'T' . $reservationtimeStart, 'end' => $reservationdate . 'T' . $reservationtimeEnd, 'color' => $barbercolor);
+			$event = array('groupId' => $reservationId, 'id' => $service, 'title' => $userName.' ('.$barberName.')', 'start' => $reservationdate . 'T' . $reservationtimeStart, 'end' => $reservationdate . 'T' . $reservationtimeEnd, 'color' => $barbercolor);
 			array_push($events, $event);
 		}
 		$events = mb_convert_encoding($events, 'UTF-8', 'UTF-8');
@@ -1266,7 +1390,7 @@ class PagesController extends AppController
 			$barberName = $reservation['Barber']['name'];
 			$barbercolor = $reservation['Barber']['color'];
 
-			$event = array('groupId' => $reservationId, 'id' => $service, 'title' => $userName, 'start' => $reservationdate . 'T' . $reservationtimeStart, 'end' => $reservationdate . 'T' . $reservationtimeEnd, 'color' => $barbercolor);
+			$event = array('groupId' => $reservationId, 'id' => $service, 'title' => $userName.' ('.$barberName.')', 'start' => $reservationdate . 'T' . $reservationtimeStart, 'end' => $reservationdate . 'T' . $reservationtimeEnd, 'color' => $barbercolor);
 			array_push($events, $event);
 		}
 
@@ -1901,8 +2025,11 @@ class PagesController extends AppController
 				$months = array('Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
 				$currentDay = date('d', strtotime($date));
 				$dayOfTheWeek = $days[$day];
-
-
+				$whatsapp = '';
+				if( $user['User']['type'] == 1 ){
+					$whatsapp = '<a taget="_blank" href="https://api.whatsapp.com/send?phone=506'.$reservation['User']['phone'].'&text=Hola '.$reservation['User']['name'].'!
+					💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confirm/'.base64_encode($reservation['Reservation']['id'].'|'.$reservation['Reservation']['reservation_time'].'|'.$reservation['Reservation']['reservation_date']).'"><img width="30px" src="img/layout/whatsapp.png" alt=""></a>';
+				}
 				$response .= '<form name="subirArchivo" action="" method="post" enctype="multipart/form-data">
                 			  <li>
                     		  <span class="event-list-item-content">
@@ -1911,8 +2038,7 @@ class PagesController extends AppController
                         	  <p>Fecha : '.$dayOfTheWeek.' '.$currentDay.' de '.$months[(int)$month-1].' del '.$year.'</p>
                         	  <p>Hora : '.date("h:i A", strtotime($reservation['Reservation']['reservation_time'])).'</p>
                         	  <p>Barbero : '.$reservation['Barber']['name'].'</p>
-                        	  <p>Cliente : '.$reservation['User']['name'].'<a taget="_blank" href="https://api.whatsapp.com/send?phone=506'.$reservation['User']['phone'].'&text=Hola '.$reservation['User']['name'].'!
-							   💈 Tienes cita para corte a las '.$reservation['Reservation']['reservation_time'].' , por favor confirmar en el siguiente link: https://alofresa.com/confirm/'.base64_encode($reservation['Reservation']['id'].'|'.$reservation['Reservation']['reservation_time'].'|'.$reservation['Reservation']['reservation_date']).'"><img width="30px" src="img/layout/whatsapp.png" alt=""></a></p>
+                        	  <p>Cliente : '.$reservation['User']['name'].$whatsapp.'</p>
                         	  <p>Tiempo : '.$reservation[0].' minutos</p>
                         	  <p>Estatus de la cita :';
 							  if( $reservation['Reservation']['reservation_status'] == 0 ){ $response .= 'Sin Confirmar'; }
@@ -2717,6 +2843,7 @@ class PagesController extends AppController
 	   }
 	   $this->set('confirm',$confirm);
 	}
+	
   /**
    * $log = $this->Model->getDataSource()->getLog(false, false);
    * echo '<pre>';
@@ -3304,5 +3431,40 @@ class PagesController extends AppController
 			$totalPrice = $totalPrice + $reservationPrice["Service"]["price"]; 
 		}
 		echo $totalPrice;
+	}
+
+	public function lunch(){
+		$users = $this->User->find('all',array('conditions'=>array('User.type'=>2)));
+		$this->set('users',$users);
+
+		$today = date('Y-m-d');
+		$lunches = $this->Lunch->find('all',array('fields'=>array('User.name','Lunch.id','Lunch.date_start','Lunch.date_end'),'conditions'=>array('Lunch.date_creation'=>$today),'joins' =>
+		array(
+			array(
+			   'table' => 'users',
+			   'alias' => 'User',
+			   'type' => 'inner',
+			   'foreignKey' => false,
+			   'conditions'=> array('User.id = Lunch.user_id')
+			)
+			)
+		   ));
+		$this->set('lunches',$lunches);
+	}
+
+	public function save_lunch(){
+		$this->layout = 'ajax';
+		$this->autoRender = false;
+		$userId = $_POST['userId'];
+		$time = $_POST['time'];
+		$todayTime = date('Y-m-d H:i:s');
+		$end_date =  date("Y-m-d H:i:s",strtotime($todayTime." + ".$time." minute"));
+		
+		$this->Lunch->create();
+		$data['Lunch']['user_id'] = $userId;
+		$data['Lunch']['date_start'] = $todayTime;
+		$data['Lunch']['date_end'] = $end_date;
+		$data['Lunch']['date_creation'] = date('Y-m-d');
+		$this->Lunch->save($data);
 	}
 }

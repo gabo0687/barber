@@ -150,14 +150,15 @@ date_default_timezone_set('America/Costa_Rica');
 
                 <?php 
                  
-                 if(!empty($_SESSION['User'])){
-                  $_SESSION['Messagenotification'] = $Messagenotification; ?>
+                 if(!empty($_SESSION['User'])){ 
+                  $_SESSION['Messagenotification'] = $Messagenotification;
+                  ?>
                  <div class="username">
                  <a class="btn btn-secondary" href="whatsapp">
                   <i class="fa fa-bell"></i>
                   <span class="badge"><?php echo $Messagenotification;?></span>
-                 </a> 
-                 <a class="user-edit btn btn-info" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>  <a href="logout" class="logout btn btn-danger">Logout</a> </div>
+                 </a>
+                  <a class="user-edit btn btn-info" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>  <a href="logout" class="logout btn btn-danger">Logout</a> </div>
                  <?php }else{ ?>
                  <div class="username"><a data-bs-toggle="modal" data-bs-target="#signup" class="btn btn-warning" style="color:white">Registrarse</a> <a data-bs-toggle="modal" data-bs-target="#login" class="btn btn-success">Login</a> </div>
                  <?php } ?>
@@ -406,9 +407,49 @@ date_default_timezone_set('America/Costa_Rica');
     </div>
   </div>
 </div>
+
+<audio id="audioWhatsapp" controls style="display:none">
+<source type="audio/mp3" src="codigos/beep-beep.mp3">
+</audio>
+<button id="notification" onclick="whatsappMessage()">Audio</button>
+
 </body>
 </html>
 <script>
+    
+        function triggerNotification() {
+         
+          if ('Notification' in window) {
+        Notification.requestPermission().then(function(permission) {
+          
+            if (permission === 'granted') {
+              let text;
+                if (confirm("Tienes un mensaje nuevo!") == true) {
+                  text = "You pressed OK!";
+                  
+                } else {
+                  text = "You canceled!";
+                }
+                alert(text);
+            } else {
+                console.log('Permission denied for notifications');
+            }
+        });
+    } else {
+        console.log('This browser does not support desktop notifications.');
+    }
+}
+//setTimeout(triggerNotification, 5000);
+              
+            
+    
+
+
+
+  function whatsappMessage(){
+    var audio = document.getElementById("audioWhatsapp");
+      audio.play();
+  }
  
   var loginNumber = localStorage.getItem("username");
   var loginPass   = localStorage.getItem("password");

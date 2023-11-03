@@ -201,8 +201,12 @@
                 <span id="appointmentService"></span>
                   </br>
                 <select class="form-control" onchange="reservationPrice()" name="appointmentServiceSelect" id="appointmentServiceSelect" multiple>
-                  <?php foreach( $services as $service ){ ?>
-                  <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                  <?php foreach( $services as $service ){
+                    if( $service['Service']['gender'] == 1 ){ $serviceType = 'Hombre'; }
+                    if( $service['Service']['gender'] == 2 ){ $serviceType = 'Mujer'; }
+                    if( $service['Service']['gender'] == 3 ){ $serviceType = 'Unisex'; }
+                    ?>
+                  <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'].' / <b>'.$serviceType.'</b>';?></option>
                   <?php } ?>
                 </select>
               </br>
@@ -265,6 +269,8 @@
                 <div class="dropdown">
                   
                   <span style="color:red; display:none;" id="errorCliente">Debes seleccionar a un cliente de la lista</span>
+                  <span style="color:red; display:none;" id="errorService">Debes seleccionar al menos un servicio</span>
+                  
                   <span style="color:red; display:none;" id="errorClienteFormat">Debes seleccionar a un cliente de la lista</span>
                   <span style="color:red; display:none;" id="alreadytaken">Este horario ya fue reservado por alguien más, por favor cambie su elección</span>
                   
@@ -290,8 +296,12 @@
                 <span class="description"><b>Servicio:</b></span>
                 <span class="tax">
                   <select class="form-control" name="services" id="services" multiple>
-                    <?php foreach( $services as $service ){ ?>
-                    <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'];?></option>
+                    <?php foreach( $services as $service ){
+                       if( $service['Service']['gender'] == 1 ){ $serviceType = 'Hombre'; }
+                       if( $service['Service']['gender'] == 2 ){ $serviceType = 'Mujer'; }
+                       if( $service['Service']['gender'] == 3 ){ $serviceType = 'Unisex'; }
+                        ?>
+                    <option value="<?php echo $service['Service']['id'];?>"><?php echo $service['Service']['service_name'].' / <b>'.$serviceType.'</b>';?></option>
                     <?php } ?>
                   </select>
                 </span> 
@@ -641,7 +651,10 @@ function saveAppointment(){
  var reservationService = $('#services').val();
  var reservationTime    = $('#reservationTime').val();
  var reservation_client = $('#reservation_client').val();
-
+ if( reservationService == null ){
+  $('#errorService').show();
+ }else{
+  $('#errorService').hide();
  if( reservation_client != '' ){
   var client = $('#reservation_client').val();
   var splitClient = client.split('-');
@@ -687,6 +700,7 @@ function saveAppointment(){
  }else{
   $('#errorCliente').show();
  }
+}
 }
 
 function reservationPrice(){

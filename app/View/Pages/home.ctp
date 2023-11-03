@@ -70,7 +70,7 @@ if( isset($user['User']) ){ ?>
                         <p>Hora : <?php echo date("h:i A", strtotime($reservation['Reservation']['reservation_time']));?></p>
                         <p>Barbero : <?php echo $reservation['Barber']['name'];?></p>
                         <p>Cliente : <?php echo $reservation['User']['name'];?> 
-                        <?php if(  $user['User']['type'] == 1  ||  $user['User']['type'] == 2  ){ ?>
+                        <?php if(  $user['User']['type'] == 1  ){ ?>
                         <a taget="_blank" href="https://api.whatsapp.com/send?phone=506<?php echo $reservation['User']['phone'];?>&text=Hola <?php echo $reservation['User']['name'];?>!
 
 💈 Tienes cita para corte a las <?php echo $reservation['Reservation']['reservation_time'];?> , por favor confirmar en el siguiente link: https://alofresa.com/confirm/<?php echo base64_encode($reservation['Reservation']['id'].'|'.$reservation['Reservation']['reservation_time'].'|'.$reservation['Reservation']['reservation_date']);?>"><img width='30px' src="img/layout/whatsapp.png" alt=""></a></p>
