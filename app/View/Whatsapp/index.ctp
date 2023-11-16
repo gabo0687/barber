@@ -199,7 +199,7 @@ body {
                         $top = '';
                         if( $user[0] > 0 ){ $top = 'top'; } ?>    
                  <span>       
-                <div class="chat <?php echo $top;?>" onclick="loadMessages(<?php echo '506'.$user['User']['phone'];?>)">
+                <div class="chat <?php echo $top;?>" onclick="loadMessages(<?php echo $user['User']['phone'];?>)">
                     <img src="img/layout/logo.jpg" alt="User 1">
                     <div class="chat-info">
                         <h3 style="color:black"><?php echo $user['User']['name'];?></h3>
@@ -217,7 +217,12 @@ body {
         <div class="chat-window" style="display:none">
          
         </div>
-
+        <div  class="message-input" style="display:none">
+                <input type="text" id="messageWhatsapp" id="messageWhatsapp" placeholder="Escribe un mensaje..." >
+                <button id="buttonSent" onclick="">Enviar</button>
+                <button id="buttonStart" onclick="">Iniciar</button>
+        </div>
+       
 </div>
 
 
@@ -303,10 +308,11 @@ const searchInpute = document.getElementById("whatsappSearch");
 
 <script>
     function loadMessages(phone){
+        var newPhone = '506'+phone;
         $.ajax({
         type: 'POST',
         url: 'messages',
-        data: 'from=' + phone,
+        data: 'from=' + newPhone,
         beforeSend: function() {
             $('.chat-list').hide();
             $('.search').hide();
@@ -318,8 +324,11 @@ const searchInpute = document.getElementById("whatsappSearch");
         success: function(response) {
             $('.jumpLoagin').hide();
             $('.chat-container').css('background-image', "url(https://alofresa.com/img/layout/backGround.png)");
+            $('#buttonSent').attr('onclick','sentMessage('+phone+')');
+            $('#buttonStart').attr('onclick','startMessage('+phone+')');
             
             $('.chat-window').show();
+            $('.message-input').show();
             $('.chat-window').html(response);
             window.scrollTo(0, document.body.scrollHeight);
             $('.messages').scrollTop(1000);
@@ -341,6 +350,26 @@ const searchInpute = document.getElementById("whatsappSearch");
             $('.chat-window').html(response);
             window.scrollTo(0, document.body.scrollHeight);
             $('.messages').scrollTop(1000);
+            limitTimeMessages(phone);
+        }
+
+      });
+    }
+
+    function limitTimeMessages(phone){
+        $.ajax({
+        type: 'POST',
+        url: 'limitTimeMessages',
+        data: 'phone=' + phone,
+        beforeSend: function() {
+                    },
+        error: function() {
+          alert('No hay internet');
+        },
+        success: function(response) {
+            $('#buttonStart').hide();
+            $('#buttonSent').show();
+            $('#messageWhatsapp').show();
         }
 
       });

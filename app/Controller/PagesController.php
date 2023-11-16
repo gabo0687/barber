@@ -155,6 +155,12 @@ class PagesController extends AppController
 
 			$blockDate = $_POST['date_block'];
 			$blockDateEnds = $_POST['date_block_ends'];
+
+			if( $_POST['schedule_block'] == 4 ){
+				$data['Block']['time_starts'] = $_POST['block_time_start'];
+				$data['Block']['time_ends'] = $_POST['block_time_ends'];
+			}
+
 			if ($_POST['date_block'] == '') {
 				$blockDate = date('Y-m-d');
 			}
@@ -237,8 +243,11 @@ class PagesController extends AppController
 				$currentDay = date('d', strtotime($date));
 				$dayOfTheWeek = $days[$day];
 				$dayFormat = $dayOfTheWeek . ' ' . $currentDay . ' de ' . $months[(int)$month - 1] . ' del ' . $year;
-				$schedules = ['Todo el día', 'Mañana', 'Tarde', 'Noche'];
+				$schedules = ['Todo el día', 'Mañana', 'Tarde', 'Noche','Personalizado'];
 				$schedule = $schedules[$blockReservation['Block']['block_schedule']];
+				if( $blockReservation['Block']['block_schedule'] == 4 ){
+					$schedule .= ' de '.$blockReservation['Block']['time_starts'].' a '.$blockReservation['Block']['time_ends'];
+ 				}
 				if ($blockReservation['Block']['barber_id'] == $barber['User']['id']) {
 					$blocks = array('id' => $blockReservation['Block']['id'], 'BarberoId' => $barber["User"]["id"], 'Barbero' => $barber["User"]["name"], 'schedule' => $schedule, 'blockDate' => $dayFormat);
 					break;
@@ -455,13 +464,19 @@ class PagesController extends AppController
 		$userId = base64_decode($info);
 		$confirm = 0;
 		$account = $this->Account->find('first',array('conditions'=>array('Account.id_user'=>$userId)));
-		$this->User->id = $userId;
-		$data['User']['status'] = 1;
-		$data['User']['password'] = $account['Account']['password'];
-		if($this->User->save($data)){
-			$this->Account->query('delete from accounts where id_user=' . $userId);
+		if($account['Account']['password'] != ''){
+			$this->User->id = $userId;
+			$data['User']['status'] = 1;
+			$data['User']['password'] = $account['Account']['password'];
+			if($this->User->save($data)){
+				$this->Account->query('delete from accounts where id_user=' . $userId);
+				$confirm = 1;
+			}
+			
+		}else{
 			$confirm = 1;
 		}
+		
 	   $this->set('confirm',$confirm);
 	}
 /**
@@ -640,7 +655,7 @@ class PagesController extends AppController
 					/**
 					 * Block Barber Shop morning
 					 */
-					if ($current_time <= '11:59:59') {
+					if (strtotime($current_time) <= strtotime('11:59:59')) {
 						$blockReservations = 1;
 					}
 					break;
@@ -648,7 +663,7 @@ class PagesController extends AppController
 					/**
 					 * Block Barber Shop afternoon
 					 */
-					if ($current_time > '11:59:59' && $current_time <= '17:59:59') {
+					if (strtotime($current_time) > strtotime('11:59:59') && strtotime($current_time) <= strtotime('17:59:59')) {
 						$blockReservations = 2;
 					}
 					break;
@@ -656,10 +671,18 @@ class PagesController extends AppController
 					/**
 					 * Block Barber Shop night
 					 */
-					if ($current_time > '17:59:59' && $current_time <= '23:59:59') {
+					if (strtotime($current_time) > strtotime('17:59:59') && strtotime($current_time) <= strtotime('23:59:59')) {
 						$blockReservations = 3;
 					}
 					break;
+				case 4:
+					/**
+					 * Block Barber Shop night
+					 */
+					if (strtotime($current_time) >= strtotime($block['Block']['time_starts']) && strtotime($current_time) < strtotime($block['Block']['time_ends'])) {
+						$blockReservations = 4;
+					}
+					break;	
 			}
 		}
 		//$blockReservations = $this->checkLunch( $current_time, $barberResponse, $reservationDate );
@@ -806,7 +829,7 @@ class PagesController extends AppController
 					/**
 					 * Block Barber Shop morning
 					 */
-					if ($current_time <= '11:59:59') {
+					if (strtotime($current_time) <= strtotime('11:59:59')) {
 						$blockReservations = 1;
 					}
 					break;
@@ -814,7 +837,7 @@ class PagesController extends AppController
 					/**
 					 * Block Barber Shop afternoon
 					 */
-					if ($current_time > '11:59:59' && $current_time <= '17:59:59') {
+					if (strtotime($current_time) > strtotime('11:59:59') && strtotime($current_time) <= strtotime('17:59:59')) {
 						$blockReservations = 2;
 					}
 					break;
@@ -822,10 +845,19 @@ class PagesController extends AppController
 					/**
 					 * Block Barber Shop night
 					 */
-					if ($current_time > '17:59:59' && $current_time <= '23:59:59') {
+					if (strtotime($current_time) > strtotime('17:59:59') && strtotime($current_time) <= strtotime('23:59:59')) {
 						$blockReservations = 3;
 					}
 					break;
+				case 4:
+					/**
+					 * Block Barber Shop night
+					 */
+					if (strtotime($current_time) >= strtotime($block['Block']['time_starts']) && strtotime($current_time) < strtotime($block['Block']['time_ends'])) {
+						
+						$blockReservations = 4;
+					}
+					break;	
 			}
 		}
 
@@ -925,7 +957,7 @@ class PagesController extends AppController
 			}
 
 			$blockAllDay = $this->checkBlockAllDay($reservationDate, $timeList);
-			$checkDayPass = $this->checkBlockDayPass($reservationDate, $timeList);
+			$checkDayPass = $this->checkBlockDayPass($reservationDate, $timeList); //No muestra horas conforma va pasando el día
 			$checkTimeOpen = $this->checkOpenClose($reservationDate, $timeList);
 			if ($blockAllDay == '' && $checkDayPass == '' && $checkTimeOpen == '') {
 				
@@ -1191,7 +1223,7 @@ class PagesController extends AppController
 		 */
 		$reservationTaken = $this->reservationTaken($_POST['reservation_barber'], $_POST['reservation_time'], $reservationDate);
 		if ($validateReservation && $reservationTaken) {
-
+			if( $reservationUser != '0' ){
 			$this->Reservation->create();
 			$data['Reservation']['reservation_date'] = $reservationDate;
 			$data['Reservation']['reservation_time'] = $_POST['reservation_time'];
@@ -1223,6 +1255,7 @@ class PagesController extends AppController
 			} else {
 				echo 0;
 			}
+		}
 		} else {
 			if (!$reservationTaken) {
 				echo 4;
@@ -1258,6 +1291,7 @@ class PagesController extends AppController
 		if( $reservationTaken ){
 		$serviceId = $_POST['reservation_service'];	
 		$reservationPrice = $this->getServicePrice( $serviceId );	
+		if( $_POST['reservation_client'] != '0' ){
 		$this->Reservation->create();
 		$data['Reservation']['reservation_date'] = $reservationDate;
 		$data['Reservation']['reservation_time'] = $_POST['reservation_time'];
@@ -1286,9 +1320,11 @@ class PagesController extends AppController
 				$this->Customer->save($data);
 				Cache::clear();
 				echo 1;
+				
 			} else {
 				echo 0;
 			}
+		}
 		} else {
 			Cache::clear();
 			echo 4;
@@ -1947,19 +1983,34 @@ class PagesController extends AppController
 		$this->layout = 'ajax';
 		$this->autoRender = false;
 		$user = $_SESSION['User'];
+		if( $_POST['reservacion_admin'] == 0 ){
+			$conditions['Reservation.reservation_status'] = 0;
+		}else{
+			if( $_POST['reservacion_admin'] == 1 ){
+				$conditions['Reservation.reservation_status'] = 1;
+				$conditions['Reservation.payment_type'] = 0;
+			}else{
+				if( $_POST['reservacion_admin'] == 2 ){
+					$conditions['Reservation.reservation_status'] = 2;
+				}		
+			}		
+		}
 		if ($_POST['barber'] != 0) {
 			$conditions['Reservation.reservation_barber'] = $_POST['barber'];
 		}
 		if ($user['User']['type'] == 2) {
 			$conditions['Reservation.reservation_barber'] = $user['User']['id'];
 		}
-		if ($_POST['filter_date'] != '') {
+		if ( $_POST['filter_date'] != '' && $_POST['reservacion_admin'] == '' ) {
 			$conditions['Reservation.reservation_date'] = $_POST['filter_date'];
 		} else {
+			if ( $_POST['reservacion_admin'] == '' ) {
 			$conditions['Reservation.reservation_date >='] = date('Y-m-d');
+			}
 		}
-
-		$conditions['Reservation.reservation_status <>'] = 2;
+		if( $_POST['reservacion_admin'] != 2 ){
+			$conditions['Reservation.reservation_status <>'] = 2;
+		}
 		$reservations = array();
 		$reservations = $this->Reservation->find('all', array(
 			'fields' =>
@@ -2598,6 +2649,13 @@ class PagesController extends AppController
 					$conditions['Reservation.reservation_time >='] = date('H:i:s', strtotime('18:00:00'));
 					$conditions['Reservation.reservation_time <='] = date('H:i:s', strtotime('23:59:59'));
 					break;
+				case 4:
+					$starts = $_POST['block_time_start'];
+					$ends = $_POST['block_time_ends'];
+
+					$conditions['Reservation.reservation_time >='] = date('H:i:s', strtotime($starts));
+					$conditions['Reservation.reservation_time <'] = date('H:i:s', strtotime($ends));
+					break;	
 			}
 		
 
@@ -2777,6 +2835,7 @@ class PagesController extends AppController
 	}
 
 	public function schedule($info){
+		$this->redirect(array('action' => 'home'));
 		$this->layout = 'cron';
 		$user = base64_decode($info);
 		$infoUser = $user.'-'.'user';

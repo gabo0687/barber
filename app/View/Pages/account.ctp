@@ -107,13 +107,79 @@ overflow:scroll;
             </div>
             <div class="form-group">
               <label for="accountInputPassword">Horario bloquear</label>
-              <select class="form-control" name="schedule_block" id="schedule_block">
+              <select class="form-control" onchange="changeSchedule()" name="schedule_block" id="schedule_block">
                 <option value="0">Todo el día</option>
                 <option value="1">Mañana</option>
                 <option value="2">Tarde</option>
                 <option value="3">Noche</option>
+                <option value="4">Personalizado</option>
               </select> 
             </div>
+            
+          <div id="customSchedule" style="display:none">  
+            <span class="description">Escoger hora inicio:</span>
+            <span class="tax">
+            <select class="form-control" name="block_time_start" id="block_time_start"> 
+            <?php 
+            $time_hour = 7;
+            $time_minute = '00';
+            for($i=0; $i <= 30; $i++){ 
+              if( $time_minute != 60 ){
+              ?>    
+            
+              <option value="<?php echo $time_hour.':'.$time_minute;?>"><?php echo date("h:i A", strtotime($time_hour.':'.$time_minute));?></option>      
+            <?php
+              }
+            if( $time_minute == 30 ){
+              $time_minute = '00';
+              $time_hour = $time_hour + 1;
+            }else{
+              if( $time_minute == 60 ){
+                $time_minute = '00';
+              $time_hour = $time_hour + 1;
+              }else{
+                if( $time_minute == 00 || $time_minute == 30 ){
+                  $time_minute = $time_minute +30;
+                }
+              }  
+            } 
+            } 
+            ?>  
+              </select>
+            </span>  
+
+            <span class="description">Escoger hora finaliza:</span>
+            <span class="tax">
+            <select class="form-control" name="block_time_ends" id="block_time_ends"> 
+            <?php 
+            $time_hour = 7;
+            $time_minute = '00';
+            for($i=0; $i <= 30; $i++){ 
+              if( $time_minute != 60 ){
+              ?>    
+            
+              <option value="<?php echo $time_hour.':'.$time_minute;?>"><?php echo date("h:i A", strtotime($time_hour.':'.$time_minute));?></option>      
+            <?php
+              }
+            if( $time_minute == 30 ){
+              $time_minute = '00';
+              $time_hour = $time_hour + 1;
+            }else{
+              if( $time_minute == 60 ){
+                $time_minute = '00';
+              $time_hour = $time_hour + 1;
+              }else{
+                if( $time_minute == 00 || $time_minute == 30 ){
+                  $time_minute = $time_minute +30;
+                }
+              }  
+            } 
+            } 
+            ?>  
+              </select>
+            </span>
+          </div>
+
             <div class="form-group" id="blocker-error" style="display:none;">
               <label for="signupName" ><img src="img/icon-error.png" height="20px" width="20px" /><span id="errorPassText"><b>No se puede ejecutar el bloqueo el usuario(s) tiene citas activas en ese horario</b></span></label>
             </div>
@@ -127,18 +193,32 @@ overflow:scroll;
     </article>
   </section>
   <script>
+    function changeSchedule(){
+      if ( $('#schedule_block').val() == 4 ) {
+        $('#customSchedule').show();
+      }else{
+        $('#customSchedule').hide();
+      }
+
+      
+    }
     
     function blockCheck(){
       
-      var barber_block= $('#barber_block').val();
-      var date_block= $('#date_block').val();
+      var barber_block = $('#barber_block').val();
+      var date_block = $('#date_block').val();
       var date_block_ends = $('#date_block_ends').val();
-      var schedule_block= $('#schedule_block').val();
+      var schedule_block = $('#schedule_block').val();
+
+      
+      var block_time_start = $('#block_time_start').val();
+      var block_time_ends = $('#block_time_ends').val();
+
       $('#blocker-error').hide();
       $.ajax({
                 type: 'POST', 
                 url: 'block_check', 
-                data: 'barber_block='+barber_block+'&date_block='+date_block+'&schedule_block='+schedule_block+'&date_block_ends='+date_block_ends,
+                data: 'barber_block='+barber_block+'&date_block='+date_block+'&schedule_block='+schedule_block+'&date_block_ends='+date_block_ends+'&block_time_start='+block_time_start+'&block_time_ends='+block_time_ends,
                 beforeSend:function() {  
                 //$('#loadingNotification').addClass('spinner-border');
                 },

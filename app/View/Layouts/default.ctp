@@ -156,7 +156,7 @@ date_default_timezone_set('America/Costa_Rica');
                  <?php if( $_SESSION['User']['User']['type'] == '1' || $_SESSION['User']['User']['type'] == '4' ){ ?> 
                  <a class="btn btn-secondary" href="whatsapp">
                   <i class="fa fa-bell"></i>
-                  <span class="badge"><?php echo $Messagenotification;?></span>
+                  <span class="badge"><?php echo $currentMessages;?></span>
                  </a> 
                  <?php } ?>
                  <a class="user-edit btn btn-info" href="account"><?php echo $_SESSION['User']['User']['name'];?>  <img src="img/layout/gear.svg"></a>  <a href="logout" class="logout btn btn-danger">Logout</a> </div>

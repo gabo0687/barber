@@ -20,7 +20,10 @@
     $currentDay = date('d', strtotime($date));
     $dayOfTheWeek = $days[$day];
     $timeDate = date('H:i:s',strtotime($message['Message']['creation_date']));
-    if( $message['Message']['message_type'] == 0 ){
+
+    $isJson = json_decode($message['Message']['message']);
+    
+    if( $isJson != NULL ){
     $messageWhatsapp = json_decode($message['Message']['message']);
     
     
@@ -113,7 +116,7 @@
     <?php } 
      $i++; 
     }
-     if( $message['Message']['message_type'] == 1 ){?>
+     if(  $isJson == NULL  ){?>
      <div class="message contact">
         <p><?php echo '<b>'.$message['Message']['message'].'</b>';?></p>
         <p><small><?php echo $currentDay.' de '.$months[(int)$month-1].' '.$year.' </br>'.date("h:i A",strtotime($timeDate))?></small></p>
@@ -126,18 +129,15 @@
    
     <!-- Add more messages here -->
 </div>
-<div class="message-input">
-    <input type="text" id="messageWhatsapp" id="messageWhatsapp" placeholder="Escribe un mensaje..." >
-    <button onclick="sentMessage(<?php echo $to;?>)">Enviar</button>
-</div>
+
 
 
 <script>
-    setInterval(function () {
-        console.log(<?php echo '506'.$to;?>);
-        loadMessagesChat(<?php echo '506'.$to;?>);
-    }, 20000);
-    
+   /* setInterval(function () {
+        console.log(<?php //echo '506'.$to;?>);
+        loadMessagesChat(<?php //echo '506'.$to;?>);
+    }, 15000);
+    */
     
 function sentMessage(to){
 
@@ -164,6 +164,34 @@ function sentMessage(to){
         }); 
     }
 
+}
+
+function startMessage(to){
+    var from = "50672795112";
+    var text = "Hola buenas, como estas?";
+    if( text != '' ){
+        $.ajax({
+        type: 'POST',
+        url: 'start_whatsapp',
+        data: 'from=' + from + '&to='+ to + '&text='+ text,
+        beforeSend: function() {
+
+        },
+        error: function() {
+
+            alert('No hay internet');
+        },
+        success: function(response) {
+            $('#messageWhatsapp').val('');
+            $('.messages').append(response);
+            $('.messages').scrollTop(1000);
+            $('#buttonStart').hide();
+            $('#buttonSent').show();
+            $('#messageWhatsapp').show();
+        }
+
+        }); 
+    }
 }
 </script>
 

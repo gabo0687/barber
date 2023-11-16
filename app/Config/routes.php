@@ -174,6 +174,8 @@
 	Router::connect('/webhook', array('controller' => 'whatsapp', 'action' => 'webhook'));
 	Router::connect('/messages', array('controller' => 'whatsapp', 'action' => 'messages'));
 	Router::connect('/send_whatsapp', array('controller' => 'whatsapp', 'action' => 'send_whatsapp'));
+	Router::connect('/start_whatsapp', array('controller' => 'whatsapp', 'action' => 'start_whatsapp'));
+	Router::connect('/limitTimeMessages', array('controller' => 'whatsapp', 'action' => 'limitTimeMessages'));
 	
 /**
  * ...and connect the rest of 'Pages' controller's URLs.

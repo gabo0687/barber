@@ -94,7 +94,7 @@ class WhatsappController extends AppController
     public function messages(){
         $this->layout = 'ajax';
         $from = $_POST['from'];
-        $messages = $this->Message->find('all',array('fields'=>array('Message.from','Message.creation_date','Message.message','Message.message_type'),'conditions'=>array('Message.from'=>$from),
+        $messages = $this->Message->find('all',array('fields'=>array('Message.from','Message.creation_date','Message.message','Message.tipomensaje'),'conditions'=>array('Message.from'=>$from),
         'order'=> array('Message.id ASC')));
         $response = array();
         
@@ -135,6 +135,7 @@ class WhatsappController extends AppController
         $data['Message']['message'] = $requestDataJson;
         $data['Message']['from'] = $from;
         $data['Message']['new_message'] = 1;
+        $data['Message']['tipomensaje'] = '0';
         $data['Message']['creation_date'] = date('Y-m-d H:i:s');
         $this->Message->save($data);
 
@@ -193,12 +194,12 @@ class WhatsappController extends AppController
 			curl_close($ch);
             $response = '';
             $this->Message->create();
-            $data['Message']['message'] = $text;
-            $data['Message']['from'] = $to;
-            $data['Message']['new_message'] = 0;
-            $data['Message']['message_type'] = 1;
-            $data['Message']['creation_date'] = date('Y-m-d H:i:s');
-            if($this->Message->save($data)){
+            $dataN['Message']['message'] = $text;
+            $dataN['Message']['from'] = $to;
+            $dataN['Message']['new_message'] = 0;
+            $dataN['Message']['tipomensaje'] = '1';
+            $dataN['Message']['creation_date'] = date('Y-m-d H:i:s');
+            if($this->Message->save($dataN)){
                 $months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
                 $days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
                 $date = date('Y-m-d H:i:s');
@@ -214,5 +215,66 @@ class WhatsappController extends AppController
             } 
 
             return $response;
+    }
+
+    function start_whatsapp(){
+        $this->layout = 'ajax';
+		$this->autoRender = false;
+        $ch = curl_init();
+		$token = "EAAZAeI4i9EJ8BO9vX1BDTVNhAuoJVvkadXCx69uzQCzZBPKxAdG0HCn1zQ9noTr8AqI1YidnQ9EU2OZCtbRZAm3fI7R45wgJPuKp5ZCNBYLAKcN6XurJ766kih47eoGexANDWZCEObdQ2EGj9xsxghxRiZCZBhdZBUeMbuAWZB7dINlaTx4bZB4rIbrB28iHpzTdqTY6OmQsp3sPCpCkTS9";
+		curl_setopt($ch, CURLOPT_URL,"https://graph.facebook.com/v17.0/135413842992132/messages");
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type:application/json',
+			'Authorization: Bearer ' . $token
+		));
+		curl_setopt($ch, CURLOPT_POST, 1);
+
+		$phone = $_POST['to'];
+			$data = array();
+			$data = array(
+				'messaging_product' => 'whatsapp',
+				'to' => '506'.$phone,
+				'type' => 'template',
+				'template' => array(
+						'name' => 'hello',
+						 'language' => array( 'code' => 'es_MX')
+						)
+			);
+			$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+			$payload = json_encode($data);
+			curl_setopt($ch, CURLOPT_POSTFIELDS,$payload);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+			$server_output = curl_exec($ch);
+			//var_dump($server_output);
+			curl_close($ch);
+			$response = '';
+            $this->Message->create();
+            $dataN['Message']['message'] = $_POST['text'];
+            $dataN['Message']['from'] = '506'.$_POST['to'];
+            $dataN['Message']['new_message'] = 0;
+            $dataN['Message']['tipomensaje'] = '5';
+            $dataN['Message']['creation_date'] = date('Y-m-d H:i:s');
+            if($this->Message->save($dataN)){
+                $months = array('Enero', 'Febrero', 'Marzo', 'Abril','Mayo','Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre');
+                $days = array('Domingo', 'Lunes', 'Martes', 'Miércoles','Jueves','Viernes', 'Sábado');
+                $date = date('Y-m-d H:i:s');
+                $day  = date('w', strtotime($date));
+                $year = date('Y', strtotime($date));
+                $month = date('m', strtotime($date));
+                $currentDay = date('d', strtotime($date));
+                $dayOfTheWeek = $days[$day];
+                $timeDate = date('H:i:s',strtotime(date('Y-m-d H:i:s')));
+                $response = '<div class="message contact"><p><b>Hola buenas, como estas?</b></p>';
+                $response.= '<p><small>'.$currentDay.' de '.$months[(int)$month-1].' '.$year.' </br>'.date("h:i A",strtotime($timeDate)).'</small></p></div>';
+                
+            } 
+
+            return $response;
+		
+    }
+
+    function limitTimeMessages(){
+        $message = $this->Message->find('first',array('conditions'=>array('Message.from'=>$_POST['phone']),'order'=>array('Message.id desc')));
+        
     }
 }

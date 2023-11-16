@@ -32,7 +32,7 @@ App::uses('Controller', 'Controller');
  */
 class AppController extends Controller {
 
-    public $uses = array('Service','Duration','User', 'Block','Messagenotification');
+    public $uses = array('Service','Duration','User', 'Block','Messagenotification','Message');
 
     function beforeFilter() {
      
@@ -65,6 +65,8 @@ class AppController extends Controller {
                 $notificationsCount = $this->Messagenotification->find('first');
                 $this->set('Messagenotification',$notificationsCount['Messagenotification']['notification']);
                 
+                $currentMessages = $this->Message->find('count',array('conditions'=>array('Message.new_message'=>1)));
+                $this->set('currentMessages',$currentMessages);
             }
             
         }

@@ -29,6 +29,13 @@ if( $user['User']['type'] == 1 || $user['User']['type'] == 4 ){ ?>
         <option value="<?php echo $users_barbero['User']['id'];?>"><?php echo $users_barbero['User']['name'];?></option>
     <?php }?>
 </select>  
+<label style="color:white">Tipo de Reservación</label>
+<select class="form-control" onchange="filterBarber()" name="reservacion_admin" id="reservacion_admin">
+    <option value="">Todas</option>
+    <option value="0">Pendientes de confirmación</option>
+    <option value="1">Pendientes de pago</option>
+    <option value="2">Canceladas</option>
+</select> 
 <?php 
 }else{
     if( $user['User']['type'] == 2 ){ ?>
@@ -237,16 +244,19 @@ function comprobanteShow(comprobante_imagen){
         }
     }
 
-    function filterBarber(barber){
+    function filterBarber(){
         var date_filter = $('#fecha_reserva_admin').val();
         var barber = $('#barbero_admin').val();
+        var barber = $('#barbero_admin').val();
+        var reservacion_admin = $('#reservacion_admin').val();
+        
         if( barber == undefined ){
             barber = 0;
         }
         $.ajax({
             type: 'POST', 
             url: 'filter_barber', 
-            data: 'barber='+barber+'&filter_date='+date_filter,
+            data: 'barber='+barber+'&filter_date='+date_filter+'&reservacion_admin='+reservacion_admin,
             beforeSend:function() {  
             //$('#loadingNotification').addClass('spinner-border');
             },
